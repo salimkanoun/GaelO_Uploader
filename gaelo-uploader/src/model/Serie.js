@@ -13,15 +13,28 @@
  */
 import dicomParser from 'dicom-parser'
 
-class Serie {
-	constructor(sriuid, srn, srd, srdesc, modlty) {
-		this.seriesInstanceUID = sriuid;
-		this.seriesNumber = srn;
-		this.seriesDate = srd;
-		this.seriesDescription = srdesc;
-		this.modality = modlty;
-		this.instances = [];
+export default class Serie {
+
+	instances = {}
+
+	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality) {
+		this.seriesInstanceUID = seriesInstanceUID;
+		this.seriesNumber = seriesNumber;
+		this.seriesDate = seriesDate;
+		this.seriesDescription = seriesDescription;
+		this.modality = modality;
 		this.warnings = {};
+	}
+
+	addInstance(instanceObject){
+		this.instances[instanceObject.SOPInstanceUID] = instanceObject
+
+	}
+
+	isExistingInstance(SOPInstanceUID){
+		let knownInstancesUID = Object.keys(this.instances)
+		return knownInstancesUID.includes(SOPInstanceUID)
+
 	}
 
 	getDate(property) {
@@ -45,7 +58,7 @@ class Serie {
 	}
 
 	getNbInstances() {
-		return this.instances.length;
+		return Object.keys(this.instances).length;
 	}
 
 	hasWarnings() {
@@ -79,12 +92,6 @@ class Serie {
 	considerWarning(name) {
 		this.warnings[name].ignore = false;
 	}
-
-	clearAllInstances() {
-		for (let inst of this.instances) {
-			inst.dicomFile.clearData();
-		}
-    }
 	
 
     toString(){
@@ -92,8 +99,6 @@ class Serie {
         + "\nModality: " + this.modality 
         + "\nSeries instance UID: " + this.seriesInstanceUID
         + "\nSeries date: " + this.seriesDate
-        + "\nSeries description: " + this.seriesDescription
-        /*+ "\nSeries instances: " + this.instances
-        + "\nSeries warnings: " + this.warnings*/)
+        + "\nSeries description: " + this.seriesDescription)
     }
 }

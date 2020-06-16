@@ -13,45 +13,10 @@
  */
 
 export default class DicomFile {
+
 	constructor(originalFile, dataSet) {
 		this.originalFile = originalFile;
 		this.dataSet = dataSet;
-		this.header = this.retrieveHeaderData(dataSet.byteArray);
-		this.removeByteArrayReferences();
-	}
-
-	removeByteArrayReferences(dataSet = this.dataSet) {
-		// Recursively delete byteArray references
-		for (let propName in dataSet) {
-			let prop = dataSet[propName];
-
-			// Check inner elements
-			if (propName == 'elements') {
-				for (let elmt in prop) {
-					if (prop[elmt].items !== undefined) {
-						for (let it of prop[elmt].items) {
-							this.removeByteArrayReferences(it.dataSet);
-						}
-					}
-				}
-			}
-
-			if (propName == 'byteArray' || propName == 'byteArrayParser') {
-				// Delete reference to the object
-				dataSet[propName] = null;
-			}
-
-		}
-	}
-
-	retrieveHeaderData(byteArray) {
-		let pxData = this.dataSet.elements.x7fe00010;
-		//If no pixel data return the full byte array
-		if(pxData === undefined){
-			return byteArray.slice()
-		}
-		//if pixel data here return only header
-		return byteArray.slice(0, pxData.dataOffset-1);
 	}
 
 	anonymise(tagsToErase) {
@@ -133,87 +98,82 @@ export default class DicomFile {
 		try{
 			let elmt = this.dataSet.elements['x00540016']
 			let radioPharmElements = elmt.items[0].dataSet.elements
-			return this.string(radioPharmElements['x'+tagAddress])
+			return this._getString(radioPharmElements['x'+tagAddress])
 		}catch ( error ) { 
 			console.log(error)
 			return undefined 
 		}
 	}
 
-	getDicomTag(tagAddress){
+	_getDicomTag(tagAddress){
 		let elmt = this.dataSet.elements['x'+tagAddress]
 		if ( elmt !== undefined && elmt.length > 0) {
 			// Return the value of the dicom attribute
-			return this.string(elmt);
+			return this._getString(elmt);
 		}
 		else return undefined
 	}
 
 	getAccessionNumber() {
-		return this.getDicomTag("00080050");
+		return this._getDicomTag("00080050");
 	}
 	getAcquisitionDate() {
-		return this.getDicomTag("00080020");
+		return this._getDicomTag("00080020");
 	}
 	getInstanceNumber() {
-		return this.getDicomTag("00200013");
+		return this._getDicomTag("00200013");
 	}
 	getModality() {
-		return this.getDicomTag("00080060");
+		return this._getDicomTag("00080060");
 	}
 	getPatientBirthDate() {
-		return this.getDicomTag("00100030");
+		return this._getDicomTag("00100030");
 	}
 	getPatientID() {
-		return this.getDicomTag("00100020");
+		return this._getDicomTag("00100020");
 	}
 	getPatientName() {
-		return this.getDicomTag("00100010");
+		return this._getDicomTag("00100010");
 	}
 	getPatientSex() {
-		return this.getDicomTag("00100040");
+		return this._getDicomTag("00100040");
 	}
 	getSeriesInstanceUID() {
-		return this.getDicomTag("0020000e");
+		return this._getDicomTag("0020000e");
 	}
 	getSeriesDate() {
-		return this.getDicomTag("00080021");
+		return this._getDicomTag("00080021");
 	}
 	getSeriesDescription() {
-		return this.getDicomTag("0008103e");
+		return this._getDicomTag("0008103e");
 	}
 	getSOPInstanceUID() {
-		return this.getDicomTag("00080018");
+		return this._getDicomTag("00080018");
 	}
-	getSOPClassUID() {
-		return this.getDicomTag("00080016");
-	}
-	//SK A TESTER : On ne pourrait utiliser que le 0002,0002
-	//Ce tag est un duplicat de 00080016 cf https://stackoverflow.com/questions/32689446/is-it-true-that-dicom-media-storage-sop-instance-uid-sop-instance-uid-why
-	getMediaStorageSOP(){
-		return this.getDicomTag("00020002")
+	getSOPClassUID(){
+		return this._getDicomTag("00020002")
 	}
 	getSeriesNumber() {
-		return this.getDicomTag('00200011')
+		return this._getDicomTag('00200011')
 	}
 	getStudyInstanceUID() {
-		return this.getDicomTag('0020000d')
+		return this._getDicomTag('0020000d')
 	}
 	getStudyDate() {
-		return this.getDicomTag("00080020");
+		return this._getDicomTag("00080020");
 	}
 	getStudyID() {
-		return this.getDicomTag("00200010");
+		return this._getDicomTag("00200010");
 	}
 	getStudyDescription() {
-		return this.getDicomTag("00081030");
+		return this._getDicomTag("00081030");
 	}
 
 	/**
 	 * Returns element contain as a string
 	 * @param {*} element element from the data set
 	 */
-	string(element) {
+	_getString(element) {
 		let position = element.dataOffset;
 		let length = element.length;
 
@@ -261,11 +221,7 @@ export default class DicomFile {
 		const dicomDirSopValues = [
 			'1.2.840.10008.1.3.10'
 		]
-		return dicomDirSopValues.includes(this.getMediaStorageSOP());
+		return dicomDirSopValues.includes(this.getSOPClassUID());
 	}
 
-	clearData() {
-		this.header = null;
-		this.dataSet = null;
-	}
 }

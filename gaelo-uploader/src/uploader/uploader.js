@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { StatusBar,DragDrop } from '@uppy/react'
 import Uppy from '@uppy/core'
-import dicomParser from 'dicom-parser'
+import dicomParser from '../model/node_modules/dicom-parser'
 import DicomFile from './DicomFile'
-import Instance from '../Modele/Instance'
-import Serie from '../Modele/Serie'
-import Study from '../Modele/Study'
+import Instance from '../model/Instance'
+import Serie from '../model/Serie'
+import Study from '../model/Study'
 
 export default class Uploader extends Component{
    

@@ -90,7 +90,7 @@ export default class DicomFile {
 			const char = newContent.charCodeAt(i % newContent.length);
 
 			// Write this char in the array
-			this.header[dataOffset + i] = char;
+			this.dataSet.byteArray[dataOffset + i] = char;
 		}
 	}
 
@@ -223,5 +223,44 @@ export default class DicomFile {
 		]
 		return dicomDirSopValues.includes(this.getSOPClassUID());
 	}
+
+	getOriginalFilePath(){
+		return this.originalFile
+	}
+
+	//SK A VOIR UTILITE
+	getDate(property) {
+		try {
+			let date = dicomParser.parseDA(this[property]);
+
+			function intToString(integer, digits) {
+				while (integer.toString().length < digits) {
+					integer = '0' + integer;
+				}
+				return integer;
+			}
+
+			date.toString = () => {
+				return date.year + '-' + intToString(date.month, 2) + '-' + intToString(date.day, 2);
+			}
+			return date;
+		} catch (e) {
+			return undefined;
+		}
+	}
+
+	//SK A VOIR UTILITE
+	getPatientName() {
+        try {
+            let name = this.patientName;
+            name.toString = () => {
+                let fullname = name.familyName + ' ' + name.givenName;
+                return fullname.replace('undefined', '').trim();
+            }
+            return name;
+        } catch (e) {
+            return undefined;
+        }
+    }
 
 }

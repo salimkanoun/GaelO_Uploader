@@ -13,7 +13,7 @@
  */
 import dicomParser from 'dicom-parser'
 
-export default class Serie {
+export default class Series {
 
 	instances = {}
 
@@ -35,26 +35,6 @@ export default class Serie {
 		let knownInstancesUID = Object.keys(this.instances)
 		return knownInstancesUID.includes(SOPInstanceUID)
 
-	}
-
-	getDate(property) {
-		try {
-			let date = dicomParser.parseDA(this[property]);
-
-			function intToString(integer, digits) {
-				while (integer.toString().length < digits) {
-					integer = '0' + integer;
-				}
-				return integer;
-			}
-
-			date.toString = () => {
-				return date.year + '-' + intToString(date.month, 2) + '-' + intToString(date.day, 2);
-			}
-			return date;
-		} catch (e) {
-			return undefined;
-		}
 	}
 
 	getNbInstances() {

@@ -27,6 +27,7 @@ export default class Study {
         this.patientBirthDate = patientBirthDate;
         this.patientSex = patientSex;
         this.acquisitionDate = acquisitionDate;
+        /*
         this.validSeries = [];     // have passed the checks
         this.rejectedSeries = [];  // do not have passed the checks
         this.queuedSeries = [];    // in wait for uplaod
@@ -34,6 +35,7 @@ export default class Study {
         this.warnings = {};
         this.isQueued = undefined;
         this.isUploadAborted = undefined;
+        */
     }
 
     addSeries(seriesObject){
@@ -45,45 +47,36 @@ export default class Study {
         return existingSeriesUID.includes(seriesInstanceUID)
     }
 
+    getPatientName(){
+        return this.patientName
+    }
+
     getStudyUID() {
-        return this.studyUID;
+        return this.studyUID
     }
 
     getStudyID() {
-        return this.studyID;
+        return this.studyID
     }
 
     getStudyDate() {
-        return this.studyDate;
+        return this.studyDate
     }
 
     getStudyDescription() {
-        return this.studyDescription;
-    }
-
-    getPatientName() {
-        try {
-            let name = this.patientName;
-            name.toString = () => {
-                let fullname = name.familyName + ' ' + name.givenName;
-                return fullname.replace('undefined', '').trim();
-            }
-            return name;
-        } catch (e) {
-            return undefined;
-        }
+        return this.studyDescription
     }
 
     getPatientBirthDate() {
-        return this.patientBirthDate;
+        return this.patientBirthDate
     }
 
     getPatientSex() {
-        return this.patientSex;
+        return this.patientSex
     }
 
     getPatientID() {
-        return this.patientID;
+        return this.patientID
     }
 
     toString() {

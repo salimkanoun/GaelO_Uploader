@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { StatusBar,DragDrop } from '@uppy/react'
 import Uppy from '@uppy/core'
-import dicomParser from '../model/node_modules/dicom-parser'
+import dicomParser from 'dicom-parser'
 import DicomFile from './DicomFile'
 import Instance from '../model/Instance'
 import Serie from '../model/Serie'
@@ -26,9 +26,9 @@ export default class Uploader extends Component{
 			try {
 				// Try to parse as dicom file
 				//Will throw exception if not dicom file (exeption from dicomParser)
-				let parsedDicom = dicomParser.parseDicom(byteArray)
+				let dataSet = dicomParser.parseDicom(byteArray)
 				//But read data in a DicomFile Object
-				let dicomFile = new DicomFile(file, parsedDicom);
+				let dicomFile = new DicomFile(file, dataSet);
 
                 this.up(dicomFile)
 

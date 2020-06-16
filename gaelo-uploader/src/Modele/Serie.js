@@ -13,7 +13,7 @@
  */
 import dicomParser from 'dicom-parser'
 
-export default class Serie {
+class Serie {
 	constructor(sriuid, srn, srd, srdesc, modlty) {
 		this.seriesInstanceUID = sriuid;
 		this.seriesNumber = srn;
@@ -85,7 +85,8 @@ export default class Serie {
 			inst.dicomFile.clearData();
 		}
     }
-    
+	
+
     toString(){
         return("\nInstance number: " + this.seriesNumber 
         + "\nModality: " + this.modality 

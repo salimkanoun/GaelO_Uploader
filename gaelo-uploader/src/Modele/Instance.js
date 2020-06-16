@@ -12,18 +12,31 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-export default class Patient {
-	constructor(ptid, ptn, ptbd, pts) {
-		this.patientId = ptid;
-		this.patientName = ptn;
-		this.patientBirthDate = ptbd;
-		this.patientSex= pts;
+class Instance {
+	constructor(sopiuid, instnb, dicomFile) {
+		this.SOPInstanceUID = sopiuid;
+		this.instanceNumber = instnb;
+		this.dicomFile = dicomFile;
+	}
+
+	getHeaderByteArray() {
+		return this.dicomFile.header;
+	}
+
+	getFilePath() {
+		let res = this.dicomFile.originalFile.fullPath;
+		if (res === undefined) {
+			// Uploaded by folder selection,
+			//doesn't have a full path but has a webkitrelativepath
+			res = this.dicomFile.originalFile.webkitRelativePath;
+		}
+		return res;
     }
     
+    
     toString(){
-        return("\nPatient birth date: " + this.patientBirthDate 
-        + "\nPatient ID: " + this.patientId 
-        + "\nPatient Name: " + this.patientName
-        + "\nPatient sex: " + this.patientSex)
+        return("\nSOP Instance UID: " + this.SOPInstanceUID
+        + "\nInstanceNumber: " + this.instanceNumber
+        + "\nDicom: " + this.dicomFile);
     }
 }

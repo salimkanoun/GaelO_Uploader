@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-class Study {
+export default class Study {
 	constructor(stiuid, stid, std, stdesc, an, ptid, ptn, ptbd, pts, acqd) {
 		this.studyIUID = stiuid;
 		this.studyID = stid;

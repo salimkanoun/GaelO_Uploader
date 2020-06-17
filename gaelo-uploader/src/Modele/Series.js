@@ -13,39 +13,32 @@
  */
 import dicomParser from 'dicom-parser'
 
-class Serie {
-	constructor(sriuid, srn, srd, srdesc, modlty) {
-		this.seriesInstanceUID = sriuid;
-		this.seriesNumber = srn;
-		this.seriesDate = srd;
-		this.seriesDescription = srdesc;
-		this.modality = modlty;
-		this.instances = [];
+export default class Series {
+
+	instances = {}
+
+	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality) {
+		this.seriesInstanceUID = seriesInstanceUID;
+		this.seriesNumber = seriesNumber;
+		this.seriesDate = seriesDate;
+		this.seriesDescription = seriesDescription;
+		this.modality = modality;
 		this.warnings = {};
 	}
 
-	getDate(property) {
-		try {
-			let date = dicomParser.parseDA(this[property]);
+	addInstance(instanceObject){
+		this.instances[instanceObject.SOPInstanceUID] = instanceObject
 
-			function intToString(integer, digits) {
-				while (integer.toString().length < digits) {
-					integer = '0' + integer;
-				}
-				return integer;
-			}
+	}
 
-			date.toString = () => {
-				return date.year + '-' + intToString(date.month, 2) + '-' + intToString(date.day, 2);
-			}
-			return date;
-		} catch (e) {
-			return undefined;
-		}
+	isExistingInstance(SOPInstanceUID){
+		let knownInstancesUID = Object.keys(this.instances)
+		return knownInstancesUID.includes(SOPInstanceUID)
+
 	}
 
 	getNbInstances() {
-		return this.instances.length;
+		return Object.keys(this.instances).length;
 	}
 
 	hasWarnings() {
@@ -79,12 +72,6 @@ class Serie {
 	considerWarning(name) {
 		this.warnings[name].ignore = false;
 	}
-
-	clearAllInstances() {
-		for (let inst of this.instances) {
-			inst.dicomFile.clearData();
-		}
-    }
 	
 
     toString(){
@@ -92,8 +79,6 @@ class Serie {
         + "\nModality: " + this.modality 
         + "\nSeries instance UID: " + this.seriesInstanceUID
         + "\nSeries date: " + this.seriesDate
-        + "\nSeries description: " + this.seriesDescription
-        /*+ "\nSeries instances: " + this.instances
-        + "\nSeries warnings: " + this.warnings*/)
+        + "\nSeries description: " + this.seriesDescription)
     }
 }

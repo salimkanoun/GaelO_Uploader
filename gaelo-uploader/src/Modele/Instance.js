@@ -12,11 +12,15 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-class Instance {
+export default class Instance {
 	constructor(sopiuid, instnb, dicomFile) {
 		this.SOPInstanceUID = sopiuid;
 		this.instanceNumber = instnb;
 		this.dicomFile = dicomFile;
+	}
+
+	getSOPInstanceUID(){
+		return this.SOPInstanceUID;
 	}
 
 	getHeaderByteArray() {

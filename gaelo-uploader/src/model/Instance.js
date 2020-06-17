@@ -13,34 +13,14 @@
  */
 
 export default class Instance {
-	constructor(sopiuid, instnb, dicomFile) {
-		this.SOPInstanceUID = sopiuid;
-		this.instanceNumber = instnb;
-		this.dicomFile = dicomFile;
-	}
 
-	getSOPInstanceUID(){
-		return this.SOPInstanceUID;
+	constructor(SOPInstanceUID, originalFilePath) {
+		this.SOPInstanceUID = SOPInstanceUID;
+		this.originalFilePath = originalFilePath;
 	}
-
-	getHeaderByteArray() {
-		return this.dicomFile.header;
-	}
-
-	getFilePath() {
-		let res = this.dicomFile.originalFile.fullPath;
-		if (res === undefined) {
-			// Uploaded by folder selection,
-			//doesn't have a full path but has a webkitrelativepath
-			res = this.dicomFile.originalFile.webkitRelativePath;
-		}
-		return res;
-    }
-    
     
     toString(){
         return("\nSOP Instance UID: " + this.SOPInstanceUID
-        + "\nInstanceNumber: " + this.instanceNumber
         + "\nDicom: " + this.dicomFile);
     }
 }

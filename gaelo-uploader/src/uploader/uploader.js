@@ -2,8 +2,11 @@ import React, { Component } from 'react'
 import { StatusBar,DragDrop } from '@uppy/react'
 import Uppy from '@uppy/core'
 import dicomParser from 'dicom-parser'
-import DicomFile from './DicomFile'
-import Modele from '../Modele/Modele'
+import DicomFile from '../model/DicomFile'
+import Modele from '../model/Model'
+import Study from '../model/Study'
+import Series from '../model/Series'
+import Instance from '../model/Instance'
 
 export default class Uploader extends Component{
    
@@ -26,13 +29,29 @@ export default class Uploader extends Component{
 				let parsedDicom = dicomParser.parseDicom(byteArray)
 				//But read data in a DicomFile Object
 				let dicomFile = new DicomFile(file, parsedDicom);
-                
-                modele.register(dicomFile);
 
+                let study = new Study(dicomFile.getStudyInstanceUID(), dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(), 
+                dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientName(), dicomFile.getPatientBirthDate(), 
+                dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
+                let series;
+
+                modele.addStudy(study);
+
+                if(!study.isExistingSeries(dicomFile.getSeriesInstanceUID())){
+                    series = new Series(dicomFile.getSeriesInstanceUID(), dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(), 
+                    dicomFile.getSeriesDescription(), dicomFile.getModality());
+                    study.addSeries(series);
+                }
+                if(!series.isExistingInstance(dicomFile.getSOPInstanceUID())){
+                    series.addInstance(new Instance(dicomFile.getSOPInstanceUID(), dicomFile.getInstanceNumber(), dicomFile));
+                }
 			} catch (e) {
 				console.warn(e)
-			}
-		}
+            }
+            
+        }
+        
+        console.log(modele.printData());
     }
 
     constructor(props){
@@ -85,8 +104,4 @@ export default class Uploader extends Component{
 
         )
     }
-
-
-    
-
 }

@@ -11,7 +11,6 @@
  with this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-import dicomParser from 'dicom-parser'
 
 export default class Series {
 
@@ -27,14 +26,13 @@ export default class Series {
 	}
 
 	addInstance(instanceObject){
-		this.instances[instanceObject.SOPInstanceUID] = instanceObject
-
+		this.instances[instanceObject.seriesInstanceUID] = instanceObject;
+		//console.log('Instance added \n' + Object.entries(this.instances));
 	}
 
 	isExistingInstance(SOPInstanceUID){
-		let knownInstancesUID = Object.keys(this.instances)
-		return knownInstancesUID.includes(SOPInstanceUID)
-
+		let knownInstancesUID = Object.keys(this.instances);
+		return knownInstancesUID.includes(SOPInstanceUID);
 	}
 
 	getNbInstances() {
@@ -73,12 +71,15 @@ export default class Series {
 		this.warnings[name].ignore = false;
 	}
 	
+	printInstances(){
+		return Object.entries(this.instances);
+	}
 
     toString(){
         return("\nInstance number: " + this.seriesNumber 
         + "\nModality: " + this.modality 
         + "\nSeries instance UID: " + this.seriesInstanceUID
         + "\nSeries date: " + this.seriesDate
-        + "\nSeries description: " + this.seriesDescription)
+        + "\nSeries description: " + this.seriesDescription);
     }
 }

@@ -26,9 +26,9 @@ export default class Uploader extends Component{
 			try {
 				// Try to parse as dicom file
 				//Will throw exception if not dicom file (exeption from dicomParser)
-				let parsedDicom = dicomParser.parseDicom(byteArray)
+				let dataSet = dicomParser.parseDicom(byteArray)
 				//But read data in a DicomFile Object
-				let dicomFile = new DicomFile(file, parsedDicom);
+				let dicomFile = new DicomFile(file, dataSet);
 
                 let study = new Study(dicomFile.getStudyInstanceUID(), dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(), 
                 dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientName(), dicomFile.getPatientBirthDate(), 

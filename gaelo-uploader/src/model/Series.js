@@ -26,13 +26,14 @@ export default class Series {
 	}
 
 	addInstance(instanceObject){
-		this.instances[instanceObject.seriesInstanceUID] = instanceObject;
-		//console.log('Instance added \n' + Object.entries(this.instances));
+		this.instances[instanceObject.SOPInstanceUID] = instanceObject
+
 	}
 
 	isExistingInstance(SOPInstanceUID){
-		let knownInstancesUID = Object.keys(this.instances);
-		return knownInstancesUID.includes(SOPInstanceUID);
+		let knownInstancesUID = Object.keys(this.instances)
+		return knownInstancesUID.includes(SOPInstanceUID)
+
 	}
 
 	getNbInstances() {

@@ -39,53 +39,44 @@ export default class Study {
     }
 
     addSeries(seriesObject){
-        this.series[seriesObject.studyUID] = seriesObject;
-        //console.log('Series added \n' + Object.entries(this.series));
+        this.series[seriesObject.seriesInstanceUID] = seriesObject
     }
 
     isExistingSeries(seriesInstanceUID){
-        let existingSeriesUID = Object.keys(this.series);
-        return existingSeriesUID.includes(seriesInstanceUID);
+        let existingSeriesUID = Object.keys(this.series)
+        return existingSeriesUID.includes(seriesInstanceUID)
     }
 
     getPatientName(){
-        return this.patientName;
+        return this.patientName
     }
 
     getStudyUID() {
-        return this.studyUID;
+        return this.studyUID
     }
 
     getStudyID() {
-        return this.studyID;
+        return this.studyID
     }
 
     getStudyDate() {
-        return this.studyDate;
+        return this.studyDate
     }
 
     getStudyDescription() {
-        return this.studyDescription;
+        return this.studyDescription
     }
 
     getPatientBirthDate() {
-        return this.patientBirthDate;
+        return this.patientBirthDate
     }
 
     getPatientSex() {
-        return this.patientSex;
+        return this.patientSex
     }
 
     getPatientID() {
-        return this.patientID;
-    }
-
-    printSeries(){
-        return Object.entries(this.series);
-    }
-
-    printSeriesStudy(key){
-        return Object.entries(this.series[key]);
+        return this.patientID
     }
 
     toString() {

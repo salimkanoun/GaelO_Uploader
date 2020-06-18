@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import Uploader from "./uploader/uploader"
+import Uploader from "./uploader/Uploader"
 
 //Css for uppy
 import '@uppy/core/dist/style.css'

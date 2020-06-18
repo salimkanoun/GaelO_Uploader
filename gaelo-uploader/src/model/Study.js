@@ -47,6 +47,9 @@ export default class Study {
         return existingSeriesUID.includes(seriesInstanceUID)
     }
 
+    getSeries(seriesInstanceUID){
+        return this.series[seriesInstanceUID]
+    }
     getPatientName(){
         return this.patientName
     }
@@ -91,4 +94,5 @@ export default class Study {
             + "\nPatient Name: " + this.patientName
             + "\nPatient sex: " + this.patientSex);
     }
+
 }

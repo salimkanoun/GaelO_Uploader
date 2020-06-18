@@ -22,17 +22,20 @@
         } 
     
         addStudy(studyObject) {
-            this.data[studyObject.getStudyUID()] = studyObject;
-            //console.log(Object.keys(this.data).length);
-            //console.log('Study added \n' + Object.entries(this.data));
+            this.data[studyObject.studyUID] = studyObject;
         }
 
+        isExistingStudy(studyInstanceUID){
+            let existingStudyUID = Object.keys(this.data);
+            return existingStudyUID.includes(studyInstanceUID);
+        }
+        
         toString(){
             console.log(this.data);
         }
 
-        printData(){
-            return Object.entries(this.data);
+        getStudy(studyInstanceUID){
+            return this.data[studyInstanceUID]
         }
     
     }

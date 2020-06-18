@@ -27,7 +27,6 @@ export default class Series {
 
 	addInstance(instanceObject){
 		this.instances[instanceObject.SOPInstanceUID] = instanceObject
-
 	}
 
 	isExistingInstance(SOPInstanceUID){
@@ -36,6 +35,9 @@ export default class Series {
 
 	}
 
+	getInstance(instanceUID){
+		return this.instances[instanceUID]
+	}
 	getNbInstances() {
 		return Object.keys(this.instances).length;
 	}
@@ -71,10 +73,6 @@ export default class Series {
 	considerWarning(name) {
 		this.warnings[name].ignore = false;
 	}
-	
-	printInstances(){
-		return Object.entries(this.instances);
-	}
 
     toString(){
         return("\nInstance number: " + this.seriesNumber 
@@ -82,5 +80,5 @@ export default class Series {
         + "\nSeries instance UID: " + this.seriesInstanceUID
         + "\nSeries date: " + this.seriesDate
         + "\nSeries description: " + this.seriesDescription);
-    }
+	}
 }

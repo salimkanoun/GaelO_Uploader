@@ -3,56 +3,13 @@ import { StatusBar,DragDrop } from '@uppy/react'
 import Uppy from '@uppy/core'
 import dicomParser from 'dicom-parser'
 import DicomFile from '../model/DicomFile'
-import Modele from '../model/Model'
+import Model from '../model/Model'
 import Study from '../model/Study'
 import Series from '../model/Series'
 import Instance from '../model/Instance'
+import Modele from '../model/Model'
 
 export default class Uploader extends Component{
-   
-    /**
-	 * Read and parse dicom file
-	 */
-	read(file) {
-
-        let modele = new Modele();
-        const reader = new FileReader();
-        console.log(reader)
-		reader.readAsArrayBuffer(file.data);
-		reader.onload = () => {
-			// Retrieve file content as Uint8Array
-			const arrayBuffer = reader.result;
-			const byteArray = new Uint8Array(arrayBuffer);
-			try {
-				// Try to parse as dicom file
-				//Will throw exception if not dicom file (exeption from dicomParser)
-				let dataSet = dicomParser.parseDicom(byteArray)
-				//But read data in a DicomFile Object
-				let dicomFile = new DicomFile(file, dataSet);
-
-                let study = new Study(dicomFile.getStudyInstanceUID(), dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(), 
-                dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientName(), dicomFile.getPatientBirthDate(), 
-                dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
-                let series;
-
-                modele.addStudy(study);
-
-                if(!study.isExistingSeries(dicomFile.getSeriesInstanceUID())){
-                    series = new Series(dicomFile.getSeriesInstanceUID(), dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(), 
-                    dicomFile.getSeriesDescription(), dicomFile.getModality());
-                    study.addSeries(series);
-                }
-                if(!series.isExistingInstance(dicomFile.getSOPInstanceUID())){
-                    series.addInstance(new Instance(dicomFile.getSOPInstanceUID(), dicomFile.getInstanceNumber(), dicomFile));
-                }
-			} catch (e) {
-				console.warn(e)
-            }
-            
-        }
-        
-        console.log(modele.printData());
-    }
 
     constructor(props){
 
@@ -80,9 +37,68 @@ export default class Uploader extends Component{
         this.uppy.on('file-added', (file) => {
             console.log('Added file', file)
             this.read(file)
+            console.log(this.uploadModel)
           })
 
+        this.uploadModel = new Model();
+
     }
+
+   
+    /**
+	 * Read and parse dicom file
+	 */
+	read(file) {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file.data);
+		reader.onload = () => {
+			// Retrieve file content as Uint8Array
+			const arrayBuffer = reader.result;
+			const byteArray = new Uint8Array(arrayBuffer);
+			try {
+				// Try to parse as dicom file
+				//Will throw exception if not dicom file (exeption from dicomParser)
+				let dataSet = dicomParser.parseDicom(byteArray)
+				//But read data in a DicomFile Object
+				let dicomFile = new DicomFile(file, dataSet);
+
+                let study;
+                let series;
+
+
+                let dicomStudyID = dicomFile.getStudyInstanceUID()
+                let dicomSeriesID = dicomFile.getSeriesInstanceUID()
+                let dicomInstanceID = dicomFile.getSOPInstanceUID()
+                if(!this.uploadModel.isExistingStudy(dicomFile.getStudyInstanceUID())){
+                    study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(), 
+                dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientName(), dicomFile.getPatientBirthDate(), 
+                dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
+                    this.uploadModel.addStudy(study);
+                } else {
+                    study = this.uploadModel.getStudy(dicomStudyID)
+                }
+
+                if(!study.isExistingSeries(dicomSeriesID)){
+                    series = new Series(dicomFile.getSeriesInstanceUID(), dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(), 
+                    dicomFile.getSeriesDescription(), dicomFile.getModality());
+                    study.addSeries(series);
+                } else {
+                    series = study.getSeries(dicomSeriesID)
+                }
+                if(!series.isExistingInstance(dicomInstanceID)){
+                    series.addInstance(new Instance(dicomFile.getSOPInstanceUID(), dicomFile.getInstanceNumber(), dicomFile));
+                } else {
+                    throw ("Existing instance")
+                }
+			} catch (e) {
+				console.warn(e)
+            }   
+            
+        }
+        
+    }
+
+    
 
     render (){
         return (

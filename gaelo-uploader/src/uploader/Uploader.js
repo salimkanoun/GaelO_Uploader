@@ -7,9 +7,15 @@ import Model from '../model/Model'
 import Study from '../model/Study'
 import Series from '../model/Series'
 import Instance from '../model/Instance'
-import Modele from '../model/Model'
+import ParsingDetails from './ParsingDetails'
+import CheckPatient from './CheckPatient'
+import StudiesSeries from './StudiesSeries'
+import ProgressUpload from './ProgressUpload'
+import IgnoredFilesPanel from './IgnoredFilesPanel'
 
 export default class Uploader extends Component{
+
+    state ={fileIgnored:0, fileParsed:0, fileLoaded:0, warning:true, show:false}
 
     constructor(props){
 
@@ -35,12 +41,15 @@ export default class Uploader extends Component{
         this.uppy.on('cancel-all', () => this.setState({inProgress: false}))
 
         this.uppy.on('file-added', (file) => {
+            this.setState((previousState) => { return {fileLoaded: previousState.fileLoaded++} } )
             console.log('Added file', file)
             this.read(file)
             console.log(this.uploadModel)
           })
 
         this.uploadModel = new Model();
+
+        this.ignoredClick=this.ignoredClick.bind(this)
 
     }
 
@@ -61,7 +70,6 @@ export default class Uploader extends Component{
 				let dataSet = dicomParser.parseDicom(byteArray)
 				//But read data in a DicomFile Object
 				let dicomFile = new DicomFile(file, dataSet);
-
                 let study;
                 let series;
 
@@ -69,26 +77,31 @@ export default class Uploader extends Component{
                 let dicomStudyID = dicomFile.getStudyInstanceUID()
                 let dicomSeriesID = dicomFile.getSeriesInstanceUID()
                 let dicomInstanceID = dicomFile.getSOPInstanceUID()
+
                 if(!this.uploadModel.isExistingStudy(dicomFile.getStudyInstanceUID())){
-                    study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(), 
+                    study = new Study(dicomFile.getStudyInstanceUID(), dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(), 
                 dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientName(), dicomFile.getPatientBirthDate(), 
                 dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
                     this.uploadModel.addStudy(study);
                 } else {
-                    study = this.uploadModel.getStudy(dicomStudyID)
+                    study = this.uploadModel.getStudy(dicomFile.getStudyInstanceUID())
                 }
 
-                if(!study.isExistingSeries(dicomSeriesID)){
+                if(!study.isExistingSeries(dicomFile.getSeriesInstanceUID())){
                     series = new Series(dicomFile.getSeriesInstanceUID(), dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(), 
                     dicomFile.getSeriesDescription(), dicomFile.getModality());
                     study.addSeries(series);
                 } else {
-                    series = study.getSeries(dicomSeriesID)
+                    series = study.getSeries(dicomFile.getSeriesInstanceUID())
                 }
-                if(!series.isExistingInstance(dicomInstanceID)){
+
+                if(!series.isExistingInstance(dicomFile.getSOPInstanceUID())){
                     series.addInstance(new Instance(dicomFile.getSOPInstanceUID(), dicomFile.getInstanceNumber(), dicomFile));
+                    this.setState((previousState) => { return {fileParsed: previousState.fileParsed++} } )
                 } else {
+                    this.setState((previousState) => { return {fileIgnored: previousState.fileIgnored++} } )
                     throw ("Existing instance")
+                    
                 }
 			} catch (e) {
 				console.warn(e)
@@ -96,6 +109,13 @@ export default class Uploader extends Component{
             
         }
         
+    }
+
+    ignoredClick(event){
+        console.log(event)
+        console.log(this)
+        console.log(this.state.show)
+        this.state.show=true
     }
 
     
@@ -115,6 +135,10 @@ export default class Uploader extends Component{
                     }}
                 />
                 <StatusBar hideUploadButton={false} showProgressDetails={true} hideRetryButton={true} hideAfterFinish={false} uppy={this.uppy} /> 
+                <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.ignoredClick} />
+                <IgnoredFilesPanel display={this.state.show} />
+                <CheckPatient show={this.state.warning}/>
+                
             </div>
         </div>
 

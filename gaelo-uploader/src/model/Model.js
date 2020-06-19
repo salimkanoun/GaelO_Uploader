@@ -26,7 +26,9 @@
         }
 
         isExistingStudy(studyInstanceUID){
+            console.log(this.data)
             let existingStudyUID = Object.keys(this.data);
+            console.log(existingStudyUID)
             return existingStudyUID.includes(studyInstanceUID);
         }
         

@@ -14,26 +14,14 @@
 
 import React, { Component, Fragment } from 'react'
 
-export default class ParsingDetails extends Component {
+export default class StudiesSeries extends Component {
+
+	
 
     render() {
         return (
             <Fragment>
-                <span id="du-loaded-badge" className="badge">
-                    <span id="nb-files-loaded">{this.props.fileLoaded}</span> File(s) loaded
-			</span>
-
-                <span id="du-parsed-badge" className="badge">
-                    <span id="nb-files-parsed">{this.props.fileParsed}</span> File(s) parsed
-			</span>
-
-                <span id="du-ignored-badge" className="badge">
-                    <span id="nb-files-ignored" onClick={this.props.onClick}>{this.props.fileIgnored} </span> File(s) ignored (Click to show)
-			</span>
-
-                <span id="du-status-info-text"></span>
-
-                <div id="du-ignored-files-panel"></div>
+                
             </Fragment>
         )
     }

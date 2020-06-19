@@ -15,8 +15,10 @@
     "dicom-parser": "^1.8.5",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
+    "react-bootstrap-table-next": "^4.0.3",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "react-table": "^7.2.1",
     "util": "^0.12.3"
   },
   "scripts": {

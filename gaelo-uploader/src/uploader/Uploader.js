@@ -8,15 +8,13 @@ import Study from '../model/Study'
 import Series from '../model/Series'
 import Instance from '../model/Instance'
 import ParsingDetails from './ParsingDetails'
-import CheckPatient from './CheckPatient'
-import StudiesSeries from './StudiesSeries'
+import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './ProgressUpload'
-import IgnoredFilesPanel from './IgnoredFilesPanel'
 import WarningPatient from './WarningPatient'
 
 export default class Uploader extends Component {
 
-    state = { fileIgnored: 0, fileParsed: 0, fileLoaded: 0, warning: true, show: false }
+    state = { fileIgnored: 0, fileParsed: 0, fileLoaded: 0, warning: true, show: false, showIgnoredFiles:false }
 
     constructor(props) {
 
@@ -97,7 +95,7 @@ export default class Uploader extends Component {
                 }
 
                 if (!series.isExistingInstance(dicomFile.getSOPInstanceUID())) {
-                    series.addInstance(new Instance(dicomFile.getSOPInstanceUID(), dicomFile.getInstanceNumber(), dicomFile));
+                    series.addInstance(new Instance(dicomFile.getSOPInstanceUID(), dicomFile.getInstanceNumber(), dicomFile, file));
                     this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
                 } else {
                     this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
@@ -115,7 +113,7 @@ export default class Uploader extends Component {
     ignoredClick(event) {
         console.log(this)
         console.log(this.state.show)
-        this.state.show = true
+        this.setState(((state) => {return {showIgnoredFiles:!state.showIgnoredFiles}}))
     }
 
 
@@ -135,11 +133,11 @@ export default class Uploader extends Component {
                         }}
                     />
                     <StatusBar hideUploadButton={false} showProgressDetails={true} hideRetryButton={true} hideAfterFinish={false} uppy={this.uppy} />
-                    <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.ignoredClick} />
-                    <IgnoredFilesPanel display={true} />
+                    <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.ignoredClick} 
+                    displayIgnoredFiles={this.state.showIgnoredFiles} closeIgnoredFiles={this.ignoredClick}/>
                     <WarningPatient show={this.state.warning} />
-                    <StudiesSeries />
-                    <CheckPatient />
+                    <ControllerStudiesSeries studies={this.uploadModel} />
+                    
                     
                 </div>
             </div>

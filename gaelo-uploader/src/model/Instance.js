@@ -14,13 +14,18 @@
 
 export default class Instance {
 
-    constructor(SOPInstanceUID, originalFilePath) {
+    constructor(SOPInstanceUID, originalFilePath, file) {
         this.SOPInstanceUID = SOPInstanceUID;
         this.originalFilePath = originalFilePath;
+        this.file = file;
     }
 
     toString() {
         return ("\nSOP Instance UID: " + this.SOPInstanceUID
             + "\nDicom: " + this.dicomFile);
+    }
+
+    getFile(){
+        return this.file
     }
 }

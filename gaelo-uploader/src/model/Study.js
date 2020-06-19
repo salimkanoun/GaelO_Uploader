@@ -66,6 +66,11 @@ export default class Study {
         return this.studyDate
     }
 
+    getDate(){
+        let rawDate = String(this.seriesDate);
+        return (rawDate.substring(5, 6) + rawDate.substring(4, 5) + rawDate.substring(0, 3))
+	}
+
     getStudyDescription() {
         return this.studyDescription
     }

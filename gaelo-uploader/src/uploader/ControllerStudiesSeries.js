@@ -13,31 +13,32 @@
  */
 
 import React, { Component, Fragment } from 'react'
+import Series from '../model/Series'
+import DisplayStudies from './DisplayStudies.js'
+import DisplaySeries from './DisplaySeries.js'
 
 
-export default class ProgressUpload {
+export default class ControllerStudiesSeries extends Component {
 
-    constructor() {
+    state = {
+        selectedStudy: null
+    }
+
+    constructor(props){
+        super(props)
+        this.selectedStudy = this.selectedStudy.bind(this)
 
     }
 
-    zipFile(){
+    selectedStudy(event){
+        this.setState(((state) => {return {selectedStudy:!state.selectedStudy}}))
     }
 
     render() {
         return (
             <Fragment>
-                <button id="du-upload" class="btn btn-success">Upload</button>
-
-                <div>
-                    <div id="du-prog-bar-zipping" class="progress">
-                        <div class="progress-bar progress-bar-striped bg-dark"></div>
-                    </div>
-
-                    <div id="du-prog-bar-upload" class="progress">
-                        <div class="progress-bar progress-bar-striped"></div>
-                    </div>
-                </div>
+                <DisplayStudies studies={this.props.studies} studySelected={this.selectedStudy}/>
+                <DisplaySeries series = {this.props.studies} />
             </Fragment>
         )
     }

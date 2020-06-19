@@ -13,8 +13,11 @@
  */
 
 import React, { Component, Fragment } from 'react'
+import IgnoredFilesPanel from './IgnoredFilesPanel'
 
 export default class ParsingDetails extends Component {
+
+
 
     render() {
         return (
@@ -28,8 +31,11 @@ export default class ParsingDetails extends Component {
                 </span>
 
                 <span id="du-ignored-badge" className="badge">
-                    <span id="nb-files-ignored" onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</span>
+        <span id="nb-files-ignored" onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</span>
                 </span>
+
+                <IgnoredFilesPanel display={this.props.displayIgnoredFiles} fileNumber={this.props.fileIgnored} closeListener={this.props.closeIgnoredFiles}/>
+
 
                 <span id="du-status-info-text"></span>
 

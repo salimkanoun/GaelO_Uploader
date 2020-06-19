@@ -40,4 +40,8 @@ export default class Modele {
         return this.data[studyInstanceUID]
     }
 
+    allStudies(){
+        return this.data
+    }
+
 }

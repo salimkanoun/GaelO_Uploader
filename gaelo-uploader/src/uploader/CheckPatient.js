@@ -21,7 +21,7 @@ export default class CheckPatient extends Component {
 
     render() {
         return (
-            <Fragment>
+            <Modal show={this.props.display}>
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <Modal.Header class="modal-header">
@@ -84,7 +84,7 @@ export default class CheckPatient extends Component {
                         </Modal.Footer>
                     </div>
                 </div>
-            </Fragment>
+            </Modal>
         )
     }
 }

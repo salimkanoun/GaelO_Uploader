@@ -25,17 +25,17 @@ export default class Series {
 		this.warnings = {};
 	}
 
-	addInstance(instanceObject){
+	addInstance(instanceObject) {
 		this.instances[instanceObject.SOPInstanceUID] = instanceObject
 	}
 
-	isExistingInstance(SOPInstanceUID){
+	isExistingInstance(SOPInstanceUID) {
 		let knownInstancesUID = Object.keys(this.instances)
 		return knownInstancesUID.includes(SOPInstanceUID)
 
 	}
 
-	getInstance(instanceUID){
+	getInstance(instanceUID) {
 		return this.instances[instanceUID]
 	}
 	getNbInstances() {
@@ -74,11 +74,11 @@ export default class Series {
 		this.warnings[name].ignore = false;
 	}
 
-    toString(){
-        return("\nInstance number: " + this.seriesNumber 
-        + "\nModality: " + this.modality 
-        + "\nSeries instance UID: " + this.seriesInstanceUID
-        + "\nSeries date: " + this.seriesDate
-        + "\nSeries description: " + this.seriesDescription);
+	toString() {
+		return ("\nInstance number: " + this.seriesNumber
+			+ "\nModality: " + this.modality
+			+ "\nSeries instance UID: " + this.seriesInstanceUID
+			+ "\nSeries date: " + this.seriesDate
+			+ "\nSeries description: " + this.seriesDescription);
 	}
 }

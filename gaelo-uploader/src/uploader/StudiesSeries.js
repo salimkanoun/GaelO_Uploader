@@ -13,15 +13,74 @@
  */
 
 import React, { Component, Fragment } from 'react'
+import Modal from 'react-bootstrap/Modal'
 
 export default class StudiesSeries extends Component {
 
-	
+
 
     render() {
         return (
             <Fragment>
-                
+                <span class="title">Studies</span>
+                <div class="row">
+                    <table class="table table-responsive col-sm-8">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>Status</th>
+                                <th>Patient name</th>
+                                <th>Description</th>
+                                <th>Accession #</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="du-studies-tbody">
+                        </tbody>
+                    </table>
+
+                    <table class="table table-responsive col-sm-4">
+                        <thead>
+                            <tr>
+                                <th>Warnings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="du-studies-warnings">
+                        </tbody>
+                    </table>
+                </div>
+
+                <span class="title">Series</span>
+
+                <div class="row">
+                    <table class="table table-responsive col-sm-8">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Status</th>
+                                <th>Description</th>
+                                <th>Modality</th>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Nb of Instances</th>
+                            </tr>
+                        </thead>
+                        <tbody id="du-series-tbody">
+                        </tbody>
+                    </table>
+
+                    <table class="table table-responsive col-sm-4">
+                        <thead>
+                            <tr>
+                                <th>Warnings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="du-series-warnings">
+                        </tbody>
+                    </table>
+                </div>
             </Fragment>
         )
     }

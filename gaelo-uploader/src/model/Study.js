@@ -38,19 +38,19 @@ export default class Study {
         */
     }
 
-    addSeries(seriesObject){
+    addSeries(seriesObject) {
         this.series[seriesObject.seriesInstanceUID] = seriesObject
     }
 
-    isExistingSeries(seriesInstanceUID){
+    isExistingSeries(seriesInstanceUID) {
         let existingSeriesUID = Object.keys(this.series)
         return existingSeriesUID.includes(seriesInstanceUID)
     }
 
-    getSeries(seriesInstanceUID){
+    getSeries(seriesInstanceUID) {
         return this.series[seriesInstanceUID]
     }
-    getPatientName(){
+    getPatientName() {
         return this.patientName
     }
 

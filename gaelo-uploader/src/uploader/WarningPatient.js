@@ -13,27 +13,21 @@
  */
 
 import React, { Component, Fragment } from 'react'
+import Alert from 'react-bootstrap/Alert'
 
-export default class ProgressUpload {
+export default class WarningPatient extends Component {
 
-    constructor() {
-
+    constructor(props) {
+        super(props)
+        this.state = {
+            setShow: this.props.show
+        }
     }
 
     render() {
         return (
             <Fragment>
-                <button id="du-upload" class="btn btn-success">Upload</button>
-
-                <div>
-                    <div id="du-prog-bar-zipping" class="progress">
-                        <div class="progress-bar progress-bar-striped bg-dark"></div>
-                    </div>
-
-                    <div id="du-prog-bar-upload" class="progress">
-                        <div class="progress-bar progress-bar-striped"></div>
-                    </div>
-                </div>
+                <Alert variant="warning" show={this.setShow} dismissible onClose={() => this.setShow = false}>Please, check/select the patient. The imported patient informations do not correspond with the expected ones.</Alert>
             </Fragment>
         )
     }

@@ -26,11 +26,11 @@ export default class DicomFile {
 	retrieveHeaderData(byteArray) {
 		let pxData = this.dataSet.elements.x7fe00010;
 		//If no pixel data return the full byte array
-		if(pxData === undefined){
+		if (pxData === undefined) {
 			return byteArray.slice()
 		}
 		//if pixel data here return only header
-		return byteArray.slice(0, pxData.dataOffset-1);
+		return byteArray.slice(0, pxData.dataOffset - 1);
 	}
 
 	anonymise(tagsToErase) {
@@ -108,20 +108,20 @@ export default class DicomFile {
 		}
 	}
 
-	getRadiopharmaceuticalTag(tagAddress){
-		try{
+	getRadiopharmaceuticalTag(tagAddress) {
+		try {
 			let elmt = this.dataSet.elements['x00540016']
 			let radioPharmElements = elmt.items[0].dataSet.elements
-			return this._getString(radioPharmElements['x'+tagAddress])
-		}catch ( error ) { 
+			return this._getString(radioPharmElements['x' + tagAddress])
+		} catch (error) {
 			console.log(error)
-			return undefined 
+			return undefined
 		}
 	}
 
-	_getDicomTag(tagAddress){
-		let elmt = this.dataSet.elements['x'+tagAddress]
-		if ( elmt !== undefined && elmt.length > 0) {
+	_getDicomTag(tagAddress) {
+		let elmt = this.dataSet.elements['x' + tagAddress]
+		if (elmt !== undefined && elmt.length > 0) {
 			// Return the value of the dicom attribute
 			return this._getString(elmt);
 		}
@@ -164,7 +164,7 @@ export default class DicomFile {
 	getSOPInstanceUID() {
 		return this._getDicomTag("00080018");
 	}
-	getSOPClassUID(){
+	getSOPClassUID() {
 		return this._getDicomTag("00020002")
 	}
 	getSeriesNumber() {
@@ -231,14 +231,14 @@ export default class DicomFile {
 		return secondaryCaptureImgValues.includes(this.getSOPClassUID());
 	}
 
-	isDicomDir(){
+	isDicomDir() {
 		const dicomDirSopValues = [
 			'1.2.840.10008.1.3.10'
 		]
 		return dicomDirSopValues.includes(this.getSOPClassUID());
 	}
 
-	getOriginalFilePath(){
+	getOriginalFilePath() {
 		return this.originalFile
 	}
 
@@ -265,16 +265,16 @@ export default class DicomFile {
 
 	//SK A VOIR UTILITE
 	getPatientFullName() {
-        try {
-            let name = this.patientName;
-            name.toString = () => {
-                let fullname = name.familyName + ' ' + name.givenName;
-                return fullname.replace('undefined', '').trim();
-            }
-            return name;
-        } catch (e) {
-            return undefined;
-        }
-    }
+		try {
+			let name = this.patientName;
+			name.toString = () => {
+				let fullname = name.familyName + ' ' + name.givenName;
+				return fullname.replace('undefined', '').trim();
+			}
+			return name;
+		} catch (e) {
+			return undefined;
+		}
+	}
 
 }

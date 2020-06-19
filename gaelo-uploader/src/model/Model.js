@@ -12,32 +12,32 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
- /*MOdele référencement des instances. Gérer les ressources. Puis front pour afficher les ressources. Ensuite partie upload des images (bcp de front et un peu de back
-    Contraintes de l'empreinte mémoire (d'abord au parsing ex: pas de pique à 1G de rame). A chaque fichier, on a besoin que des références.
-    Puis front en React avec Sylvain*/
+/*MOdele référencement des instances. Gérer les ressources. Puis front pour afficher les ressources. Ensuite partie upload des images (bcp de front et un peu de back
+   Contraintes de l'empreinte mémoire (d'abord au parsing ex: pas de pique à 1G de rame). A chaque fichier, on a besoin que des références.
+   Puis front en React avec Sylvain*/
 
-    export default class Modele {
+export default class Modele {
 
-        data = {
-        } 
-    
-        addStudy(studyObject) {
-            this.data[studyObject.studyUID] = studyObject;
-        }
-
-        isExistingStudy(studyInstanceUID){
-            console.log(this.data)
-            let existingStudyUID = Object.keys(this.data);
-            console.log(existingStudyUID)
-            return existingStudyUID.includes(studyInstanceUID);
-        }
-        
-        toString(){
-            console.log(this.data);
-        }
-
-        getStudy(studyInstanceUID){
-            return this.data[studyInstanceUID]
-        }
-    
+    data = {
     }
+
+    addStudy(studyObject) {
+        this.data[studyObject.studyUID] = studyObject;
+    }
+
+    isExistingStudy(studyInstanceUID) {
+        console.log(this.data)
+        let existingStudyUID = Object.keys(this.data);
+        console.log(existingStudyUID)
+        return existingStudyUID.includes(studyInstanceUID);
+    }
+
+    toString() {
+        console.log(this.data);
+    }
+
+    getStudy(studyInstanceUID) {
+        return this.data[studyInstanceUID]
+    }
+
+}

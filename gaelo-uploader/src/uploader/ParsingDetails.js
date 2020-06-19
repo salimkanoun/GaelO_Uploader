@@ -20,16 +20,16 @@ export default class ParsingDetails extends Component {
         return (
             <Fragment>
                 <span id="du-loaded-badge" className="badge">
-                    <span id="nb-files-loaded">{this.props.fileLoaded}</span> File(s) loaded
-			</span>
+                    <span id="nb-files-loaded">{this.props.fileLoaded} File(s) loaded</span>
+                </span>
 
                 <span id="du-parsed-badge" className="badge">
-                    <span id="nb-files-parsed">{this.props.fileParsed}</span> File(s) parsed
-			</span>
+                    <span id="nb-files-parsed">{this.props.fileParsed} File(s) parsed</span>
+                </span>
 
                 <span id="du-ignored-badge" className="badge">
-                    <span id="nb-files-ignored" onClick={this.props.onClick}>{this.props.fileIgnored} </span> File(s) ignored (Click to show)
-			</span>
+                    <span id="nb-files-ignored" onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</span>
+                </span>
 
                 <span id="du-status-info-text"></span>
 

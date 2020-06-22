@@ -50,6 +50,9 @@ export default class Uploader extends Component {
 
         this.ignoredClick = this.ignoredClick.bind(this)
 
+        this.ignoredFiles = {
+
+        }
     }
 
 
@@ -103,16 +106,16 @@ export default class Uploader extends Component {
 
                 }
             } catch (e) {
-                console.warn(e)
-            }
+				console.warn(e)
+                this.ignoredFiles[file.name] = e;		
+                console.log(this.ignoredFiles)		
+			}
 
         }
 
     }
 
     ignoredClick(event) {
-        console.log(this)
-        console.log(this.state.show)
         this.setState(((state) => {return {showIgnoredFiles:!state.showIgnoredFiles}}))
     }
 
@@ -134,11 +137,9 @@ export default class Uploader extends Component {
                     />
                     <StatusBar hideUploadButton={false} showProgressDetails={true} hideRetryButton={true} hideAfterFinish={false} uppy={this.uppy} />
                     <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.ignoredClick} 
-                    displayIgnoredFiles={this.state.showIgnoredFiles} closeIgnoredFiles={this.ignoredClick}/>
+                    displayIgnoredFiles={this.state.showIgnoredFiles} closeIgnoredFiles={this.ignoredClick} dataIgnoredFiles={this.ignoredFiles}/>
                     <WarningPatient show={this.state.warning} />
-                    <ControllerStudiesSeries studies={this.uploadModel} />
-                    
-                    
+                    <ControllerStudiesSeries studies={this.uploadModel} />                    
                 </div>
             </div>
 

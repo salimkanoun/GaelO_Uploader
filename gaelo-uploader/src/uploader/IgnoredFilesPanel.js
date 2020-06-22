@@ -12,10 +12,45 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, useState, setShow } from 'react'
+import React, { Component } from 'react'
 import Modal from 'react-bootstrap/Modal'
+import BootstrapTable from 'react-bootstrap-table-next';
 
 export default class IgnoredFilesPanel extends Component {
+
+    rows = {
+    }
+
+    columns = [
+        {
+            dataField: 'files',
+            text: 'Files',
+        },
+        {
+            dataField: 'reasons',
+            text: 'Reason',
+        },
+    ];
+
+    files = []
+    reasons = []
+
+    getFiles(){
+        return Object.keys(this.props.dataIgnoredFiles)
+    }
+
+    getReasons(){
+        return Object.values(this.props.dataIgnoredFiles)
+    }
+
+    createRows(){
+        this.files = this.getFiles()
+        this.reasons = this.getReasons()
+        for(let i=0; i<this.files.length; i++){
+            this.rows[this.files[i]]= { files:this.files[i], reasons:this.reasons[i] }
+        }
+        return this.rows
+    }
 
     render() {
         return (
@@ -24,16 +59,13 @@ export default class IgnoredFilesPanel extends Component {
                     <Modal.Title class="modal-title">Ignored files <span id="du-ignored-files-badge" class="badge badge-danger">{this.props.fileNumber}</span></Modal.Title>
                 </Modal.Header>
                 <Modal.Body class="modal-body">
-                    <table class="table table-responsive">
-                        <thead>
-                            <tr>
-                                <th>Files</th>
-                                <th>Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                    {console.log(this.createRows())}
+                    <BootstrapTable
+                            keyField='id'
+                            classes="table table-responsive table-borderless"
+                            data={Object.values(this.createRows())}
+                            columns={this.columns}
+                     />
                 </Modal.Body>
             </Modal>
         )

@@ -17,8 +17,6 @@ import IgnoredFilesPanel from './IgnoredFilesPanel'
 
 export default class ParsingDetails extends Component {
 
-
-
     render() {
         return (
             <Fragment>
@@ -34,7 +32,8 @@ export default class ParsingDetails extends Component {
         <span id="nb-files-ignored" onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</span>
                 </span>
 
-                <IgnoredFilesPanel display={this.props.displayIgnoredFiles} fileNumber={this.props.fileIgnored} closeListener={this.props.closeIgnoredFiles}/>
+                <IgnoredFilesPanel display={this.props.displayIgnoredFiles} fileNumber={this.props.fileIgnored} 
+                closeListener={this.props.closeIgnoredFiles} dataIgnoredFiles={this.props.dataIgnoredFiles}/>
 
 
                 <span id="du-status-info-text"></span>

@@ -14,76 +14,70 @@
 
 import React, { Component, Fragment } from 'react'
 import Modal from 'react-bootstrap/Modal'
+import BootstrapTable from 'react-bootstrap-table-next';
+
 
 export default class CheckPatient extends Component {
 
+    constructor(props) {
+        super(props)
+    }
+    columns = [
+        {
+            dataField: 'rowName',
+            text: '',
+        },
+        {
+            dataField: 'seriesDescription',
+            text: 'Expected',
+        },
+        {
+            dataField: 'rowNameData',
+            text: 'Current',
+        },
+        {
+            dataField: 'ignoreButton',
+            text: '',
+        },
+    ]
 
+
+    getData() {
+        let studyTemp = this.props.studies.allStudies();
+        //let study = studyTemp[String(Object.keys(studyTemp))]
+        //console.log("temp" + Object.values(study))
+        return Object.entries(this.props.studies.allStudies())
+    }
+
+    getPatientFirstName() {
+        let data = this.getData().patientName;
+        console.log(data)
+        return Object.keys(this.props.studies.allStudies())
+    }
+
+    gatheredData() {
+        return this.getData();
+    }
 
     render() {
         return (
-            <Modal show={this.props.display}>
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <Modal.Header class="modal-header">
-                            <h5 class="modal-title" id="du-patientLongTitle">Check Patient</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </Modal.Header>
-                        <Modal.Body class="modal-body">
-                            <div id="du-patp-comparison">
-                                <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Expected</th>
-                                            <th>Current</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr id="${µ(this.fields.fname.idRow)}">
-                                            <th>First name</th>
-                                            <td id="${µ(this.fields.fname.idExpected)}"></td>
-                                            <td id="${µ(this.fields.fname.idCurrent)}"></td>
-                                            <td><button id="${µ(this.fields.fname.idBtn)}">Ignore</button></td>
-                                        </tr>
-                                        <tr id="${µ(this.fields.lname.idRow)}">
-                                            <th>Last name</th>
-                                            <td id="${µ(this.fields.lname.idExpected)}"></td>
-                                            <td id="${µ(this.fields.lname.idCurrent)}"></td>
-                                            <td><button id="${µ(this.fields.lname.idBtn)}">Ignore</button></td>
-                                        </tr>
-                                        <tr id="${µ(this.fields.birthd.idRow)}">
-                                            <th>Birth date</th>
-                                            <td id="${µ(this.fields.birthd.idExpected)}"></td>
-                                            <td id="${µ(this.fields.birthd.idCurrent)}"></td>
-                                            <td><button id="${µ(this.fields.birthd.idBtn)}">Ignore</button></td>
-                                        </tr>
-                                        <tr id="${µ(this.fields.sex.idRow)}">
-                                            <th>Sex</th>
-                                            <td id="${µ(this.fields.sex.idExpected)}"></td>
-                                            <td id="${µ(this.fields.sex.idCurrent)}"></td>
-                                            <td><button id="${µ(this.fields.sex.idBtn)}">Ignore</button></td>
-                                        </tr>
-                                        <tr id="${µ(this.fields.acqd.idRow)}">
-                                            <th>Acquisition date</th>
-                                            <td id="${µ(this.fields.acqd.idExpected)}"></td>
-                                            <td id="${µ(this.fields.acqd.idCurrent)}"></td>
-                                            <td><button id="${µ(this.fields.acqd.idBtn)}">Ignore</button></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p>If you want to force the upload you may have to ignore all the warnings.</p>
-                        </Modal.Body>
-                        <Modal.Footer class="modal-footer">
-                            <button id="du-patp-btn-cancel" type="button" class="btn btn-secondary mr-3" data-dismiss="modal">Cancel</button>
-                            <button id="du-patp-btn-confirm" type="button" class="btn btn-primary" data-dismiss="modal">This is the correct patient</button>
-                        </Modal.Footer>
-                    </div>
-                </div>
+            <Modal show={this.props.display} onHide={this.props.closeListener}>
+                <Modal.Header class="modal-header" closeButton>
+                    <h5 class="modal-title" id="du-patientLongTitle">Check Patient</h5>
+                </Modal.Header>
+                <Modal.Body class="modal-body" id="du-patp-comparison">
+                    <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
+                    <BootstrapTable
+                        keyField='id'
+                        classes="table table-responsive table-borderless table-sm"
+                        bodyClasses="du-patp-comparison"
+                        data={this.gatheredData()}
+                        columns={this.columns} />
+                    <p>If you want to force the upload you may have to ignore all the warnings.</p>
+                </Modal.Body>
+                <Modal.Footer class="modal-footer">
+                    <button id="du-patp-btn-confirm" type="button" class="btn btn-primary" data-dismiss="modal">This is the correct patient</button>
+                </Modal.Footer>
             </Modal>
         )
     }

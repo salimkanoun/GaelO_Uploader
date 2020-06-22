@@ -42,14 +42,16 @@ export default class DisplaySeries extends Component {
             dataField: 'instances',
             text: 'Nb of Instances',
         },
+    ];
+
+    warnings = [
         {
             dataField: 'warnings',
             text: 'Warnings',
         },
     ];
-    
+
     getData() {
-        let studyTemp = this.props.series.allStudies();
         return Object.values(this.props.series.allStudies())
     }
 
@@ -57,13 +59,24 @@ export default class DisplaySeries extends Component {
         return (
             <>
                 <span class="title">Series</span>
-
-                <BootstrapTable
-                    keyField='id'
-                    classes="table table-responsive col-sm-8"
-                    bodyClasses="du-series-tbody"
-                    data={this.getData()}
-                    columns={this.columns} />
+                <div className="row">
+                    <div className="col" class="table table-responsive table-borderless col-sm-8">
+                        <BootstrapTable
+                            keyField='id'
+                            classes="table table-responsive col-sm-8"
+                            bodyClasses="du-series-tbody"
+                            data={this.getData()}
+                            columns={this.columns} />
+                    </div>
+                    <div className="col" class="table table-responsive table-borderless col-sm-4">
+                        <BootstrapTable
+                            keyField='id'
+                            classes="table table-responsive col-sm-4"
+                            bodyClasses="du-series-warnings"
+                            data={this.getData()}
+                            columns={this.warnings} />
+                    </div>
+                </div>
             </>
         )
     }

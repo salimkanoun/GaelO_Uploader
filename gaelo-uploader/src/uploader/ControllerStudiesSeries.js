@@ -37,7 +37,7 @@ export default class ControllerStudiesSeries extends Component {
     render() {
         return (
             <Fragment>
-                <DisplayStudies studies={this.props.studies} studySelected={this.selectedStudy}/>
+                <DisplayStudies studies={this.props.studies} studyID={this.selectedStudy}/>
                 <DisplaySeries series = {this.props.studies} />
             </Fragment>
         )

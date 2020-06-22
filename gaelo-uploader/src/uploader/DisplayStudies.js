@@ -14,42 +14,74 @@
 
 import React, { Component, Fragment } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
+import Button from 'react-bootstrap/Button'
+import CheckPatient from './CheckPatient'
 
 export default class DisplayStudies extends Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
 
+            columns: [
+                {
+                    dataField: 'idP',
+                    text: '',
+                    formatter: this.linkCheck,
+                },
+                {
+                    dataField: 'status',
+                    text: 'Status',
+                },
+                {
+                    dataField: 'patientName',
+                    text: 'Patient name',
+                },
+                {
+                    dataField: 'studyDescription',
+                    text: 'Description',
+                },
+                {
+                    dataField: 'accessionNumber',
+                    text: 'Accession #',
+                },
+                {
+                    dataField: 'acquisitionDate',
+                    text: 'Date',
+                },
+            ],
+            isCheck: false
+        }
+        this.onCheckChanged = this.onCheckChanged.bind(this);
+    }
 
-    columns = [
-        {
-            dataField: 'status',
-            text: 'Status',
-        },
-        {
-            dataField: 'patientName',
-            text: 'Patient name',
-        },
-        {
-            dataField: 'studyDescription',
-            text: 'Description',
-        },
-        {
-            dataField: 'accessionNumber',
-            text: 'Accesion #',
-        },
-        {
-            dataField: 'acquisitionDate',
-            text: 'Date',
-        },
+    warnings = [
         {
             dataField: 'warnings',
             text: 'Warnings',
         },
     ];
 
+    rowEventsStudies = {
+        onClick: (e, row) => {
+          this.setState({currentSelectedStudyId: row.patientName})
+        }
+      }
+
+    onCheckChanged() {
+        this.setState({ isCheck: !this.state.isCheck });
+        console.log(this.state.isCheck);
+    }
+
+    linkCheck = (cell, row, rowIndex, formatExtraData) => {
+        return (
+            <Button onClick={() => { this.onCheckChanged(row); }}>
+                Check Patient
+            </Button>
+        );
+    };
+
     getData() {
-        let studyTemp = this.props.studies.allStudies();
-        //let study = studyTemp[String(Object.keys(studyTemp))]
-        //console.log("temp" + Object.values(study))
         return Object.values(this.props.studies.allStudies())
     }
 
@@ -61,15 +93,28 @@ export default class DisplayStudies extends Component {
     render() {
         return (
             <>
+            <CheckPatient display={this.state.isCheck} closeListener={this.onCheckChanged} studies={this.props.studies}/>
                 <span class="title">Study</span>
-
-                <BootstrapTable
-                    keyField='id'
-                    classes="table table-responsive col-sm-8"
-                    bodyClasses="du-study-tbody"
-                    data={this.getData()}
-                    columns={this.columns}
-                    selectRow={selectRow} />
+                <div className="row">
+                    {console.log(this.getData())}
+                    <div className="col" class="table table-hover table-responsive table-borderless col-sm-8">
+                        <BootstrapTable studyID={this.state.currentSelectedStudyId}
+                            keyField='id'
+                            classes="table table-responsive col-sm-8"
+                            bodyClasses="du-studies-tbody"
+                            data={this.getData()}
+                            columns={this.state.columns}
+                            selectRow={selectRow} />
+                    </div>
+                    <div className="col" class="table table-hover table-responsive table-borderless col-sm-4">
+                        <BootstrapTable
+                            keyField='id'
+                            classes="table table-responsive col-sm-4"
+                            bodyClasses="du-studies-warnings"
+                            data={this.getData()}
+                            columns={this.warnings} />
+                    </div>
+                </div>
             </>
         )
     }

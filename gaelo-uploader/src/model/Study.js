@@ -50,6 +50,11 @@ export default class Study {
     getSeries(seriesInstanceUID) {
         return this.series[seriesInstanceUID]
     }
+
+    getAllSeries() {
+        return this.series
+    }
+    
     getPatientName() {
         return this.patientName
     }

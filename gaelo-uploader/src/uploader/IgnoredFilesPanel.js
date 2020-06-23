@@ -59,7 +59,6 @@ export default class IgnoredFilesPanel extends Component {
                     <Modal.Title class="modal-title">Ignored files <span id="du-ignored-files-badge" class="badge badge-danger">{this.props.fileNumber}</span></Modal.Title>
                 </Modal.Header>
                 <Modal.Body class="modal-body">
-                    {console.log(this.createRows())}
                     <BootstrapTable
                             keyField='id'
                             classes="table table-responsive table-borderless"

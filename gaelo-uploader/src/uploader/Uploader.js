@@ -108,7 +108,6 @@ export default class Uploader extends Component {
             } catch (e) {
 				console.warn(e)
                 this.ignoredFiles[file.name] = e;		
-                console.log(this.ignoredFiles)		
 			}
 
         }

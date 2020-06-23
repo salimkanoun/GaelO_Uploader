@@ -25,7 +25,7 @@ export default class DisplayStudies extends Component {
 
             columns: [
                 {
-                    dataField: 'idP',
+                    dataField: 'studyUID',
                     text: '',
                     formatter: this.linkCheck,
                 },
@@ -62,11 +62,18 @@ export default class DisplayStudies extends Component {
         },
     ];
 
-    rowEventsStudies = {
-        onClick: (e, row) => {
-          this.setState({currentSelectedStudyId: row.patientName})
+    state = {
+        currentSelectedStudyId: ''
+    }
+
+    selectRow = {
+        mode: 'radio',
+        clickToSelect: true,
+        onSelect: (row) => {
+            this.state.currentSelectedStudyId = row.studyUID
+            this.sendData()
         }
-      }
+    };
 
     onCheckChanged() {
         this.setState({ isCheck: !this.state.isCheck });
@@ -85,26 +92,23 @@ export default class DisplayStudies extends Component {
         return Object.values(this.props.studies.allStudies())
     }
 
-    getSelectedRowKeys() {
-        //Here is your answer
-        console.log(this.refs.table.state.selectedRowKeys)
-    }
+    sendData = () => { this.props.handleToUpdate(this.state.currentSelectedStudyId) }
 
     render() {
         return (
             <>
-            <CheckPatient display={this.state.isCheck} closeListener={this.onCheckChanged} studies={this.props.studies}/>
+                <CheckPatient display={this.state.isCheck} closeListener={this.onCheckChanged} studies={this.props.studies} />
                 <span class="title">Study</span>
                 <div className="row">
-                    {console.log(this.getData())}
                     <div className="col" class="table table-hover table-responsive table-borderless col-sm-8">
-                        <BootstrapTable studyID={this.state.currentSelectedStudyId}
+                        <BootstrapTable
                             keyField='id'
                             classes="table table-responsive col-sm-8"
                             bodyClasses="du-studies-tbody"
                             data={this.getData()}
                             columns={this.state.columns}
-                            selectRow={selectRow} />
+                            selectRow={this.selectRow}
+                        />
                     </div>
                     <div className="col" class="table table-hover table-responsive table-borderless col-sm-4">
                         <BootstrapTable
@@ -120,7 +124,3 @@ export default class DisplayStudies extends Component {
     }
 }
 
-const selectRow = {
-    mode: 'radio',
-    clickToSelect: true
-};

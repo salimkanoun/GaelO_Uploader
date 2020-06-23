@@ -35,8 +35,6 @@ export default class Series {
 
 	}
 
-	
-
 	getInstance(instanceUID) {
 		return this.instances[instanceUID]
 	}

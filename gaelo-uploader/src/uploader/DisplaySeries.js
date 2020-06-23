@@ -17,6 +17,10 @@ import BootstrapTable from 'react-bootstrap-table-next';
 
 export default class DisplaySeries extends Component {
 
+    constructor(props) {
+        super(props)
+    }
+
     columns = [
         {
             dataField: 'status',
@@ -28,7 +32,7 @@ export default class DisplaySeries extends Component {
         },
         {
             dataField: 'modality',
-            text: 'Description',
+            text: 'Modality',
         },
         {
             dataField: 'accessionNumber',
@@ -51,34 +55,53 @@ export default class DisplaySeries extends Component {
         },
     ];
 
-    getData() {
-        return Object.values(this.props.series.allStudies())
+    getSeries() {
+        let series = this.props.studies.allStudies() 
+        let seriesData = []
+        for (let e in series[this.props.studyID]) {
+            if(e == 'series'){
+                series = series[this.props.studyID][e]
+                for(let element in series){
+                let nbInstances = 0
+                for (let instances in series[element].instances){
+                    nbInstances++
+                }
+                seriesData.push({
+                    status: null, seriesDescription: series[element].seriesDescription, modality: series[element].modality,
+                    accessionNumber: series[element].seriesNumber, acquisitionDate: series[element].seriesDate, instances:nbInstances
+                })
+            }
+            }
+        }         
+        return seriesData
     }
 
     render() {
-        return (
-            <>
-                <span class="title">Series</span>
-                <div className="row">
-                    <div className="col" class="table table-responsive table-borderless col-sm-8">
-                        <BootstrapTable
-                            keyField='id'
-                            classes="table table-responsive col-sm-8"
-                            bodyClasses="du-series-tbody"
-                            data={this.getData()}
-                            columns={this.columns} />
+        if (this.props.studies != null) {
+            return (
+                <>
+                    <span class="title">Series</span>
+                    <div className="row">
+                        <div className="col" class="table table-responsive table-borderless col-sm-8">
+                            <BootstrapTable
+                                keyField='id'
+                                classes="table table-responsive col-sm-8"
+                                bodyClasses="du-series-tbody"
+                                data={Object.values(this.getSeries())}
+                                columns={this.columns} />
+                        </div>
+                        <div className="col" class="table table-responsive table-borderless col-sm-4">
+                            <BootstrapTable
+                                keyField='id'
+                                classes="table table-responsive col-sm-4"
+                                bodyClasses="du-series-warnings"
+                                data={Object.values(this.props.studies.allStudies())}
+                                columns={this.warnings} />
+                        </div>
                     </div>
-                    <div className="col" class="table table-responsive table-borderless col-sm-4">
-                        <BootstrapTable
-                            keyField='id'
-                            classes="table table-responsive col-sm-4"
-                            bodyClasses="du-series-warnings"
-                            data={this.getData()}
-                            columns={this.warnings} />
-                    </div>
-                </div>
-            </>
-        )
+                </>
+            )
+        } else { return null }
     }
 
 }

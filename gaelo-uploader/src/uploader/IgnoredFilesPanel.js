@@ -35,19 +35,19 @@ export default class IgnoredFilesPanel extends Component {
     files = []
     reasons = []
 
-    getFiles(){
+    getFiles() {
         return Object.keys(this.props.dataIgnoredFiles)
     }
 
-    getReasons(){
+    getReasons() {
         return Object.values(this.props.dataIgnoredFiles)
     }
 
-    createRows(){
+    createRows() {
         this.files = this.getFiles()
         this.reasons = this.getReasons()
-        for(let i=0; i<this.files.length; i++){
-            this.rows[this.files[i]]= { files:this.files[i], reasons:this.reasons[i] }
+        for (let i = 0; i < this.files.length; i++) {
+            this.rows[this.files[i]] = { files: this.files[i], reasons: this.reasons[i] }
         }
         return this.rows
     }
@@ -60,11 +60,11 @@ export default class IgnoredFilesPanel extends Component {
                 </Modal.Header>
                 <Modal.Body class="modal-body">
                     <BootstrapTable
-                            keyField='id'
-                            classes="table table-responsive table-borderless"
-                            data={Object.values(this.createRows())}
-                            columns={this.columns}
-                     />
+                        keyField='id'
+                        classes="table table-responsive table-borderless"
+                        data={Object.values(this.createRows())}
+                        columns={this.columns}
+                    />
                 </Modal.Body>
             </Modal>
         )

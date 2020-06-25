@@ -14,32 +14,25 @@
 
 import React, { Component, Fragment } from 'react'
 import IgnoredFilesPanel from './IgnoredFilesPanel'
+import Badge from 'react-bootstrap/Badge'
 
 export default class ParsingDetails extends Component {
 
     render() {
         return (
-            <Fragment>
-                <span id="du-loaded-badge" className="badge">
-                    <span id="nb-files-loaded">{this.props.fileLoaded} File(s) loaded</span>
-                </span>
+            <>
+                <div>
+                    <Badge variant='secondary'>{this.props.fileLoaded} File(s) loaded</Badge>{' '}
 
-                <span id="du-parsed-badge" className="badge">
-                    <span id="nb-files-parsed">{this.props.fileParsed} File(s) parsed</span>
-                </span>
+                    <Badge variant='success'>{this.props.fileParsed} File(s) parsed</Badge>{' '}
 
-                <span id="du-ignored-badge" className="badge">
-        <span id="nb-files-ignored" onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</span>
-                </span>
+                    <Badge variant='warning' class='du-ignored-badge' onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</Badge>{' '}
+                </div>
 
-                <IgnoredFilesPanel display={this.props.displayIgnoredFiles} fileNumber={this.props.fileIgnored} 
-                closeListener={this.props.closeIgnoredFiles} dataIgnoredFiles={this.props.dataIgnoredFiles}/>
+                <IgnoredFilesPanel display={this.props.displayIgnoredFiles} fileNumber={this.props.fileIgnored}
+                    closeListener={this.props.closeIgnoredFiles} dataIgnoredFiles={this.props.dataIgnoredFiles} />
 
-
-                <span id="du-status-info-text"></span>
-
-                <div id="du-ignored-files-panel"></div>
-            </Fragment>
+            </>
         )
     }
 }

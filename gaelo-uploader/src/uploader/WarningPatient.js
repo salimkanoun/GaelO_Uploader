@@ -26,9 +26,9 @@ export default class WarningPatient extends Component {
 
     render() {
         return (
-            <Fragment>
+            <>
                 <Alert variant="warning" show={this.setShow} dismissible onClose={() => this.setShow = false}>Please, check/select the patient. The imported patient informations do not correspond with the expected ones.</Alert>
-            </Fragment>
+            </>
         )
     }
 }

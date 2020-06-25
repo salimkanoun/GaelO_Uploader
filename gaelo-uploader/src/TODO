@@ -1,7 +1,7 @@
-Récupérer les infos dans un fichier et les trier dans un modèle
-Description dicom (path + infos noms etc) et explorer profil de mémoire (plus de réf de dicomParser, uniquement les objets)
+Bootstrap Dropzone
+Clean code & components
+Simplifier composants
+Warnings
+/!\ state en dehors des constructeurs
 
-Regrouper les mêmes studies
-Modele: array study (getSeries (-> getInstances pour récupérer les instances relatives)) isExisting pour les study et series
-Clés uniques UIDs
-Stocker chemin
+REDUX

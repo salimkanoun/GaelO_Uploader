@@ -26,7 +26,7 @@ export default class Study {
         this.patientName = patientName;
         this.patientBirthDate = patientBirthDate;
         this.patientSex = patientSex;
-        this.acquisitionDate = acquisitionDate;
+        this.acquisitionDate = this.getDate(acquisitionDate);
         /*
         this.validSeries = [];     // have passed the checks
         this.rejectedSeries = [];  // do not have passed the checks
@@ -54,7 +54,7 @@ export default class Study {
     getAllSeries() {
         return this.series
     }
-    
+
     getPatientName() {
         return this.patientName
     }
@@ -71,10 +71,13 @@ export default class Study {
         return this.studyDate
     }
 
-    getDate(){
-        let rawDate = String(this.seriesDate);
-        return (rawDate.substring(5, 6) + rawDate.substring(4, 5) + rawDate.substring(0, 3))
-	}
+    getDate(rawDate) {
+        if (rawDate != null) {
+            return (rawDate.substring(0, 4) + '-' + rawDate.substring(4, 6) + '-' + rawDate.substring(6, 8))
+        } else {
+            return null
+        }
+    }
 
     getStudyDescription() {
         return this.studyDescription

@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment, setState} from 'react'
+import React, { Component, Fragment, setState } from 'react'
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 
@@ -23,21 +23,21 @@ export default class ControllerStudiesSeries extends Component {
         selectedStudy: null
     }
 
-    constructor(props){
+    constructor(props) {
         super(props)
         //this.handleToUpdate = this.handleToUpdate.bind(this)
     }
 
-    handleToUpdate = (studyUID)  => {
-        this.setState({selectedStudy: studyUID})
-        
+    handleToUpdate = (studyUID) => {
+        this.setState({ selectedStudy: studyUID })
+
     }
 
     render() {
         return (
             <Fragment>
-                <DisplayStudies studies={this.props.studies} handleToUpdate={this.handleToUpdate}/>
-                <DisplaySeries studies = {this.props.studies} studyID={this.state.selectedStudy} refreshSerie={this.selectedStudy}/>
+                <DisplayStudies studies={this.props.studies} handleToUpdate={this.handleToUpdate} />
+                <DisplaySeries studies={this.props.studies} studyID={this.state.selectedStudy} refreshSerie={this.selectedStudy} />
             </Fragment>
         )
     }

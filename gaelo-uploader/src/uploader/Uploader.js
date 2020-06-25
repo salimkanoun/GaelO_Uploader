@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import Jumbotron from 'react-bootstrap/Jumbotron'
+import Card from 'react-bootstrap/Card'
 import { StatusBar, DragDrop } from '@uppy/react'
 import Uppy from '@uppy/core'
 import dicomParser from 'dicom-parser'
@@ -12,9 +14,11 @@ import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './ProgressUpload'
 import WarningPatient from './WarningPatient'
 
+import { getAets, logIn, registerStudy } from '../services/api'
+
 export default class Uploader extends Component {
 
-    state = { fileIgnored: 0, fileParsed: 0, fileLoaded: 0, warning: true, show: false, showIgnoredFiles:false }
+    state = { fileIgnored: 0, fileParsed: 0, fileLoaded: 0, warning: true, show: false, showIgnoredFiles: false }
 
     constructor(props) {
 
@@ -54,6 +58,15 @@ export default class Uploader extends Component {
 
         }
     }
+
+    async componentDidMount() {
+        await logIn()
+        await registerStudy()
+        let answer = await getAets()
+        console.log(answer)
+
+    }
+
 
 
     /**
@@ -106,41 +119,43 @@ export default class Uploader extends Component {
 
                 }
             } catch (e) {
-				console.warn(e)
-                this.ignoredFiles[file.name] = e;		
-			}
+                console.warn(e)
+                this.ignoredFiles[file.name] = e;
+            }
 
         }
 
     }
 
     ignoredClick(event) {
-        this.setState(((state) => {return {showIgnoredFiles:!state.showIgnoredFiles}}))
+        this.setState(((state) => { return { showIgnoredFiles: !state.showIgnoredFiles } }))
     }
 
 
 
     render() {
         return (
-            <div className="jumbotron">
-                <h2 className="col card-title">Import Dicom Files</h2>
-                <div className="col mb-5">
-                    <DragDrop
-                        uppy={this.uppy}
-                        locale={{
-                            strings: {
-                                dropHereOr: 'Drop Dicom Folder',
-                                browse: 'browse'
-                            }
-                        }}
-                    />
-                    <StatusBar hideUploadButton={false} showProgressDetails={true} hideRetryButton={true} hideAfterFinish={false} uppy={this.uppy} />
-                    <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.ignoredClick} 
-                    displayIgnoredFiles={this.state.showIgnoredFiles} closeIgnoredFiles={this.ignoredClick} dataIgnoredFiles={this.ignoredFiles}/>
-                    <WarningPatient show={this.state.warning} />
-                    <ControllerStudiesSeries studies={this.uploadModel} />                    
-                </div>
-            </div>
+            <Jumbotron className="jumbotron">
+                <Card className="col mb-5">
+                    <Card.Title className="card-title">Import Dicom Files</Card.Title>
+                    <Card.Body>
+                        <DragDrop
+                            uppy={this.uppy}
+                            locale={{
+                                strings: {
+                                    dropHereOr: 'Drop Dicom Folder',
+                                    browse: 'browse'
+                                }
+                            }}
+                        />
+                        <StatusBar Button={true} showProgressDetails={true} hideRetryButton={false} hideAfterFinish={false} uppy={this.uppy} />
+                        <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.ignoredClick}
+                            displayIgnoredFiles={this.state.showIgnoredFiles} closeIgnoredFiles={this.ignoredClick} dataIgnoredFiles={this.ignoredFiles} />
+                        <WarningPatient show={this.state.warning} />
+                        <ControllerStudiesSeries studies={this.uploadModel} />
+                    </Card.Body>
+                </Card>
+            </Jumbotron>
 
         )
     }

@@ -90,23 +90,8 @@
 	font-weight: bold;
 }
 
-#du-status-info #du-loaded-badge {
-	color: #10212b;
-	background-color: #bec2ca;
-}
-
-#du-status-info #du-parsed-badge {
-	color: #0a4d10;
-	background-color: #a6e38d;
-}
-
 #du-status-info #du-ignored-badge {
-	cursor: pointer;
-	color: #212529;
-	background-color: #ffc107;
-}
-#du-status-info #du-ignored-badge:hover {
-	background-color: #ffd146;
+	cursor:pointer;
 }
 
 /* # IGNORED PANEL */

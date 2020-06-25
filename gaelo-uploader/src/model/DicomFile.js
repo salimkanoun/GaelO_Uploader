@@ -14,7 +14,6 @@
 
 import dicomParser from 'dicom-parser'
 
-
 export default class DicomFile {
 
 	constructor(originalFile, dataSet) {

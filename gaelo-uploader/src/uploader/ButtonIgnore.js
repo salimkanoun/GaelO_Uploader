@@ -13,32 +13,33 @@
  */
 
 import React, { Component, Fragment } from 'react'
+import Button from 'react-bootstrap/Button'
 
+export default class ButtonIgnore extends Component {
 
-export default class ProgressUpload {
+    state = { ignored: false }
 
-    constructor() {
+    constructor(props) {
+        super(props)
+        this.id = this.props.id
+        this.onClick = this.onClick.bind(this)
 
     }
 
-    zipFile() {
+    isIgnoredData() {
+        this.setState((state) => { return { ignored: !state.ignored } })
+    }
+
+    onClick() {
+        this.isIgnoredData()
+        this.props.onClick(this.id, this.state.ignored);
     }
 
     render() {
         return (
-            <Fragment>
-                <button id="du-upload" class="btn btn-success">Upload</button>
-
-                <div>
-                    <div id="du-prog-bar-zipping" class="progress">
-                        <div class="progress-bar progress-bar-striped bg-dark"></div>
-                    </div>
-
-                    <div id="du-prog-bar-upload" class="progress">
-                        <div class="progress-bar progress-bar-striped"></div>
-                    </div>
-                </div>
-            </Fragment>
+            <>
+                <Button onClick={this.onClick}>{!this.ignored ? 'Consider' : 'Ignore'}</Button>
+            </>
         )
     }
 }

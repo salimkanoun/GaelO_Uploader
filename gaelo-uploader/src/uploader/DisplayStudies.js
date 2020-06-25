@@ -16,7 +16,9 @@ import React, { Component, Fragment } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
 import Button from 'react-bootstrap/Button'
 import CheckPatient from './CheckPatient'
-
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 export default class DisplayStudies extends Component {
 
     constructor(props) {
@@ -50,7 +52,8 @@ export default class DisplayStudies extends Component {
                     text: 'Date',
                 },
             ],
-            isCheck: false
+            isCheck: false,
+            currentSelectedStudyId: ''
         }
         this.onCheckChanged = this.onCheckChanged.bind(this);
     }
@@ -61,10 +64,6 @@ export default class DisplayStudies extends Component {
             text: 'Warnings',
         },
     ];
-
-    state = {
-        currentSelectedStudyId: ''
-    }
 
     selectRow = {
         mode: 'radio',
@@ -77,16 +76,34 @@ export default class DisplayStudies extends Component {
 
     onCheckChanged() {
         this.setState({ isCheck: !this.state.isCheck });
-        console.log(this.state.isCheck);
     }
 
-    linkCheck = (cell, row, rowIndex, formatExtraData) => {
+    linkCheck = (row) => {
         return (
             <Button onClick={() => { this.onCheckChanged(row); }}>
                 Check Patient
             </Button>
         );
     };
+
+    getDate(date) {
+        let rawDate = String(date);
+        return (rawDate.substring(0, 4) + '-' + rawDate.substring(4, 6) + '-' + rawDate.substring(6, 8))
+    }
+
+    formatDate() {
+        let data = this.props.studies.allStudies()
+        let date = {}
+        for (let element in data) {
+            let tempObj = data[element]
+            for (let e in tempObj) {
+                if (e == 'studyDate') {
+                    date[element] = (tempObj[e])
+                }
+            }
+        }
+        return date
+    }
 
     getData() {
         return Object.values(this.props.studies.allStudies())
@@ -97,28 +114,30 @@ export default class DisplayStudies extends Component {
     render() {
         return (
             <>
-                <CheckPatient display={this.state.isCheck} closeListener={this.onCheckChanged} studies={this.props.studies} />
-                <span class="title">Study</span>
-                <div className="row">
-                    <div className="col" class="table table-hover table-responsive table-borderless col-sm-8">
-                        <BootstrapTable
-                            keyField='id'
-                            classes="table table-responsive col-sm-8"
-                            bodyClasses="du-studies-tbody"
-                            data={this.getData()}
-                            columns={this.state.columns}
-                            selectRow={this.selectRow}
-                        />
-                    </div>
-                    <div className="col" class="table table-hover table-responsive table-borderless col-sm-4">
-                        <BootstrapTable
-                            keyField='id'
-                            classes="table table-responsive col-sm-4"
-                            bodyClasses="du-studies-warnings"
-                            data={this.getData()}
-                            columns={this.warnings} />
-                    </div>
-                </div>
+                <CheckPatient display={this.state.isCheck} closeListener={this.onCheckChanged} studies={this.props.studies} studyID={this.state.currentSelectedStudyId} />
+                <Container fluid>
+                    <span class="title">Study</span>
+                    <Row>
+                        <Col xs={12} md={8}>
+                            <BootstrapTable
+                                keyField='id'
+                                classes="table table-responsive table-borderless"
+                                bodyClasses="du-studies-tbody"
+                                data={this.getData()}
+                                columns={this.state.columns}
+                                selectRow={this.selectRow}
+                            />
+                        </Col>
+                        <Col xs={6} md={4}>
+                            <BootstrapTable
+                                keyField='id'
+                                classes="table table-responsive table-borderless"
+                                bodyClasses="du-studies-warnings"
+                                data={this.getData()}
+                                columns={this.warnings} />
+                        </Col>
+                    </Row>
+                </Container>
             </>
         )
     }

@@ -38,7 +38,7 @@ export default class Modele {
         return this.data[studyInstanceUID]
     }
 
-    allStudies(){
+    allStudies() {
         return this.data
     }
 

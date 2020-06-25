@@ -15,24 +15,27 @@
 import React, { Component, Fragment } from 'react'
 import Modal from 'react-bootstrap/Modal'
 import BootstrapTable from 'react-bootstrap-table-next';
-
+import ButtonIgnore from './ButtonIgnore'
+import Button from 'react-bootstrap/Button'
 
 export default class CheckPatient extends Component {
 
     constructor(props) {
         super(props)
+        this.onClick = this.onClick.bind(this)
     }
+
     columns = [
         {
             dataField: 'rowName',
             text: '',
         },
         {
-            dataField: 'seriesDescription',
+            dataField: 'expectedData',
             text: 'Expected',
         },
         {
-            dataField: 'rowNameData',
+            dataField: 'currentData',
             text: 'Current',
         },
         {
@@ -41,6 +44,9 @@ export default class CheckPatient extends Component {
         },
     ]
 
+    onClick(id, ignored) {
+
+    }
 
     getData() {
         let studyTemp = this.props.studies.allStudies();
@@ -50,9 +56,17 @@ export default class CheckPatient extends Component {
     }
 
     getPatientFirstName() {
-        let data = this.getData().patientName;
-        console.log(data)
-        return Object.keys(this.props.studies.allStudies())
+        let data = this.props.studies;
+        return (this.data)
+    }
+
+    generateRows() {
+        let labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
+        let data = []
+        for (let i in labels) {
+            data.push({ id: i, rowName: labels[i], expectedData: null, currentData: null, ignoreButton: <ButtonIgnore id={i} onClick={this.onClick} /> })
+        }
+        return data
     }
 
     gatheredData() {
@@ -61,9 +75,10 @@ export default class CheckPatient extends Component {
 
     render() {
         return (
-            <Modal show={this.props.display} onHide={this.props.closeListener}>
+            <Modal show={this.props.display} onHide={this.props.closeListener} updatedData={null}>
+                {this.getPatientFirstName()}
                 <Modal.Header class="modal-header" closeButton>
-                    <h5 class="modal-title" id="du-patientLongTitle">Check Patient</h5>
+                    <Modal.Title class="modal-title" id="du-patientLongTitle">Check Patient</Modal.Title>
                 </Modal.Header>
                 <Modal.Body class="modal-body" id="du-patp-comparison">
                     <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
@@ -71,12 +86,12 @@ export default class CheckPatient extends Component {
                         keyField='id'
                         classes="table table-responsive table-borderless table-sm"
                         bodyClasses="du-patp-comparison"
-                        data={this.gatheredData()}
+                        data={Object.values(this.generateRows())}
                         columns={this.columns} />
                     <p>If you want to force the upload you may have to ignore all the warnings.</p>
                 </Modal.Body>
                 <Modal.Footer class="modal-footer">
-                    <button id="du-patp-btn-confirm" type="button" class="btn btn-primary" data-dismiss="modal">This is the correct patient</button>
+                    <Button id="du-patp-btn-confirm" type="button" class="btn btn-primary" data-dismiss="modal">This is the correct patient</Button>
                 </Modal.Footer>
             </Modal>
         )

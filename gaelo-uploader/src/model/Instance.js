@@ -25,7 +25,7 @@ export default class Instance {
             + "\nDicom: " + this.dicomFile);
     }
 
-    getFile(){
+    getFile() {
         return this.file
     }
 }

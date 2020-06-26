@@ -16,15 +16,17 @@ export default class Study {
 
     series = {}
 
-    constructor(studyUID, studyID, studyDate, studyDescription, accessionNumber, patientID, patientName, patientBirthDate, patientSex, acquisitionDate) {
+    constructor(studyUID, studyID, studyDate, studyDescription, accessionNumber, patientID, patientFirstName, patientLastName,
+        patientBirthDate, patientSex, acquisitionDate) {
         this.studyUID = studyUID;
         this.studyID = studyID;
         this.studyDate = studyDate;
         this.studyDescription = studyDescription;
         this.accessionNumber = accessionNumber;
         this.patientID = patientID;
-        this.patientName = patientName;
-        this.patientBirthDate = patientBirthDate;
+        this.patientFirstName = patientFirstName;
+        this.patientLastName = patientLastName;
+        this.patientBirthDate = this.getDate(patientBirthDate);
         this.patientSex = patientSex;
         this.acquisitionDate = this.getDate(acquisitionDate);
         /*
@@ -33,8 +35,6 @@ export default class Study {
         this.queuedSeries = [];    // in wait for uplaod
         this.visit = null;
         this.warnings = {};
-        this.isQueued = undefined;
-        this.isUploadAborted = undefined;
         */
     }
 
@@ -56,7 +56,15 @@ export default class Study {
     }
 
     getPatientName() {
-        return this.patientName
+        return (this.patientFirstName + this.patientLastName)
+    }
+
+    getPatientFirstName() {
+        return this.patientFirstName
+    }
+
+    getPatientLastName() {
+        return this.patientLastName
     }
 
     getStudyUID() {
@@ -69,6 +77,10 @@ export default class Study {
 
     getStudyDate() {
         return this.studyDate
+    }
+
+    getAcquisitionDate() {
+        return this.acquisitionDate
     }
 
     getDate(rawDate) {
@@ -107,5 +119,6 @@ export default class Study {
             + "\nPatient Name: " + this.patientName
             + "\nPatient sex: " + this.patientSex);
     }
+
 
 }

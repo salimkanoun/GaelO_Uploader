@@ -38,7 +38,7 @@ export default class ButtonIgnore extends Component {
     render() {
         return (
             <>
-                <Button onClick={this.onClick}>{!this.ignored ? 'Consider' : 'Ignore'}</Button>
+                <Button onClick={this.onClick}>{!this.state.ignored ? 'Consider' : 'Ignore'}</Button>
             </>
         )
     }

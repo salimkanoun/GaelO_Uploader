@@ -17,6 +17,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 export default class DisplaySeries extends Component {
 
     constructor(props) {
@@ -101,34 +102,35 @@ export default class DisplaySeries extends Component {
     }
 
     render() {
-        if (this.props.studies != null) {
-            return (
-                <>
-                    <Container fluid>
-                        <span class="title">Series</span>
-                        <Row>
-                            <Col xs={12} md={8}>
-                                <BootstrapTable
-                                    keyField='seriesInstanceUID'
-                                    classes="table table-responsive table-borderless"
-                                    bodyClasses="du-series-tbody"
-                                    data={Object.values(this.getSeries())}
-                                    columns={this.columns}
-                                    selectRow={this.selectRow} />
-                            </Col>
-                            <Col xs={6} md={4}>
-                                <BootstrapTable
-                                    keyField='id'
-                                    classes="table table-responsive table-borderless"
-                                    bodyClasses="du-series-warnings"
-                                    data={Object.values(this.props.studies.allStudies())}
-                                    columns={this.warnings} />
-                            </Col>
-                        </Row>
-                    </Container>
-                </>
-            )
-        } else { return null }
+        return (
+            <>
+                <Container fluid>
+                    <span class="title">Series</span>
+                    <Row>
+                        <Col xs={12} md={8}>
+                            <BootstrapTable
+                                classes="table table-borderless"
+                                bodyClasses="du-series-tbody"
+                                headerClasses="du-series th"
+                                rowClasses="du-series td"
+                                keyField='seriesInstanceUID'
+                                data={Object.values(this.getSeries())}
+                                columns={this.columns}
+                                selectRow={this.selectRow} />
+                        </Col>
+                        <Col xs={6} md={4}>
+                            <BootstrapTable
+                                keyField='id'
+                                classes="table table-borderless"
+                                bodyClasses="du-series-warnings"
+                                headerClasses="du-series-warnings th"
+                                data={Object.values(this.props.studies.allStudies())}
+                                columns={this.warnings} />
+                        </Col>
+                    </Row>
+                </Container>
+            </>
+        )
     }
 
 }

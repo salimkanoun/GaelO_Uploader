@@ -90,13 +90,13 @@
 	font-weight: bold;
 }
 
-#du-status-info #du-ignored-badge {
+#du-status-info .du-ignored-badge {
 	cursor:pointer;
 }
 
 /* # IGNORED PANEL */
-#du-ignored-files-modal td,
-#du-ignored-files-modal th {
+.du-ignored-files-modal td,
+.du-ignored-files-modal th {
 	padding-top: 2px;
 	padding-bottom: 2px;
 	border-left: none;
@@ -107,16 +107,16 @@
 
 /* # ALERTS */
 
-#du-alerts {
+.du-alerts {
 	margin-bottom: 16px;
 }
 
-#du-alerts .card-body {
+.du-alerts .card-body {
 	padding:0;
 }
 
-#du-alerts td,
-#du-alerts th {
+.du-alerts td,
+.du-alerts th {
 	padding-left: 20px;
 	padding-top: 2px;
 	padding-bottom: 2px;
@@ -126,121 +126,120 @@
 	text-align: inherit;
 }
 
-#du-alerts #du-warnings .card-link {
+.du-alerts .du-warnings .card-link {
 	font-weight: bold;
 	color: #F04100;
 }
-#du-alerts #du-warnings .card-link:hover {
+.du-alerts .du-warnings .card-link:hover {
 	font-weight: bold;
 	color: #c73500;
 }
 
-#du-alerts #du-warnings {
+.du-alerts .du-warnings {
 	color: #735245;
 	background-color: #ffffff;
 }
 
 
-#du-alerts #du-ignored .card-link {
+.du-alerts .du-ignored .card-link {
 	font-weight: bold;
 	color: #F29E14;
 }
-#du-alerts #du-ignored .card-link:hover {
+.du-alerts .du-ignored .card-link:hover {
 	font-weight: bold;
 	color: #d38810;
 }
 
-#du-alerts #du-ignored {
+.du-alerts .du-ignored {
 	color: #735245;
 	background-color: #ffffff;
 }
 
 /* STUDIES & SERIES LIST */
 
-#du-studies td,
-#du-studies th,
-#du-series td,
-#du-series th {
+.du-studies td,
+.du-studies th,
+.du-series td,
+.du-series th {
 	padding: 2px 10px;
-	border-left: none;
-	border-right: none;
-	border-block-end: none;
+	border-top: 1px solid #dee2e6;
 	text-align: inherit;
 }
 
-#du-studies th,
-#du-series th {
+.du-studies th,
+.du-series th {
 	color: #956a6a;
+	border-top: 1px solid #dee2e6;
 }
 
-#du-studies table,
-#du-series table {
+.du-studies table,
+.du-series table {
 	font-size: 13px;
 	background-color: #fff;
 }
 
-#du-studies td,
-#du-series td {
+.du-studies td,
+.du-series td {
 	padding: 2px 6px;
 }
 
-#du-studies :not(.row-clicked).row-clickable:hover,
-#du-series :not(.row-clicked).row-clickable:hover {
+.du-studies :not(.row-clicked).row-clickable:hover,
+.du-series :not(.row-clicked).row-clickable:hover {
 	cursor: pointer;
 	color: #08121b;
 	background-color: #e7f0f8;
 }
 
-#du-studies .row-clicked,
-#du-series .row-clicked {
+.du-studies .row-clicked,
+.du-series .row-clicked {
 	font-weight: bold;
 }
 
-#du-studies .row-success,
-#du-series .row-success {
+.du-studies .row-success,
+.du-series .row-success {
 	color: #09810f;
 	background-color: #e2ffe1;
 }
 
-#du-studies .row-danger,
-#du-series .row-danger {
+.du-studies .row-danger,
+.du-series .row-danger {
 	color: #c40404;
 	background-color: #fff3f3;
 }
 
-#du-studies :not(.ignored).row-warning,
-#du-series :not(.ignored).row-warning {
+.du-studies :not(.ignored).row-warning,
+.du-series :not(.ignored).row-warning {
 	color: #8f510a;
 	background-color: #ffeacb;
 }
 
-#du-studies .ignored,
-#du-series .ignored {
+.du-studies .ignored,
+.du-series .ignored {
 	font-style: italic;
 	color: #a4a4a4;
 	background-color: #f7f7f7;
 }
 
-#du-studies-warnings,
-#du-series-warnings {
+.du-studies-warnings,
+.du-series-warnings {
 	background-color: #fef5e7;
 	color: #810909;
 }
 
-#du-studies-warnings td button,
-#du-series-warnings td button {
+.du-studies-warnings td button,
+.du-series-warnings td button {
 	color: white;
 	background-color: #4a4848;
 	border-radius: 4px;
 	border: 0;
 }
 
-#du-studies-warnings td button:hover,
-#du-series-warnings td button:hover {
+.du-studies-warnings td button:hover,
+.du-series-warnings td button:hover {
 	background-color: #686666;
 }
 
-#du-studies .du-pat-remove-btn {
+.du-studies .du-pat-remove-btn {
 	padding: 0px 6px;
 }
 
@@ -300,38 +299,38 @@ input:disabled {
 
 /* # CONTROLS */
 
-#du-controls {
+.du-controls {
 	display: flex;
 	margin: 12px auto;
 }
 
-#du-controls>button {
+.du-controls>button {
 	max-width: 100px;
 	margin-right: 12px;
 }
 
-#du-controls>div {
+.du-controls>div {
 	flex: 1;
 }
 
-#du-controls #du-prog-bar-zipping {
+.du-controls #du-prog-bar-zipping {
 	margin-bottom: 6px;
 }
 
 
 /* # SELECT VISIT ID */
-#du-patient .modal-content p {
+.du-patient .modal-content p {
 	font-size: 14px;
 	line-height: 15px;
 	margin-bottom: 4px;
 }
 
-#du-patient .modal-body > div {
+.du-patient .modal-body > div {
 	margin-bottom: 12px;
 }
 
-#du-patient td,
-#du-patient th {
+.du-patient td,
+.du-patient th {
 	padding: 2px 10px;
 	border-left: none;
 	border-right: none;
@@ -339,45 +338,46 @@ input:disabled {
 	text-align: inherit;
 }
 
-#du-patient .row-success {
+.du-patient .row-success {
 	color: #1a8a1f;
 	background-color: #f7fff6;
 }
 
-#du-patient .row-danger {
+.du-patient .row-danger {
 	color: #a31e1e;
 	background-color: #fff2f2;
 }
 
-#du-patient :not(.row-clicked).row-clickable:hover {
+.du-patient :not(.row-clicked).row-clickable:hover {
 	cursor: pointer;
 	color: #08121b;
 	background-color: #e7f0f8;
 }
 
-#du-patient .row-clicked{
+.du-patient .row-clicked{
 	font-weight: bold;
 }
 
-#du-patient .row-disabled {
+.du-patient .row-disabled {
 	background-color: #f0f0f0;
 	color: #aaa;
 	font-style: italic;
 }
 
-#du-patient .du-patp-label {
+.du-patient .du-patp-label {
 	font-weight: bold;
 	color: rgb(165, 23, 56);
 }
 
-#du-patient #du-patp-comparison tbody td button {
+.du-patient .du-patp-comparison tbody td button {
 	padding-bottom: 1px;
 	color: white;
 	background-color: #4a4848;
 	border-radius: 4px;
-	border: 0;
+	border-top: 1px solid #dee2e6;
 }
 
-#du-patient #du-patp-comparison tbody td button:hover {
+.du-patient .du-patp-comparison tbody td button:hover {
 	background-color: #686666;
+	
 }

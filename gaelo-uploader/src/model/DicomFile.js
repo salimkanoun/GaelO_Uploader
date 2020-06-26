@@ -262,18 +262,14 @@ export default class DicomFile {
 		}
 	}
 
-	//SK A VOIR UTILITE
-	getPatientFullName() {
-		try {
-			let name = this.patientName;
-			name.toString = () => {
-				let fullname = name.familyName + ' ' + name.givenName;
-				return fullname.replace('undefined', '').trim();
-			}
-			return name;
-		} catch (e) {
-			return undefined;
-		}
+	getPatientFirstName(){
+		return this.getPatientName().split('-').pop();
 	}
+
+	getPatientLastName(){
+		return this.getPatientName().substring(0, this.getPatientName().indexOf("^"));
+	}
+
+
 
 }

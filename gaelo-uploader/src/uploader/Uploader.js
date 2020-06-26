@@ -18,7 +18,7 @@ import { getAets, logIn, registerStudy } from '../services/api'
 
 export default class Uploader extends Component {
 
-    state = { fileIgnored: 0, fileParsed: 0, fileLoaded: 0, warning: true, show: false, showIgnoredFiles: false }
+    state = { fileIgnored: 0, fileParsed: 0, fileLoaded: 0, showIgnoredFiles: false, showWarning:true }
 
     constructor(props) {
 
@@ -53,6 +53,7 @@ export default class Uploader extends Component {
         this.uploadModel = new Model();
 
         this.ignoredClick = this.ignoredClick.bind(this)
+        this.onHideWarning = this.onHideWarning.bind(this)
 
         this.ignoredFiles = {
 
@@ -64,10 +65,7 @@ export default class Uploader extends Component {
         await registerStudy()
         let answer = await getAets()
         console.log(answer)
-
     }
-
-
 
     /**
 	 * Read and parse dicom file
@@ -88,15 +86,15 @@ export default class Uploader extends Component {
                 let study;
                 let series;
 
-
+                console.log(dicomFile)
                 let dicomStudyID = dicomFile.getStudyInstanceUID()
                 let dicomSeriesID = dicomFile.getSeriesInstanceUID()
                 let dicomInstanceID = dicomFile.getSOPInstanceUID()
 
                 if (!this.uploadModel.isExistingStudy(dicomFile.getStudyInstanceUID())) {
                     study = new Study(dicomFile.getStudyInstanceUID(), dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
-                        dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientName(), dicomFile.getPatientBirthDate(),
-                        dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
+                        dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
+                        dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
                     this.uploadModel.addStudy(study);
                 } else {
                     study = this.uploadModel.getStudy(dicomFile.getStudyInstanceUID())
@@ -116,22 +114,24 @@ export default class Uploader extends Component {
                 } else {
                     this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
                     throw ("Existing instance")
-
                 }
             } catch (e) {
                 console.warn(e)
                 this.ignoredFiles[file.name] = e;
             }
-
         }
-
     }
 
+    /*Trigger ignored files panel if clicked*/
     ignoredClick(event) {
         this.setState(((state) => { return { showIgnoredFiles: !state.showIgnoredFiles } }))
     }
 
-
+    /*Trigger hide warning if closed*/
+    onHideWarning() {
+        console.log(this.state.onHideWarning)
+        this.setState( (state) => { return { showWarning: !state.showWarning } });
+    }
 
     render() {
         return (
@@ -151,7 +151,7 @@ export default class Uploader extends Component {
                         <StatusBar Button={true} showProgressDetails={true} hideRetryButton={false} hideAfterFinish={false} uppy={this.uppy} />
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.ignoredClick}
                             displayIgnoredFiles={this.state.showIgnoredFiles} closeIgnoredFiles={this.ignoredClick} dataIgnoredFiles={this.ignoredFiles} />
-                        <WarningPatient show={this.state.warning} />
+                        <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning}/>
                         <ControllerStudiesSeries studies={this.uploadModel} />
                     </Card.Body>
                 </Card>

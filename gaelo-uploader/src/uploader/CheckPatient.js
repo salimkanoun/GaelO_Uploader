@@ -49,22 +49,35 @@ export default class CheckPatient extends Component {
     }
 
     getData() {
-        let studyTemp = this.props.studies.allStudies();
-        //let study = studyTemp[String(Object.keys(studyTemp))]
-        //console.log("temp" + Object.values(study))
-        return Object.entries(this.props.studies.allStudies())
+        let data = []
+        let studies = this.props.studies.allStudies()
+        for (let e in studies) {
+            if (e === this.props.studyID){
+                data.push(studies[e].getPatientFirstName().substr(0,1))
+                data.push(studies[e].getPatientLastName().substr(0,1))
+                data.push(studies[e].getPatientBirthDate())
+                data.push(studies[e].getPatientSex())
+                data.push(studies[e].getAcquisitionDate())
+            }
+        }
+        return data
     }
 
-    getPatientFirstName() {
+    getPatientFirstName(patient) {
         let data = this.props.studies;
         return (this.data)
+    }
+
+    getPatientLastName() {
+
     }
 
     generateRows() {
         let labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
         let data = []
+        let currData = this.getData()
         for (let i in labels) {
-            data.push({ id: i, rowName: labels[i], expectedData: null, currentData: null, ignoreButton: <ButtonIgnore id={i} onClick={this.onClick} /> })
+            data.push({ id: i, rowName: labels[i], expectedData: null, currentData: currData[i], ignoreButton: <ButtonIgnore id={i} onClick={this.onClick} /> })
         }
         return data
     }
@@ -76,7 +89,6 @@ export default class CheckPatient extends Component {
     render() {
         return (
             <Modal show={this.props.display} onHide={this.props.closeListener} updatedData={null}>
-                {this.getPatientFirstName()}
                 <Modal.Header class="modal-header" closeButton>
                     <Modal.Title class="modal-title" id="du-patientLongTitle">Check Patient</Modal.Title>
                 </Modal.Header>
@@ -85,7 +97,9 @@ export default class CheckPatient extends Component {
                     <BootstrapTable
                         keyField='id'
                         classes="table table-responsive table-borderless table-sm"
-                        bodyClasses="du-patp-comparison"
+                        bodyClasses="du-patp-comparison tbody"
+                        headerClasses="du-patp-comparison th"
+                        rowClasses="du-patp-comparison td"
                         data={Object.values(this.generateRows())}
                         columns={this.columns} />
                     <p>If you want to force the upload you may have to ignore all the warnings.</p>

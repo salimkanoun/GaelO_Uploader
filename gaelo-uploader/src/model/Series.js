@@ -46,6 +46,11 @@ export default class Series {
 	getInstance(instanceUID) {
 		return this.instances[instanceUID]
 	}
+
+	allInstances() {
+		return this.instances
+	}
+
 	getNbInstances() {
 		return Object.keys(this.instances).length;
 	}

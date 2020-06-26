@@ -86,25 +86,6 @@ export default class DisplayStudies extends Component {
         );
     };
 
-    getDate(date) {
-        let rawDate = String(date);
-        return (rawDate.substring(0, 4) + '-' + rawDate.substring(4, 6) + '-' + rawDate.substring(6, 8))
-    }
-
-    formatDate() {
-        let data = this.props.studies.allStudies()
-        let date = {}
-        for (let element in data) {
-            let tempObj = data[element]
-            for (let e in tempObj) {
-                if (e == 'studyDate') {
-                    date[element] = (tempObj[e])
-                }
-            }
-        }
-        return date
-    }
-
     getData() {
         return Object.values(this.props.studies.allStudies())
     }
@@ -116,13 +97,15 @@ export default class DisplayStudies extends Component {
             <>
                 <CheckPatient display={this.state.isCheck} closeListener={this.onCheckChanged} studies={this.props.studies} studyID={this.state.currentSelectedStudyId} />
                 <Container fluid>
-                    <span class="title">Study</span>
+                    <span class="title">Studies</span>
                     <Row>
                         <Col xs={12} md={8}>
                             <BootstrapTable
-                                keyField='id'
-                                classes="table table-responsive table-borderless"
+                                keyField='studyUID'
+                                classes="table table-borderless"
                                 bodyClasses="du-studies-tbody"
+                                headerClasses="du-studies th"
+                                rowClasses="du-studies td"
                                 data={this.getData()}
                                 columns={this.state.columns}
                                 selectRow={this.selectRow}
@@ -131,8 +114,9 @@ export default class DisplayStudies extends Component {
                         <Col xs={6} md={4}>
                             <BootstrapTable
                                 keyField='id'
-                                classes="table table-responsive table-borderless"
+                                classes="table table-borderless"
                                 bodyClasses="du-studies-warnings"
+                                headerClasses="du-studies-warnings th"
                                 data={this.getData()}
                                 columns={this.warnings} />
                         </Col>

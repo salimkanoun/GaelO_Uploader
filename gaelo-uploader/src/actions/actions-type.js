@@ -1,0 +1,1 @@
+export const SELECT_STUDY = 'SELECT_STUDY'

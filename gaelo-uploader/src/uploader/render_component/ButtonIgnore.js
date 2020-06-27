@@ -12,33 +12,29 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
+import Button from 'react-bootstrap/Button'
 
+export default class ButtonIgnore extends Component {
 
-export default class ProgressUpload {
+    state = { ignored: false }
 
-    constructor() {
-
+    constructor(props) {
+        super(props)
+        this.id = this.props.id
+        this.onClick = this.onClick.bind(this)
     }
 
-    zipFile() {
+    onClick() {
+        this.setState( (state) => { 
+            this.props.onClick(this.id, !state.ignored)
+            return { ignored: !state.ignored } 
+        })
     }
 
     render() {
         return (
-            <Fragment>
-                <button id="du-upload" class="btn btn-success">Upload</button>
-
-                <div>
-                    <div id="du-prog-bar-zipping" class="progress">
-                        <div class="progress-bar progress-bar-striped bg-dark"></div>
-                    </div>
-
-                    <div id="du-prog-bar-upload" class="progress">
-                        <div class="progress-bar progress-bar-striped"></div>
-                    </div>
-                </div>
-            </Fragment>
+            <Button onClick={this.onClick}> { this.state.ignored ?  'Ignore' : 'Consider' } </Button>
         )
     }
 }

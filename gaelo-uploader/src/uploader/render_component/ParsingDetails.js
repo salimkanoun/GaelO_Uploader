@@ -12,21 +12,18 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
-import Alert from 'react-bootstrap/Alert'
+import React, { Component, Fragment} from 'react'
+import Badge from 'react-bootstrap/Badge'
 
-export default class WarningPatient extends Component {
-
-    constructor(props) {
-        super(props)
-    }
+export default class ParsingDetails extends Component {
 
     render() {
         return (
-            <>
-                <Alert variant="warning" show={this.props.show} dismissible onClose={this.props.closeListener}>
-                    Please, check/select the patient. The imported patient informations do not correspond with the expected ones.</Alert>
-            </>
+            <Fragment>
+                <Badge variant='secondary'>{this.props.fileLoaded} File(s) loaded</Badge>
+                <Badge variant='success'>{this.props.fileParsed} File(s) parsed</Badge>
+                <Badge variant='warning' className='du-ignored-badge' onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</Badge>
+            </Fragment>
         )
     }
 }

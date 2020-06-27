@@ -13,33 +13,16 @@
  */
 
 import React, { Component, Fragment } from 'react'
-import Button from 'react-bootstrap/Button'
+import Alert from 'react-bootstrap/Alert'
 
-export default class ButtonIgnore extends Component {
-
-    state = { ignored: false }
-
-    constructor(props) {
-        super(props)
-        this.id = this.props.id
-        this.onClick = this.onClick.bind(this)
-
-    }
-
-    isIgnoredData() {
-        this.setState((state) => { return { ignored: !state.ignored } })
-    }
-
-    onClick() {
-        this.isIgnoredData()
-        this.props.onClick(this.id, this.state.ignored);
-    }
+export default class WarningPatient extends Component {
 
     render() {
         return (
-            <>
-                <Button onClick={this.onClick}>{!this.state.ignored ? 'Consider' : 'Ignore'}</Button>
-            </>
+            <Fragment>
+                <Alert variant="warning" show={this.props.show} dismissible onClose={this.props.closeListener}>
+                    Please, check/select the patient. The imported patient informations do not correspond with the expected ones.</Alert>
+            </Fragment>
         )
     }
 }

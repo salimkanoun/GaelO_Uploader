@@ -94,7 +94,7 @@ export default class DisplayStudies extends Component {
 
     render() {
         return (
-            <>
+            <Fragment>
                 <CheckPatient display={this.state.isCheck} closeListener={this.onCheckChanged} studies={this.props.studies} studyID={this.state.currentSelectedStudyId} />
                 <Container fluid>
                     <span class="title">Studies</span>
@@ -122,7 +122,7 @@ export default class DisplayStudies extends Component {
                         </Col>
                     </Row>
                 </Container>
-            </>
+            </Fragment>
         )
     }
 }

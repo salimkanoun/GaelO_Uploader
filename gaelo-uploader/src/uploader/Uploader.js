@@ -9,16 +9,25 @@ import Model from '../model/Model'
 import Study from '../model/Study'
 import Series from '../model/Series'
 import Instance from '../model/Instance'
-import ParsingDetails from './ParsingDetails'
+import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
-import ProgressUpload from './ProgressUpload'
-import WarningPatient from './WarningPatient'
+import ProgressUpload from './render_component/ProgressUpload'
+import IgnoredFilesPanel from './render_component/IgnoredFilesPanel'
+import WarningPatient from './render_component/WarningPatient'
 
 import { getAets, logIn, registerStudy } from '../services/api'
 
 export default class Uploader extends Component {
 
-    state = { fileIgnored: 0, fileParsed: 0, fileLoaded: 0, showIgnoredFiles: false, showWarning:true }
+    state = {
+        fileIgnored: 0,
+        fileParsed: 0,
+        fileLoaded: 0,
+        showIgnoredFiles: false,
+        showWarning: true,
+        zipPercent: 50,
+        uploadPercent: 30
+    }
 
     constructor(props) {
 
@@ -52,12 +61,11 @@ export default class Uploader extends Component {
 
         this.uploadModel = new Model();
 
-        this.ignoredClick = this.ignoredClick.bind(this)
+        this.toogleShowIgnoreFile = this.toogleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
+        this.onUploadClick = this.onUploadClick.bind(this)
 
-        this.ignoredFiles = {
-
-        }
+        this.ignoredFiles = {}
     }
 
     async componentDidMount() {
@@ -117,20 +125,28 @@ export default class Uploader extends Component {
                 }
             } catch (e) {
                 console.warn(e)
+                this.setState(state => {
+                    return { fileIgnored: state.fileIgnored++ }
+                })
                 this.ignoredFiles[file.name] = e;
             }
         }
     }
 
     /*Trigger ignored files panel if clicked*/
-    ignoredClick(event) {
+    toogleShowIgnoreFile () {
         this.setState(((state) => { return { showIgnoredFiles: !state.showIgnoredFiles } }))
     }
 
     /*Trigger hide warning if closed*/
     onHideWarning() {
         console.log(this.state.onHideWarning)
-        this.setState( (state) => { return { showWarning: !state.showWarning } });
+        this.setState((state) => { return { showWarning: !state.showWarning } });
+    }
+
+    onUploadClick(e) {
+        console.log('upload clicked')
+
     }
 
     render() {
@@ -148,11 +164,11 @@ export default class Uploader extends Component {
                                 }
                             }}
                         />
-                        <StatusBar Button={true} showProgressDetails={true} hideRetryButton={false} hideAfterFinish={false} uppy={this.uppy} />
-                        <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.ignoredClick}
-                            displayIgnoredFiles={this.state.showIgnoredFiles} closeIgnoredFiles={this.ignoredClick} dataIgnoredFiles={this.ignoredFiles} />
-                        <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning}/>
+                        <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toogleShowIgnoreFile} />
+                        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.ignoredFiles} />
+                        <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
                         <ControllerStudiesSeries studies={this.uploadModel} />
+                        <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipPercent} uploadPercent={this.state.uploadPercent} />
                     </Card.Body>
                 </Card>
             </Jumbotron>

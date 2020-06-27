@@ -12,10 +12,10 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import Modal from 'react-bootstrap/Modal'
 import BootstrapTable from 'react-bootstrap-table-next';
-import ButtonIgnore from './ButtonIgnore'
+import ButtonIgnore from './render_component/ButtonIgnore'
 import Button from 'react-bootstrap/Button'
 
 export default class CheckPatient extends Component {

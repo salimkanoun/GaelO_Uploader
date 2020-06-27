@@ -12,20 +12,16 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+
 export default class DisplaySeries extends Component {
 
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            currentSelectedStudyIds: [],
-        }
+    state = {
+        currentSelectedStudyIds: [],
     }
 
     columns = [
@@ -71,7 +67,7 @@ export default class DisplaySeries extends Component {
                 this.state.currentSelectedStudyIds.push(row.seriesInstanceUID)
             } else {
                 for (let e in this.state.currentSelectedStudyIds) {
-                    if (this.state.currentSelectedStudyIds[e] == row.seriesInstanceUID) {
+                    if (this.state.currentSelectedStudyIds[e] === row.seriesInstanceUID) {
                         this.state.currentSelectedStudyIds.splice(e, 1)
                     }
                 }
@@ -83,7 +79,7 @@ export default class DisplaySeries extends Component {
         let series = this.props.studies.allStudies()
         let seriesData = []
         for (let e in series[this.props.studyID]) {
-            if (e == 'series') {
+            if (e === 'series') {
                 series = series[this.props.studyID][e]
                 for (let element in series) {
                     let nbInstances = 0
@@ -103,33 +99,31 @@ export default class DisplaySeries extends Component {
 
     render() {
         return (
-            <>
-                <Container fluid>
-                    <span class="title">Series</span>
-                    <Row>
-                        <Col xs={12} md={8}>
-                            <BootstrapTable
-                                classes="table table-borderless"
-                                bodyClasses="du-series-tbody"
-                                headerClasses="du-series th"
-                                rowClasses="du-series td"
-                                keyField='seriesInstanceUID'
-                                data={Object.values(this.getSeries())}
-                                columns={this.columns}
-                                selectRow={this.selectRow} />
-                        </Col>
-                        <Col xs={6} md={4}>
-                            <BootstrapTable
-                                keyField='id'
-                                classes="table table-borderless"
-                                bodyClasses="du-series-warnings"
-                                headerClasses="du-series-warnings th"
-                                data={Object.values(this.props.studies.allStudies())}
-                                columns={this.warnings} />
-                        </Col>
-                    </Row>
-                </Container>
-            </>
+            <Container fluid>
+                <span class="title">Series</span>
+                <Row>
+                    <Col xs={12} md={8}>
+                        <BootstrapTable
+                            classes="table table-borderless"
+                            bodyClasses="du-series-tbody"
+                            headerClasses="du-series th"
+                            rowClasses="du-series td"
+                            keyField='seriesInstanceUID'
+                            data={Object.values(this.getSeries())}
+                            columns={this.columns}
+                            selectRow={this.selectRow} />
+                    </Col>
+                    <Col xs={6} md={4}>
+                        <BootstrapTable
+                            keyField='id'
+                            classes="table table-borderless"
+                            bodyClasses="du-series-warnings"
+                            headerClasses="du-series-warnings th"
+                            data={Object.values(this.props.studies.allStudies())}
+                            columns={this.warnings} />
+                    </Col>
+                </Row>
+            </Container>
         )
     }
 

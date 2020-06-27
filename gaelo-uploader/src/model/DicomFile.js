@@ -67,7 +67,7 @@ export default class DicomFile {
 				this.erase(id);
 			} catch (e) {
 				// Only catch "Can't find tag id" error
-				if (e != `Can't find ${id} while erasing.`) {
+				if (e !== `Can't find ${id} while erasing.`) {
 					throw e;
 				}
 				notFoundTags.push(id);
@@ -91,6 +91,23 @@ export default class DicomFile {
 			throw `Can't find ${id.toUpperCase()} while erasing.`;
 		}
 
+		if(element.vr === "SQ"){
+			//Treat each item of sequence
+			element.items.forEach(item =>{
+				let sequenceElement = item.dataSet.elements
+				let elementsInSeq = Object.keys(sequenceElement)
+				//erase each tag in this item
+				elementsInSeq.forEach( tag => {
+					this.__editElement(sequenceElement[tag], newContent)
+				})
+			})
+		}else{
+			this.__editElement(element, newContent)
+		}
+	}
+
+	__editElement(element, newContent){
+
 		// Retrieve the index position of the element in the data set array
 		const dataOffset = element.dataOffset;
 
@@ -103,8 +120,9 @@ export default class DicomFile {
 			const char = newContent.charCodeAt(i % newContent.length);
 
 			// Write this char in the array
-			this.dataSet.byteArray[dataOffset + i] = char;
+			this.header[dataOffset + i] = char;
 		}
+
 	}
 
 	getRadiopharmaceuticalTag(tagAddress) {
@@ -263,6 +281,8 @@ export default class DicomFile {
 	}
 
 	getPatientFirstName(){
+		//SK Attention au risque undefined
+		// - pas  ^ ??
 		return this.getPatientName().split('-').pop();
 	}
 

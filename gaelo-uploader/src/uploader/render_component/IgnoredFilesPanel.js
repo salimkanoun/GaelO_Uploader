@@ -15,54 +15,46 @@
 import React, { Component } from 'react'
 import Modal from 'react-bootstrap/Modal'
 import BootstrapTable from 'react-bootstrap-table-next';
+import Badge from 'react-bootstrap/Badge'
 
 export default class IgnoredFilesPanel extends Component {
 
-    rows = {
-    }
-
     columns = [
         {
-            dataField: 'files',
+            dataField: 'file',
             text: 'Files',
         },
         {
-            dataField: 'reasons',
-            text: 'Reason',
+            dataField: 'reason',
+            text: 'Reasons',
         },
     ];
 
-    files = []
-    reasons = []
-
-    getFiles() {
-        return Object.keys(this.props.dataIgnoredFiles)
-    }
-
-    getReasons() {
-        return Object.values(this.props.dataIgnoredFiles)
-    }
-
     createRows() {
-        this.files = this.getFiles()
-        this.reasons = this.getReasons()
-        for (let i = 0; i < this.files.length; i++) {
-            this.rows[this.files[i]] = { files: this.files[i], reasons: this.reasons[i] }
-        }
-        return this.rows
+        let ignoredFileNames = Object.keys(this.props.dataIgnoredFiles)
+
+        let rows = []
+
+        ignoredFileNames.forEach(ingoredFileName => {
+            rows.push( { file: ingoredFileName, reason: this.props.dataIgnoredFiles[ingoredFileName] })
+        })
+        
+        return rows
     }
 
     render() {
         return (
             <Modal show={this.props.display} onHide={this.props.closeListener}>
                 <Modal.Header class="modal-header" closeButton>
-                    <Modal.Title class="modal-title">Ignored files <span id="du-ignored-files-badge" class="badge badge-danger">{this.props.fileNumber}</span></Modal.Title>
+                    <Modal.Title class="modal-title"> 
+                        <Badge variant='warning'> {Object.keys(this.props.dataIgnoredFiles).length} File(s) Ignored</Badge>
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body class="modal-body">
                     <BootstrapTable
                         keyField='id'
                         classes="table table-responsive table-borderless"
-                        data={Object.values(this.createRows())}
+                        data={ this.createRows() }
                         columns={this.columns}
                     />
                 </Modal.Body>

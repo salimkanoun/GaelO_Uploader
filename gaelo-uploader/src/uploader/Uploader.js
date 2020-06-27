@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import Card from 'react-bootstrap/Card'
+import Dropzone from 'react-dropzone'
 import { DragDrop } from '@uppy/react'
-import Uppy from '@uppy/core'
 import dicomParser from 'dicom-parser'
 import DicomFile from '../model/DicomFile'
 import Model from '../model/Model'
@@ -31,32 +31,6 @@ export default class Uploader extends Component {
     constructor(props) {
 
         super(props)
-        this.uppy = Uppy({
-            autoProceed: false,
-            allowMultipleUploads: true,
-        })
-
-        this.uppy.on('upload-success', async (file, response) => {
-            if (response.body.ID !== undefined) {
-                await this.addUploadedFileToState(response.body)
-            }
-        })
-
-        this.uppy.on('upload-error', (file, error, response) => {
-            this.uppy.removeFile(file.id)
-            let info = JSON.parse(response.body.error)
-            this.addErrorToState(file.id, file.name, info.Details)
-        })
-        this.uppy.on('upload', () => this.setState({ inProgress: true }))
-        this.uppy.on('complete', () => this.setState({ inProgress: false }))
-        this.uppy.on('cancel-all', () => this.setState({ inProgress: false }))
-
-        this.uppy.on('file-added', (file) => {
-            this.setState((previousState) => { return { fileLoaded: previousState.fileLoaded++ } })
-            console.log('Added file', file)
-            this.read(file)
-            console.log(this.uploadModel)
-        })
 
         this.uploadModel = new Model();
 
@@ -74,12 +48,22 @@ export default class Uploader extends Component {
         console.log(answer)
     }
 
+    addFile(files){
+            this.setState((previousState) => { return { fileLoaded: previousState.fileLoaded++ } })
+            console.log('Added file', files)
+            files.forEach(file =>{
+                this.read(file)
+            })
+            
+            console.log(this.uploadModel)
+    }
+
     /**
 	 * Read and parse dicom file
 	 */
     read(file) {
         const reader = new FileReader();
-        reader.readAsArrayBuffer(file.data);
+        reader.readAsArrayBuffer(file);
         reader.onload = () => {
             // Retrieve file content as Uint8Array
             const arrayBuffer = reader.result;
@@ -133,7 +117,7 @@ export default class Uploader extends Component {
     }
 
     /*Trigger ignored files panel if clicked*/
-    toogleShowIgnoreFile () {
+    toogleShowIgnoreFile() {
         this.setState(((state) => { return { showIgnoredFiles: !state.showIgnoredFiles } }))
     }
 
@@ -154,15 +138,16 @@ export default class Uploader extends Component {
                 <Card className="col mb-5">
                     <Card.Title className="card-title">Import Dicom Files</Card.Title>
                     <Card.Body>
-                        <DragDrop
-                            uppy={this.uppy}
-                            locale={{
-                                strings: {
-                                    dropHereOr: 'Drop Dicom Folder',
-                                    browse: 'browse'
-                                }
-                            }}
-                        />
+                        <Dropzone onDrop={acceptedFiles => this.addFile(acceptedFiles)} styles={{ dropzone: { minHeight: 200, maxHeight: 250 } }}>
+                            {({ getRootProps, getInputProps }) => (
+                                <section>
+                                    <div {...getRootProps()}>
+                                        <input {...getInputProps()} />
+                                        <p>Drag 'n' drop some files here, or click to select files</p>
+                                    </div>
+                                </section>
+                            )}
+                        </Dropzone>
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toogleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />

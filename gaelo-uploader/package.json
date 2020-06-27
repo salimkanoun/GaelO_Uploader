@@ -20,6 +20,7 @@
     "react-bootstrap": "^1.0.1",
     "react-bootstrap-table-next": "^4.0.3",
     "react-dom": "^16.13.1",
+    "react-dropzone": "^11.0.1",
     "react-scripts": "3.4.1",
     "util": "^0.12.3"
   },

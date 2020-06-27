@@ -26,3 +26,5 @@ export default class WarningPatient extends Component {
         )
     }
 }
+
+//SK CE COMPONENT PEUT ETRE ETENDU AUX WARNING SERIES (en jouant sur des constante pour la string)

@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
-import Jumbotron from 'react-bootstrap/Jumbotron'
+import React, { Component, Fragment } from 'react'
 import Card from 'react-bootstrap/Card'
-import { StatusBar, DragDrop } from '@uppy/react'
+import { DragDrop } from '@uppy/react'
 import Uppy from '@uppy/core'
 import dicomParser from 'dicom-parser'
 import DicomFile from '../model/DicomFile'
@@ -151,7 +150,7 @@ export default class Uploader extends Component {
 
     render() {
         return (
-            <Jumbotron className="jumbotron">
+            <Fragment>
                 <Card className="col mb-5">
                     <Card.Title className="card-title">Import Dicom Files</Card.Title>
                     <Card.Body>
@@ -171,7 +170,7 @@ export default class Uploader extends Component {
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipPercent} uploadPercent={this.state.uploadPercent} />
                     </Card.Body>
                 </Card>
-            </Jumbotron>
+            </Fragment>
 
         )
     }

@@ -38,3 +38,5 @@ export default class ButtonIgnore extends Component {
         )
     }
 }
+
+//SK Ce composant est pas completement stateless, devrait le devenir à l'implementation du REDUX

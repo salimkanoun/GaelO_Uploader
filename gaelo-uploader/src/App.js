@@ -1,13 +1,13 @@
 import React from 'react';
-import './App.css';
 import Uploader from "./uploader/Uploader"
 
-//Css for uppy
+//Uppy CSS
 import '@uppy/core/dist/style.css'
 import '@uppy/drag-drop/dist/style.css'
-import '@uppy/status-bar/dist/style.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
+//Boostrap Table CSS
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+//Custom CSS
 import './style/dicomupload.css'
 
 function App() {

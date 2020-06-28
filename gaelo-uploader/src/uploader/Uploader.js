@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import Card from 'react-bootstrap/Card'
 import Dropzone from 'react-dropzone'
-import { DragDrop } from '@uppy/react'
 import dicomParser from 'dicom-parser'
 import DicomFile from '../model/DicomFile'
 import Model from '../model/Model'

@@ -24,7 +24,7 @@ export default class Uploader extends Component {
         fileLoaded: 0,
         showIgnoredFiles: false,
         ignoredFiles : {},
-        showWarning: true,
+        showWarning: false,
         zipPercent: 50,
         uploadPercent: 30
     }

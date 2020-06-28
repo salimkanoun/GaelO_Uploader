@@ -110,11 +110,14 @@ export default class Uploader extends Component {
             } catch (e) {
                 console.warn(e)
                 this.setState(state => {
-                    return { fileIgnored: state.fileIgnored++ }
-                })
-                this.setState(state => {
-                    return  state. ignoredFiles[file.name] = e
-                    
+                    //SK ICI BUG IGNORE FILE A UN SEUL ITEM
+                    return { 
+                        fileIgnored: state.fileIgnored++,
+                        ignoredFiles : {
+                            ...state.ignoredFiles,
+                            [file.name] : e
+                        } 
+                    }
                 })
             }
         }
@@ -140,7 +143,6 @@ export default class Uploader extends Component {
         return (
             <Fragment>
                 <Card className="col mb-5">
-                    <Card.Title className="card-title">Import Dicom Files</Card.Title>
                     <Card.Body>
                         <Dropzone onDrop={acceptedFiles => this.addFile(acceptedFiles)} >
                             {({ getRootProps, getInputProps }) => (

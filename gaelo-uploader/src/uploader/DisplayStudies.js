@@ -19,84 +19,75 @@ import CheckPatient from './CheckPatient'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+
+import DisplayWarning from './DisplayWarning'
+
 export default class DisplayStudies extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-
-            columns: [
-                {
-                    dataField: 'studyUID',
-                    text: '',
-                    formatter: this.linkCheck,
-                },
-                {
-                    dataField: 'status',
-                    text: 'Status',
-                },
-                {
-                    dataField: 'patientName',
-                    text: 'Patient name',
-                },
-                {
-                    dataField: 'studyDescription',
-                    text: 'Description',
-                },
-                {
-                    dataField: 'accessionNumber',
-                    text: 'Accession #',
-                },
-                {
-                    dataField: 'acquisitionDate',
-                    text: 'Date',
-                },
-            ],
-            isCheck: false,
-            currentSelectedStudyId: ''
-        }
-        this.onCheckChanged = this.onCheckChanged.bind(this);
+    state = {
+        isCheck: false,
     }
 
-    warnings = [
+    columns = [
         {
-            dataField: 'warnings',
-            text: 'Warnings',
+            dataField: 'studyUID',
+            hidden: true,
+            formatter: this.linkCheck,
         },
-    ];
+        {
+            dataField: 'status',
+            text: 'Status',
+        },
+        {
+            dataField: 'patientName',
+            text: 'Patient name',
+        },
+        {
+            dataField: 'studyDescription',
+            text: 'Description',
+        },
+        {
+            dataField: 'accessionNumber',
+            text: 'Accession #',
+        },
+        {
+            dataField: 'acquisitionDate',
+            text: 'Date',
+        },
+    ]
 
+    
     selectRow = {
         mode: 'radio',
         clickToSelect: true,
+        hideSelectColumn : true,
         onSelect: (row) => {
-            this.state.currentSelectedStudyId = row.studyUID
-            this.sendData()
+            console.log(row)
+            this.props.onSelectChange(row.studyUID)
         }
     };
 
-    onCheckChanged() {
-        this.setState({ isCheck: !this.state.isCheck });
+    toogleCheckPatient(row){
+        console.log(row)
+
     }
 
     linkCheck = (row) => {
         return (
-            <Button onClick={() => { this.onCheckChanged(row); }}>
-                Check Patient
-            </Button>
+            <Fragment>
+                <Button onClick={() => { this.toogleCheckPatient(row); }}>
+                    Check Patient
+                </Button>
+                <CheckPatient studyUID = {this.row.studyUID} validateCheckPatient = {this.props.validateCheckPatient} display={this.state.isCheck} closeListener={() => this.toogleCheckPatient(row) } studies={this.props.studies} />
+            </Fragment>
         );
     };
 
-    getData() {
-        return Object.values(this.props.studies.allStudies())
-    }
-
-    sendData = () => { this.props.handleToUpdate(this.state.currentSelectedStudyId) }
-
     render() {
+        console.log(this.props.studies)
         return (
             <Fragment>
-                <CheckPatient display={this.state.isCheck} closeListener={this.onCheckChanged} studies={this.props.studies} studyID={this.state.currentSelectedStudyId} />
-                <Container fluid>
+                 <Container fluid>
                     <span class="title">Studies</span>
                     <Row>
                         <Col xs={12} md={8}>
@@ -106,19 +97,13 @@ export default class DisplayStudies extends Component {
                                 bodyClasses="du-studies-tbody"
                                 headerClasses="du-studies th"
                                 rowClasses="du-studies td"
-                                data={this.getData()}
-                                columns={this.state.columns}
+                                data={this.props.studies}
+                                columns={this.columns}
                                 selectRow={this.selectRow}
                             />
                         </Col>
                         <Col xs={6} md={4}>
-                            <BootstrapTable
-                                keyField='id'
-                                classes="table table-borderless"
-                                bodyClasses="du-studies-warnings"
-                                headerClasses="du-studies-warnings th"
-                                data={this.getData()}
-                                columns={this.warnings} />
+                           
                         </Col>
                     </Row>
                 </Container>

@@ -25,21 +25,21 @@ export default class Modele {
         this.data[studyObject.studyUID] = studyObject;
     }
 
+    getStudy(studyUID){
+        return this.data[studyUID]
+    }
+
     isExistingStudy(studyInstanceUID) {
         let existingStudyUID = Object.keys(this.data);
         return existingStudyUID.includes(studyInstanceUID);
     }
 
-    toString() {
-        //console.log(this.data);
-    }
-
-    getStudy(studyInstanceUID) {
-        return this.data[studyInstanceUID]
-    }
-
-    allStudies() {
-        return this.data
+    getStudiesArray() {
+        let studyArray = []
+        for (let studyUID in this.data){
+            studyArray.push(this.data[studyUID])
+        }
+        return studyArray
     }
 
 }

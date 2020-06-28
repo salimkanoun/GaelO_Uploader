@@ -20,9 +20,15 @@ import Button from 'react-bootstrap/Button'
 
 export default class CheckPatient extends Component {
 
+    state = []
+
     constructor(props) {
         super(props)
         this.onClick = this.onClick.bind(this)
+    }
+
+    componentDidMount(){
+        this.generateRows()
     }
 
     columns = [
@@ -31,59 +37,58 @@ export default class CheckPatient extends Component {
             text: '',
         },
         {
-            dataField: 'expectedData',
+            dataField: 'expectedStudy',
             text: 'Expected',
         },
         {
-            dataField: 'currentData',
+            dataField: 'currentStudy',
             text: 'Current',
         },
         {
             dataField: 'ignoreButton',
             text: '',
         },
+        {
+            dataField : 'valid',
+            hidden : true
+        }
     ]
 
     onClick(id, ignored) {
+        this.setState(state => {
+            state.forEach(row => {
+                if(row.rowName === id ) row[id]['valid'] = ignored    
+            })
 
+        })
     }
 
-    getData() {
-        let data = []
-        let studies = this.props.studies.allStudies()
-        for (let e in studies) {
-            if (e === this.props.studyID){
-                data.push(studies[e].getPatientFirstName().substr(0,1))
-                data.push(studies[e].getPatientLastName().substr(0,1))
-                data.push(studies[e].getPatientBirthDate())
-                data.push(studies[e].getPatientSex())
-                data.push(studies[e].getAcquisitionDate())
-            }
+    checkRow(expected, current){
+        if(expected === '' || expected === undefined) {
+            return true
+        }else if(expected === current) {
+            return true
+        }else {
+            return false
         }
-        return data
-    }
-
-    getPatientFirstName(patient) {
-        let data = this.props.studies;
-        return (this.data)
-    }
-
-    getPatientLastName() {
-
     }
 
     generateRows() {
         let labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
-        let data = []
-        let currData = this.getData()
+        let keys = ['firstName, lastName', 'birthDate', 'sex', 'acquisitionDate']
+        let currentStudy =  this.props.currentStudy
+        let expectedStudy = this.props.expectedStudy
         for (let i in labels) {
-            data.push({ id: i, rowName: labels[i], expectedData: null, currentData: currData[i], ignoreButton: <ButtonIgnore id={i} onClick={this.onClick} /> })
+            this.setState(state => {
+                return state.push ({ 
+                rowName: labels[i], 
+                expectedStudy: expectedStudy[keys[i]], 
+                currentStudy: currentStudy[keys[i]], 
+                ignoreButton: <ButtonIgnore id={labels[i]} onClick={this.onClick} />,
+                valid : this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])
+                })
+            })
         }
-        return data
-    }
-
-    gatheredData() {
-        return this.getData();
     }
 
     render() {
@@ -95,17 +100,17 @@ export default class CheckPatient extends Component {
                 <Modal.Body class="modal-body" id="du-patp-comparison">
                     <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
                     <BootstrapTable
-                        keyField='id'
+                        keyField='rowName'
                         classes="table table-responsive table-borderless table-sm"
                         bodyClasses="du-patp-comparison tbody"
                         headerClasses="du-patp-comparison th"
                         rowClasses="du-patp-comparison td"
-                        data={Object.values(this.generateRows())}
+                        data={this.state}
                         columns={this.columns} />
                     <p>If you want to force the upload you may have to ignore all the warnings.</p>
                 </Modal.Body>
                 <Modal.Footer class="modal-footer">
-                    <Button id="du-patp-btn-confirm" type="button" class="btn btn-primary" data-dismiss="modal">This is the correct patient</Button>
+                    <Button id="du-patp-btn-confirm" type="button" onClick = {this.props.validateCheckPatient(this.props.studyUID) } class="btn btn-primary" data-dismiss="modal">This is the correct patient</Button>
                 </Modal.Footer>
             </Modal>
         )

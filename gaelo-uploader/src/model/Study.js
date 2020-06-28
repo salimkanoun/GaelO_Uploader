@@ -51,8 +51,12 @@ export default class Study {
         return this.series[seriesInstanceUID]
     }
 
-    getAllSeries() {
-        return this.series
+    getSeriesArray() {
+        let series= []
+        Object.keys(this.series).forEach(seriesUID =>{
+            series.push(this.series[seriesUID])
+        })
+        return series
     }
 
     getPatientName() {

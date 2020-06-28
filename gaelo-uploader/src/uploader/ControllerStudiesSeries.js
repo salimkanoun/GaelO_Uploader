@@ -20,7 +20,7 @@ import DisplaySeries from './DisplaySeries.js'
 export default class ControllerStudiesSeries extends Component {
 
     state = {
-        selectedStudy: null
+        selectedStudy: undefined
     }
 
     constructor(props) {
@@ -28,16 +28,35 @@ export default class ControllerStudiesSeries extends Component {
         //this.handleToUpdate = this.handleToUpdate.bind(this)
     }
 
-    handleToUpdate = (studyUID) => {
-        this.setState({ selectedStudy: studyUID })
+    setCurrentStudy = (studyUID) => {
+        this.setState({ selectedStudy : studyUID })
 
+    }
+
+    validateCheckPatient(studyUID){
+        console.log(studyUID)
+    }
+
+    ignoreStudyWarning(studyUID){
+
+    }
+
+    getSeries(studyUID){
+        console.log('change Series')
+        console.log(studyUID)
+        
+        if(studyUID !== undefined) {
+            console.log(this.props.uploadModel.getStudy(studyUID).getSeriesArray())
+            return this.props.uploadModel.getStudy(studyUID).getSeriesArray()
+        }
+        else return []
     }
 
     render() {
         return (
             <Fragment>
-                <DisplayStudies studies={this.props.studies} handleToUpdate={this.handleToUpdate} />
-                <DisplaySeries studies={this.props.studies} studyID={this.state.selectedStudy} refreshSerie={this.selectedStudy} />
+                <DisplayStudies validateCheckPatient = {this.validateCheckPatient} ignoreStudyWarning = {this.ignoreStudyWarning} studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
+                <DisplaySeries studyUID={this.state.selectedStudy} series = {this.getSeries(this.state.selectedStudy)} />
             </Fragment>
         )
     }

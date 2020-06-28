@@ -23,6 +23,7 @@ export default class Uploader extends Component {
         fileParsed: 0,
         fileLoaded: 0,
         showIgnoredFiles: false,
+        ignoredFiles : {},
         showWarning: true,
         zipPercent: 50,
         uploadPercent: 30
@@ -111,7 +112,10 @@ export default class Uploader extends Component {
                 this.setState(state => {
                     return { fileIgnored: state.fileIgnored++ }
                 })
-                this.ignoredFiles[file.name] = e;
+                this.setState(state => {
+                    return  state. ignoredFiles[file.name] = e
+                    
+                })
             }
         }
     }
@@ -142,14 +146,14 @@ export default class Uploader extends Component {
                             {({ getRootProps, getInputProps }) => (
                                 <section>
                                     <div className="dropzone" {...getRootProps()}>
-                                        <input {...getInputProps()} />
+                                        <input directory="" webkitdirectory="" {...getInputProps()} />
                                         <p>Drag 'n' drop some files here, or click to select files</p>
                                     </div>
                                 </section>
                             )}
                         </Dropzone>
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toogleShowIgnoreFile} />
-                        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.ignoredFiles} />
+                        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
                         <ControllerStudiesSeries uploadModel={this.uploadModel} />
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipPercent} uploadPercent={this.state.uploadPercent} />

@@ -21,6 +21,10 @@ export default class IgnoredFilesPanel extends Component {
 
     columns = [
         {
+            dataFiled : 'key',
+            hidden : true
+        },
+        {
             dataField: 'file',
             text: 'Files',
         },
@@ -36,9 +40,13 @@ export default class IgnoredFilesPanel extends Component {
         let rows = []
 
         ignoredFileNames.forEach(ingoredFileName => {
-            rows.push( { file: ingoredFileName, reason: this.props.dataIgnoredFiles[ingoredFileName] })
+            rows.push( { 
+                key : Math.random(), 
+                file: ingoredFileName, 
+                reason: this.props.dataIgnoredFiles[ingoredFileName].message 
+            })
         })
-        
+        console.log(rows)
         return rows
     }
 
@@ -52,7 +60,7 @@ export default class IgnoredFilesPanel extends Component {
                 </Modal.Header>
                 <Modal.Body class="modal-body">
                     <BootstrapTable
-                        keyField='id'
+                        keyField='key'
                         classes="table table-responsive table-borderless"
                         data={ this.createRows() }
                         columns={this.columns}

@@ -14,7 +14,7 @@
  
  /* # DROPZONE */
 
-#du-drop-zone {
+.dropzone {
 	margin: 16px 0;
 	height: 100px;
 	width: 100%;
@@ -32,6 +32,7 @@
 	pointer-events: none;
 	cursor: no-drop;
 }
+
 @keyframes drop-zone-deactivate {
 	0% {
 		border-color: rgba(209, 19, 63, 0.7);

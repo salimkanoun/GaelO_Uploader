@@ -138,10 +138,10 @@ export default class Uploader extends Component {
                 <Card className="col mb-5">
                     <Card.Title className="card-title">Import Dicom Files</Card.Title>
                     <Card.Body>
-                        <Dropzone onDrop={acceptedFiles => this.addFile(acceptedFiles)} styles={{ dropzone: { minHeight: 200, maxHeight: 250 } }}>
+                        <Dropzone onDrop={acceptedFiles => this.addFile(acceptedFiles)} >
                             {({ getRootProps, getInputProps }) => (
                                 <section>
-                                    <div {...getRootProps()}>
+                                    <div className="dropzone" {...getRootProps()}>
                                         <input {...getInputProps()} />
                                         <p>Drag 'n' drop some files here, or click to select files</p>
                                     </div>

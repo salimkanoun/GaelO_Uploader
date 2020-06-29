@@ -26,7 +26,7 @@ export default class DisplayWarning extends Component {
                 classes="table table-borderless"
                 bodyClasses="du-studies-warnings"
                 headerClasses="du-studies-warnings th"
-                data={[this.buildRow()]}
+                data={this.buildRow()}
                 columns={this.columns}
             />
         )

@@ -29,6 +29,7 @@ export default class Study {
         this.patientBirthDate = this.getDate(patientBirthDate);
         this.patientSex = patientSex;
         this.acquisitionDate = this.getDate(acquisitionDate);
+        this.patientName = patientFirstName + ' ' + patientLastName
         /*
         this.validSeries = [];     // have passed the checks
         this.rejectedSeries = [];  // do not have passed the checks

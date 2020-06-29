@@ -281,15 +281,21 @@ export default class DicomFile {
 	}
 
 	getPatientFirstName(){
-		//SK Attention au risque undefined
-		// - pas  ^ ??
-		return this.getPatientName().split('^').pop();
+		if (this.getPatientName() !== undefined) {
+			return this.getPatientName().split('^').pop();
+		} else {
+			return null;
+		}
+		
 	}
 
 	getPatientLastName(){
-		return this.getPatientName().substring(0, this.getPatientName().indexOf("^"));
+		if (this.getPatientName() !== undefined) {
+			return this.getPatientName().substring(0, this.getPatientName().indexOf("^"));
+		} else {
+			return null;
+		}
 	}
-
 
 
 }

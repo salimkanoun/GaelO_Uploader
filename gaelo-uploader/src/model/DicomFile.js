@@ -283,7 +283,7 @@ export default class DicomFile {
 	getPatientFirstName(){
 		//SK Attention au risque undefined
 		// - pas  ^ ??
-		return this.getPatientName().split('-').pop();
+		return this.getPatientName().split('^').pop();
 	}
 
 	getPatientLastName(){

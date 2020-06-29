@@ -58,12 +58,12 @@ export default class DisplaySeries extends Component {
         }
     }
 
-    buildRows(){
+    buildRows() {
         let rows = []
         this.props.series.forEach(series => {
             rows.push({
                 ...series,
-                numberOfInstances : Object.keys(series.instances).length
+                numberOfInstances: Object.keys(series.instances).length
             })
         })
         return rows
@@ -85,7 +85,7 @@ export default class DisplaySeries extends Component {
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                        
+
                     </Col>
                 </Row>
             </Container>
@@ -93,3 +93,8 @@ export default class DisplaySeries extends Component {
     }
 
 }
+
+/*
+A IMPLEMENTER
+<DisplayWarning type='studies' warnings={}/>
+*/

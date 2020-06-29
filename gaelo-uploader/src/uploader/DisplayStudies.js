@@ -13,97 +13,28 @@
  */
 
 import React, { Component, Fragment } from 'react'
-import BootstrapTable from 'react-bootstrap-table-next';
-import Button from 'react-bootstrap/Button'
-import CheckPatient from './CheckPatient'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-
 import DisplayWarning from './DisplayWarning'
+
+import StudiesTab from './StudiesTab';
 
 export default class DisplayStudies extends Component {
 
-    state = {
-        isCheck: false,
-    }
-
-    columns = [
-        {
-            dataField: 'studyUID',
-            hidden: true,
-            formatter: this.linkCheck,
-        },
-        {
-            dataField: 'status',
-            text: 'Status',
-        },
-        {
-            dataField: 'patientName',
-            text: 'Patient name',
-        },
-        {
-            dataField: 'studyDescription',
-            text: 'Description',
-        },
-        {
-            dataField: 'accessionNumber',
-            text: 'Accession #',
-        },
-        {
-            dataField: 'acquisitionDate',
-            text: 'Date',
-        },
-    ]
-
-    
-    selectRow = {
-        mode: 'radio',
-        clickToSelect: true,
-        hideSelectColumn : true,
-        onSelect: (row) => {
-            console.log(row)
-            this.props.onSelectChange(row.studyUID)
-        }
-    };
-
-    toogleCheckPatient(row){
-        console.log(row)
-
-    }
-
-    linkCheck = (row) => {
-        return (
-            <Fragment>
-                <Button onClick={() => { this.toogleCheckPatient(row); }}>
-                    Check Patient
-                </Button>
-                <CheckPatient studyUID = {this.row.studyUID} validateCheckPatient = {this.props.validateCheckPatient} display={this.state.isCheck} closeListener={() => this.toogleCheckPatient(row) } studies={this.props.studies} />
-            </Fragment>
-        );
-    };
-
     render() {
-        console.log(this.props.studies)
+        //console.log(this.props.studies)
         return (
             <Fragment>
-                 <Container fluid>
+                <Container fluid>
                     <span class="title">Studies</span>
                     <Row>
                         <Col xs={12} md={8}>
-                            <BootstrapTable
-                                keyField='studyUID'
-                                classes="table table-borderless"
-                                bodyClasses="du-studies-tbody"
-                                headerClasses="du-studies th"
-                                rowClasses="du-studies td"
-                                data={this.props.studies}
-                                columns={this.columns}
-                                selectRow={this.selectRow}
-                            />
+                            <StudiesTab studies={this.props.studies} onSelectChange={this.props.onSelectChange} 
+                            validateCheckPatient={this.props.validateCheckPatient}/>
                         </Col>
                         <Col xs={6} md={4}>
-                           
+
                         </Col>
                     </Row>
                 </Container>
@@ -112,3 +43,7 @@ export default class DisplayStudies extends Component {
     }
 }
 
+/*
+A IMPLEMENTER
+<DisplayWarning type='studies' warnings={} />
+*/

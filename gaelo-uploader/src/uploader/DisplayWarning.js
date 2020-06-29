@@ -1,4 +1,4 @@
-import { React, Component } from "react";
+import React, { Component } from "react";
 import BootstrapTable from 'react-bootstrap-table-next'
 
 export default class DisplayWarning extends Component {

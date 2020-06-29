@@ -39,14 +39,16 @@ export default class IgnoredFilesPanel extends Component {
 
         let rows = []
 
-        ignoredFileNames.forEach(ingoredFileName => {
+        ignoredFileNames.forEach(ignoredFileName => {
             rows.push( { 
                 key : Math.random(), 
-                file: ingoredFileName, 
-                reason: this.props.dataIgnoredFiles[ingoredFileName].message 
+                file: ignoredFileName, 
+                reason: this.props.dataIgnoredFiles[ignoredFileName],
             })
+            console.log(this.props.dataIgnoredFiles[ignoredFileName])
+            
         })
-        console.log(rows)
+        //console.log(rows)
         return rows
     }
 

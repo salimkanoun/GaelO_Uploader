@@ -29,24 +29,24 @@ export default class ControllerStudiesSeries extends Component {
     }
 
     setCurrentStudy = (studyUID) => {
-        this.setState({ selectedStudy : studyUID })
+        this.setState({ selectedStudy: studyUID })
 
     }
 
-    validateCheckPatient(studyUID){
-        console.log(studyUID)
+    validateCheckPatient(studyUID) {
+        //console.log(studyUID)
     }
 
-    ignoreStudyWarning(studyUID){
+    ignoreStudyWarning(studyUID) {
 
     }
 
-    getSeries(studyUID){
-        console.log('change Series')
-        console.log(studyUID)
-        
-        if(studyUID !== undefined) {
-            console.log(this.props.uploadModel.getStudy(studyUID).getSeriesArray())
+    getSeries(studyUID) {
+        //console.log('change Series')
+        //console.log(studyUID)
+
+        if (studyUID !== undefined) {
+            //console.log(this.props.uploadModel.getStudy(studyUID).getSeriesArray())
             return this.props.uploadModel.getStudy(studyUID).getSeriesArray()
         }
         else return []
@@ -55,8 +55,9 @@ export default class ControllerStudiesSeries extends Component {
     render() {
         return (
             <Fragment>
-                <DisplayStudies validateCheckPatient = {this.validateCheckPatient} ignoreStudyWarning = {this.ignoreStudyWarning} studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
-                <DisplaySeries studyUID={this.state.selectedStudy} series = {this.getSeries(this.state.selectedStudy)} />
+                <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
+                    studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
+                <DisplaySeries studyUID={this.state.selectedStudy} series={this.getSeries(this.state.selectedStudy)} />
             </Fragment>
         )
     }

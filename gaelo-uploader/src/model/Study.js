@@ -35,8 +35,9 @@ export default class Study {
         this.rejectedSeries = [];  // do not have passed the checks
         this.queuedSeries = [];    // in wait for uplaod
         this.visit = null;
-        this.warnings = {};
         */
+       this.warnings = {};
+
     }
 
     addSeries(seriesObject) {
@@ -125,5 +126,55 @@ export default class Study {
             + "\nPatient sex: " + this.patientSex);
     }
 
+    checkStudies() {
+		for (let st of this.studies) {
 
+			// Check if the study corresponds to the visits in wait for series upload
+			/*let expectedVisit = this.findExpectedVisit(st);
+			if (expectedVisit === undefined) {
+				st.setWarning('notExpectedVisit', 'You should check/select the patient. The imported study informations do not match with the expected ones.', true, false, true);
+			} else {
+				delete st.warnings['notExpectedVisit'];
+				if (!this.config.multiImportMode) {
+					st.visit = expectedVisit;
+				}
+			}
+
+			// Check if visit ID is set
+			if (st.visit == null || typeof st.visit.idVisit === undefined) {
+				st.setWarning('visitID', 'You should check/select the patient. Null visit ID.', false, true, false);
+			} else {
+				delete st.warnings['visitID'];
+			}
+
+			// Check inner series
+			this.checkSeries(st);*/
+
+			// Check if study has warnings
+			if (st.hasWarnings()) {
+				if (!st.hasCriticalWarnings() && st.hasValidSeries()) {
+					this.setStatusStudy(st, 'incomplete');
+				} else {
+					this.setStatusStudy(st, 'rejected');
+					this.dequeueStudy(st);
+				}
+			} else {
+					this.setStatusStudy(st, 'valid');
+			}
+
+
+            if (st.hasWarnings()) {
+				st.setStatusSerie(this, 'rejected');
+				st.dequeueSerie(this);
+				st.setWarning('serie' + this.seriesNumber, 'Invalid serie: #' + this.seriesNumber + '.', false, false);
+			} else {
+				st.setStatusSerie(this, 'valid');
+				delete st.warnings['serie' + this.seriesNumber];
+			}
+		}
+    }
+    
+    getArrayWarnings() {
+        return Object.values(this.warnings)
+    }
 }

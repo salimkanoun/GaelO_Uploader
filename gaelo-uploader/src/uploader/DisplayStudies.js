@@ -23,18 +23,18 @@ import StudiesTab from './StudiesTab';
 export default class DisplayStudies extends Component {
 
     render() {
-        //console.log(this.props.studies)
         return (
             <Fragment>
                 <Container fluid>
                     <span class="title">Studies</span>
                     <Row>
                         <Col xs={12} md={8}>
-                            <StudiesTab studies={this.props.studies} onSelectChange={this.props.onSelectChange} 
-                            validateCheckPatient={this.props.validateCheckPatient}/>
+                            <StudiesTab studies={this.props.studies} onSelectChange={this.props.onSelectChange}
+                                validateCheckPatient={this.props.validateCheckPatient} />
                         </Col>
                         <Col xs={6} md={4}>
-
+                            <DisplayWarning type='studies' warnings={this.props.studies.warnings}
+                                loaded={(this.props.studies.length !== 0) ? true : false} />
                         </Col>
                     </Row>
                 </Container>
@@ -42,8 +42,3 @@ export default class DisplayStudies extends Component {
         )
     }
 }
-
-/*
-A IMPLEMENTER
-<DisplayWarning type='studies' warnings={} />
-*/

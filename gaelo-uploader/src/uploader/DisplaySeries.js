@@ -68,6 +68,7 @@ export default class DisplaySeries extends Component {
         })
         return rows
     }
+    
     render() {
         return (
             <Container fluid>
@@ -85,7 +86,8 @@ export default class DisplaySeries extends Component {
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-
+                        <DisplayWarning type='studies' warnings={this.props.series.warnings}
+                            loaded={(this.props.series.length !== 0) ? true : false} />
                     </Col>
                 </Row>
             </Container>
@@ -93,8 +95,3 @@ export default class DisplaySeries extends Component {
     }
 
 }
-
-/*
-A IMPLEMENTER
-<DisplayWarning type='studies' warnings={}/>
-*/

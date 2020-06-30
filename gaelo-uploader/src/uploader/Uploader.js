@@ -22,7 +22,7 @@ export default class Uploader extends Component {
         fileParsed: 0,
         fileLoaded: 0,
         showIgnoredFiles: false,
-        ignoredFiles : {},
+        ignoredFiles: {},
         showWarning: false,
         zipPercent: 50,
         uploadPercent: 30
@@ -48,14 +48,14 @@ export default class Uploader extends Component {
         console.log(answer)
     }
 
-    addFile(files){
-            this.setState((previousState) => { return { fileLoaded: previousState.fileLoaded++ } })
-            console.log('Added file', files)
-            files.forEach(file =>{
-                this.read(file)
-            })
-            
-            console.log(this.uploadModel)
+    addFile(files) {
+        this.setState((previousState) => { return { fileLoaded: previousState.fileLoaded++ } })
+        console.log('Added file', files)
+        files.forEach(file => {
+            this.read(file)
+        })
+
+        //console.log(this.uploadModel)
     }
 
     /**
@@ -77,30 +77,30 @@ export default class Uploader extends Component {
                 let study;
                 let series;
 
-                console.log(dicomFile)
+                //console.log(dicomFile)
                 let dicomStudyID = dicomFile.getStudyInstanceUID()
                 let dicomSeriesID = dicomFile.getSeriesInstanceUID()
                 let dicomInstanceID = dicomFile.getSOPInstanceUID()
 
-                if (!this.uploadModel.isExistingStudy(dicomFile.getStudyInstanceUID())) {
-                    study = new Study(dicomFile.getStudyInstanceUID(), dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
+                if (!this.uploadModel.isExistingStudy(dicomStudyID)) {
+                    study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
                         dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
                         dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
                     this.uploadModel.addStudy(study);
                 } else {
-                    study = this.uploadModel.getStudy(dicomFile.getStudyInstanceUID())
+                    study = this.uploadModel.getStudy(dicomStudyID)
                 }
 
-                if (!study.isExistingSeries(dicomFile.getSeriesInstanceUID())) {
-                    series = new Series(dicomFile.getSeriesInstanceUID(), dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
+                if (!study.isExistingSeries(dicomSeriesID)) {
+                    series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
                         dicomFile.getSeriesDescription(), dicomFile.getModality());
                     study.addSeries(series);
                 } else {
-                    series = study.getSeries(dicomFile.getSeriesInstanceUID())
+                    series = study.getSeries(dicomSeriesID)
                 }
 
-                if (!series.isExistingInstance(dicomFile.getSOPInstanceUID())) {
-                    series.addInstance(new Instance(dicomFile.getSOPInstanceUID(), dicomFile.getInstanceNumber(), dicomFile, file));
+                if (!series.isExistingInstance(dicomInstanceID)) {
+                    series.addInstance(new Instance(dicomInstanceID, dicomFile.getInstanceNumber(), dicomFile, file));
                     this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
                 } else {
                     this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
@@ -110,12 +110,12 @@ export default class Uploader extends Component {
                 console.warn(e)
                 this.setState(state => {
                     //SK ICI BUG IGNORE FILE A UN SEUL ITEM
-                    return { 
+                    return {
                         fileIgnored: state.fileIgnored++,
-                        ignoredFiles : {
+                        ignoredFiles: {
                             ...state.ignoredFiles,
-                            [file.name] : e
-                        } 
+                            [file.name]: e
+                        }
                     }
                 })
             }

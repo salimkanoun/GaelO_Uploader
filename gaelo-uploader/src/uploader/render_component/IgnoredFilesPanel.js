@@ -61,6 +61,8 @@ export default class IgnoredFilesPanel extends Component {
                 <Modal.Body class="modal-body">
                     <BootstrapTable
                         keyField='key'
+                        bodyClasses="du-ignored-files-modal td"
+                        headerClasses="du-ignored-files-modal th"
                         classes="table table-responsive table-borderless"
                         data={ this.createRows() }
                         columns={this.columns}

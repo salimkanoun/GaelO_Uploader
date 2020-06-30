@@ -12,7 +12,6 @@ import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import IgnoredFilesPanel from './render_component/IgnoredFilesPanel'
 import WarningPatient from './render_component/WarningPatient'
-
 import { getAets, logIn, registerStudy } from '../services/api'
 
 export default class Uploader extends Component {
@@ -103,9 +102,12 @@ export default class Uploader extends Component {
                     series.addInstance(new Instance(dicomInstanceID, dicomFile.getInstanceNumber(), dicomFile, file));
                     this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
                 } else {
-                    this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
+                    //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
                     throw ("Existing instance")
                 }
+                series.checkSeries(dicomFile)
+
+
             } catch (e) {
                 console.warn(e)
                 this.setState(state => {
@@ -161,7 +163,6 @@ export default class Uploader extends Component {
                     </Card.Body>
                 </Card>
             </Fragment>
-
         )
     }
 }

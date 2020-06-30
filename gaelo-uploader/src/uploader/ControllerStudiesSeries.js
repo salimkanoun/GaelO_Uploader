@@ -25,7 +25,6 @@ export default class ControllerStudiesSeries extends Component {
 
     constructor(props) {
         super(props)
-        //this.handleToUpdate = this.handleToUpdate.bind(this)
     }
 
     setCurrentStudy = (studyUID) => {
@@ -42,11 +41,7 @@ export default class ControllerStudiesSeries extends Component {
     }
 
     getSeries(studyUID) {
-        //console.log('change Series')
-        //console.log(studyUID)
-
         if (studyUID !== undefined) {
-            //console.log(this.props.uploadModel.getStudy(studyUID).getSeriesArray())
             return this.props.uploadModel.getStudy(studyUID).getSeriesArray()
         }
         else return []

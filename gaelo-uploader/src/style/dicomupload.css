@@ -68,30 +68,30 @@
 
 /* # STATUS INFO */
 
-#du-status-info>* {
+.du-status-info>* {
 	padding: 5px 10px;
 	font-size: 14px;
 	font-weight: 400;
 }
 
-#du-status-info>.info {
+.du-status-info>.info {
 	color: #0262b0;
 	font-weight: bold;
 }
-#du-status-info>.warn {
+.du-status-info>.warn {
 	color: #f46a0e;
 	font-weight: bold;
 }
-#du-status-info>.error {
+.du-status-info>.error {
 	color: #d11818;
 	font-weight: bold;
 }
-#du-status-info>.success {
+.du-status-info>.success {
 	color: #22ac10;
 	font-weight: bold;
 }
 
-#du-status-info .du-ignored-badge {
+.du-status-info .du-ignored-badge {
 	cursor:pointer;
 }
 
@@ -161,8 +161,10 @@
 .du-studies td,
 .du-studies th,
 .du-series td,
-.du-series th {
-	padding: 2px 10px;
+.du-series th,
+.du-warnings td,
+.du-warnings th {
+	padding: 8px 15px;
 	border-top: 1px solid #dee2e6;
 	text-align: inherit;
 }
@@ -180,7 +182,8 @@
 }
 
 .du-studies td,
-.du-series td {
+.du-series td,
+.du-warnings td {
 	padding: 2px 6px;
 }
 
@@ -221,22 +224,19 @@
 	background-color: #f7f7f7;
 }
 
-.du-studies-warnings,
-.du-series-warnings {
+.du-warnings {
 	background-color: #fef5e7;
 	color: #810909;
 }
 
-.du-studies-warnings td button,
-.du-series-warnings td button {
+.du-warnings td button {
 	color: white;
 	background-color: #4a4848;
 	border-radius: 4px;
 	border: 0;
 }
 
-.du-studies-warnings td button:hover,
-.du-series-warnings td button:hover {
+.du-warnings td button:hover {
 	background-color: #686666;
 }
 

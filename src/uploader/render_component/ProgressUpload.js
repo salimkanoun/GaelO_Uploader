@@ -19,22 +19,21 @@ import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 
 export default class ProgressUpload extends Component {
-
-    render() {
-        return (
-            <Fragment>
-                <Row>
-                    <Col md="auto">
-                        <Button variant="primary" onClick = {this.props.onUploadClick}> Upload </Button>
-                    </Col>
-                    <Col>
-                        <ProgressBar style = {{height : "100%"}}>
-                            <ProgressBar variant="success" min={0} max={100} now={this.props.uploadPercent} label={`Upload ${this.props.uploadPercent}%`} key={1} />
-                            <ProgressBar striped variant="info" min={0} max={100} now={this.props.zipPercent} label={`Zip`} key={2} />
-                        </ ProgressBar>
-                    </Col>
-                </Row>
-            </Fragment>
-        )
-    }
+  render () {
+    return (
+      <>
+        <Row>
+          <Col md='auto'>
+            <Button variant='primary' onClick={this.props.onUploadClick}> Upload </Button>
+          </Col>
+          <Col>
+            <ProgressBar style={{ height: '100%' }}>
+              <ProgressBar variant='success' min={0} max={100} now={this.props.uploadPercent} label={`Upload ${this.props.uploadPercent}%`} key={1} />
+              <ProgressBar striped variant='info' min={0} max={100} now={this.props.zipPercent} label='Zip' key={2} />
+            </ProgressBar>
+          </Col>
+        </Row>
+      </>
+    )
+  }
 }

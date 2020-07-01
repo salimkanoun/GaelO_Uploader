@@ -12,18 +12,17 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment} from 'react'
+import React, { Component, Fragment } from 'react'
 import Badge from 'react-bootstrap/Badge'
 
 export default class ParsingDetails extends Component {
-
-    render() {
-        return (
-            <Fragment>
-                <Badge variant='secondary'>{this.props.fileLoaded} File(s) loaded</Badge>
-                <Badge variant='success'>{this.props.fileParsed} File(s) parsed</Badge>
-                <Badge variant='warning' className='du-ignored-badge' onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</Badge>
-            </Fragment>
-        )
-    }
+  render () {
+    return (
+      <>
+        <Badge variant='secondary'>{this.props.fileLoaded} File(s) loaded</Badge>
+        <Badge variant='success'>{this.props.fileParsed} File(s) parsed</Badge>
+        <Badge variant='warning' className='du-ignored-badge' onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</Badge>
+      </>
+    )
+  }
 }

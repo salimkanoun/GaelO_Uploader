@@ -18,33 +18,31 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
 
-import StudiesTab from './StudiesTab';
+import StudiesTab from './StudiesTab'
 
 export default class DisplayStudies extends Component {
-
-    
-    render() {
-        /*if (this.props.studies.length !== 0) {
+  render () {
+    /* if (this.props.studies.length !== 0) {
             console.log(this.props.studies[0]['warnings'])
-        }*/
-        return (
-            <Fragment>
-                <Container fluid>
-                    <span class="title">Studies</span>
-                    <Row>
-                        <Col xs={12} md={8}>
-                            <StudiesTab studies={this.props.studies} onSelectChange={this.props.onSelectChange}
-                                validateCheckPatient={this.props.validateCheckPatient} />
-                        </Col>
-                        <Col xs={6} md={4}>
-                            
-                        </Col>
-                    </Row>
-                </Container>
-            </Fragment>
-        )
-    }
+        } */
+    return (
+      <>
+        <Container fluid>
+          <span class='title'>Studies</span>
+          <Row>
+            <Col xs={12} md={8}>
+              <StudiesTab
+                studies={this.props.studies} onSelectChange={this.props.onSelectChange}
+                validateCheckPatient={this.props.validateCheckPatient}
+              />
+            </Col>
+            <Col xs={6} md={4} />
+          </Row>
+        </Container>
+      </>
+    )
+  }
 }
 
-/*<DisplayWarning type='studies' object={(this.props.studies.length !== 0) ? this.props.studies : null}
-                                loaded={(this.props.studies.length !== 0) ? true : false} />*/
+/* <DisplayWarning type='studies' object={(this.props.studies.length !== 0) ? this.props.studies : null}
+                                loaded={(this.props.studies.length !== 0) ? true : false} /> */

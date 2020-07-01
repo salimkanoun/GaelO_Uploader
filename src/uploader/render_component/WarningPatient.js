@@ -16,15 +16,15 @@ import React, { Component, Fragment } from 'react'
 import Alert from 'react-bootstrap/Alert'
 
 export default class WarningPatient extends Component {
-
-    render() {
-        return (
-            <Fragment>
-                <Alert variant="warning" show={this.props.show} dismissible onClose={this.props.closeListener}>
-                    Please, check/select the patient. The imported patient informations do not correspond with the expected ones.</Alert>
-            </Fragment>
-        )
-    }
+  render () {
+    return (
+      <>
+        <Alert variant='warning' show={this.props.show} dismissible onClose={this.props.closeListener}>
+                    Please, check/select the patient. The imported patient informations do not correspond with the expected ones.
+        </Alert>
+      </>
+    )
+  }
 }
 
-//SK CE COMPONENT PEUT ETRE ETENDU AUX WARNING SERIES (en jouant sur des constante pour la string)
+// SK CE COMPONENT PEUT ETRE ETENDU AUX WARNING SERIES (en jouant sur des constante pour la string)

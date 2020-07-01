@@ -11,7 +11,7 @@
  with this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-import DicomFile from '../model/DicomFile'
+import DicomFile from './DicomFile'
 
 const minNbOfInstances = 30
 

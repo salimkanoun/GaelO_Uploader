@@ -37,8 +37,7 @@ export default class DisplayStudies extends Component {
                                 validateCheckPatient={this.props.validateCheckPatient} />
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='studies' object={(this.props.studies.length !== 0) ? this.props.studies : null}
-                                loaded={(this.props.studies.length !== 0) ? true : false} />
+                            
                         </Col>
                     </Row>
                 </Container>
@@ -46,3 +45,6 @@ export default class DisplayStudies extends Component {
         )
     }
 }
+
+/*<DisplayWarning type='studies' object={(this.props.studies.length !== 0) ? this.props.studies : null}
+                                loaded={(this.props.studies.length !== 0) ? true : false} />*/

@@ -24,7 +24,8 @@ export default class Uploader extends Component {
         ignoredFiles: {},
         showWarning: false,
         zipPercent: 50,
-        uploadPercent: 30
+        uploadPercent: 30,
+        queuedStudies: []
     }
 
     constructor(props) {
@@ -36,7 +37,7 @@ export default class Uploader extends Component {
         this.toogleShowIgnoreFile = this.toogleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
-
+        this.uploadStudies = this.uploadStudies.bind(this)
         this.ignoredFiles = {}
     }
 
@@ -140,6 +141,10 @@ export default class Uploader extends Component {
 
     }
 
+    uploadStudies = (studiesReady) => {
+        return null
+    }
+
     render() {
         return (
             <Fragment>
@@ -158,7 +163,7 @@ export default class Uploader extends Component {
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toogleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries uploadModel={this.uploadModel} />
+                        <ControllerStudiesSeries uploadModel={this.uploadModel} studiesReadyToUpload={this.uploadStudies} />
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipPercent} uploadPercent={this.state.uploadPercent} />
                     </Card.Body>
                 </Card>

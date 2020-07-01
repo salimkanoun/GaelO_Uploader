@@ -15,16 +15,41 @@
 import React, { Component, Fragment } from 'react'
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
+import Row from 'react-bootstrap/Row'
 
 
 export default class ControllerStudiesSeries extends Component {
 
     state = {
-        selectedStudy: undefined
+        selectedStudy: undefined,
+        seriestoUpload: [],
+        selectedSeries: []
     }
 
     constructor(props) {
         super(props)
+        this.updateSelectedSeries = this.updateSelectedSeries.bind(this)
+    }
+
+    prepareSeriesToUpload = () => {
+        //console.log(this.state.selectedSeries)
+        let seriesIDs = this.state.selectedSeries
+        let series = []
+            let study = this.props.uploadModel.getStudy(this.state.selectedStudy)['series']
+            seriesIDs.forEach( (serie) => {
+                    console.log(study[serie])
+                    series.push(study[serie])
+                
+                 } )
+    
+        console.log(series)
+        this.setState( { seriesToUpload: [...series] }, () => (console.log(this.state.seriesToUpload)) )
+        
+    }
+
+    updateSelectedSeries = (series) => {
+        console.log(series)
+        this.setState( {selectedSeries: series }, () => (this.prepareSeriesToUpload()))
     }
 
     setCurrentStudy = (studyUID) => {
@@ -50,9 +75,14 @@ export default class ControllerStudiesSeries extends Component {
     render() {
         return (
             <Fragment>
-                <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
-                    studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
-                <DisplaySeries studyUID={this.state.selectedStudy} series={this.getSeries(this.state.selectedStudy)} />
+                <Row>
+                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
+                        studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
+                </Row>
+                <Row>
+                    <DisplaySeries studyUID={this.state.selectedStudy} series={this.getSeries(this.state.selectedStudy)}
+                    selectedSeries={this.updateSelectedSeries} />
+                </Row>
             </Fragment>
         )
     }

@@ -18,7 +18,6 @@ import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 
-
 export default class ProgressUpload extends Component {
 
     render() {

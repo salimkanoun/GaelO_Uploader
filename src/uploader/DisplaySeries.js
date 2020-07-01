@@ -22,7 +22,20 @@ import DisplayWarning from './DisplayWarning'
 
 export default class DisplaySeries extends Component {
 
+    state = {
+        selectedSeries:[]
+    }
+
+    constructor(props) {
+        super(props)
+    }
+
     columns = [
+        {
+            dataField: 'seriesInstanceUID',
+            isDummyField: true,
+            hidden: true
+        },
         {
             dataField: 'status',
             text: 'Status',
@@ -53,8 +66,17 @@ export default class DisplaySeries extends Component {
     selectRow = {
         mode: 'checkbox',
         clickToSelect: true,
+        selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
             //ICI FAIRE REMONTER L INFO QUE L UPLAD EST A FAIREs
+            if (isSelect) {
+                this.setState( (prevState) => ( {selectedSeries: [...prevState.selectedSeries, row.seriesInstanceUID] } ),
+                () => (this.props.selectedSeries(this.state.selectedSeries)) )
+            } else {
+                this.setState( (prevState) => ({selectedSeries: prevState.selectedSeries.filter(thisRow => thisRow !== row.seriesInstanceUID)}),
+                () => (this.props.selectedSeries(this.state.selectedSeries)) )
+            }
+            
         }
     }
 
@@ -86,8 +108,7 @@ export default class DisplaySeries extends Component {
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                    <DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.series : null}
-                                loaded={(this.props.series.length !== 0) ? true : false} />
+
                     </Col>
                 </Row>
             </Container>
@@ -95,3 +116,8 @@ export default class DisplaySeries extends Component {
     }
 
 }
+
+/*
+<DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.series : null}
+                                loaded={(this.props.series.length !== 0) ? true : false} />
+                                */

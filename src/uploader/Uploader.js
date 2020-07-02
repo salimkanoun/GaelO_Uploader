@@ -13,6 +13,10 @@ import ProgressUpload from './render_component/ProgressUpload'
 import IgnoredFilesPanel from './render_component/IgnoredFilesPanel'
 import WarningPatient from './render_component/WarningPatient'
 import { getAets, logIn, registerStudy } from '../services/api'
+import JSZip from "jszip";
+
+import Uppy from '@uppy/core'
+import Tus from '@uppy/tus'
 
 export default class Uploader extends Component {
 
@@ -25,7 +29,6 @@ export default class Uploader extends Component {
         showWarning: false,
         zipPercent: 50,
         uploadPercent: 30,
-        queuedStudies: []
     }
 
     constructor(props) {
@@ -37,8 +40,43 @@ export default class Uploader extends Component {
         this.toogleShowIgnoreFile = this.toogleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
-        this.uploadStudies = this.uploadStudies.bind(this)
         this.ignoredFiles = {}
+        this.controlerStudiesSeriesRefs = React.createRef();
+
+        this.uppy = Uppy({  
+            id: 'uppy', 
+            autoProceed: false,
+            allowMultipleUploads: true,
+            debug: true
+        })
+
+
+        this.uppy.use(Tus, {
+            endpoint: 'http://localhost:3000/scripts/tus_upload.php', // use your tus endpoint here
+            resume: true,
+            autoRetry: true,
+            chunkSize: 2000000,
+            limit: 3,
+            headers:{
+                Location : 'http://localhost:3000/scripts/tus_upload.php'
+            },
+            retryDelays: [0, 1000, 3000, 5000]
+        })
+
+        this.uppy.on('complete', (result) => {
+            console.log(result)
+        })
+
+        this.uppy.on('upload-error', (file, error, response) => {
+            console.log('error with file:', file.id)
+            console.log('error message:', error)
+        })
+
+        this.uppy.on('upload-progress', (file, progress) => {
+            // file: { id, name, type, ... }
+            // progress: { uploader, bytesUploaded, bytesTotal }
+            console.log(file.id, progress.bytesUploaded, progress.bytesTotal)
+        })
     }
 
     async componentDidMount() {
@@ -100,14 +138,13 @@ export default class Uploader extends Component {
                 }
 
                 if (!series.isExistingInstance(dicomInstanceID)) {
-                    series.addInstance(new Instance(dicomInstanceID, dicomFile.getInstanceNumber(), dicomFile, file));
+                    series.addInstance(new Instance(dicomInstanceID, file));
                     this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
                 } else {
                     //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
                     throw ("Existing instance")
                 }
                 series.checkSeries(dicomFile)
-
 
             } catch (e) {
                 console.warn(e)
@@ -123,6 +160,7 @@ export default class Uploader extends Component {
                 })
             }
         }
+        //console.log(this.uploadModel)
     }
 
     /*Trigger ignored files panel if clicked*/
@@ -136,13 +174,63 @@ export default class Uploader extends Component {
         this.setState((state) => { return { showWarning: !state.showWarning } });
     }
 
-    onUploadClick(e) {
+    async onUploadClick(e) {
+        console.log(this.controlerStudiesSeriesRefs)
+        console.log(this.controlerStudiesSeriesRefs.current.getValidatedItems())
         console.log('upload clicked')
+        let zipBlob = await this.prepareZip()
+        console.log(zipBlob)
+        this.uppy.addFile(
+            {
+            name: 'my-file.zip', // file name
+            type: 'application/zip', // file type
+            data: zipBlob// file blob
+            }
+        )
 
+        this.uppy.upload()
     }
 
-    uploadStudies = (studiesReady) => {
-        return null
+
+    /**
+	 * Add the dicom files contained in the queued series of 'study'
+	 * to a JSZip object
+	 */
+    async prepareZip() {
+        console.log('Zipping files...');
+        
+        // Create a new jszip object with folders & dicom files
+        let jszip = new JSZip();
+        let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
+        let serieID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
+        let series = this.uploadModel.getStudy(studyID).getSeries(serieID)
+        let instances = series.getArrayInstances()
+        for(let instance in instances){
+            let dicomFile = new DicomFile(instances[instance].getFile())
+            await dicomFile.readDicomFile()
+
+            jszip.file(dicomFile.getFilePath(), dicomFile.byteArray);
+            console.log(jszip)
+        }
+
+        let uintarray = await jszip.generateAsync(
+            // Zipping options
+            {
+                type: "uint8array",
+                compression: "DEFLATE",
+                compressionOptions: {
+                    level: 3,
+                    streamFiles: true
+                }
+            },
+            // Callback on update
+            (metadata) => {
+                //this.v.zippingProgress[indexStudyToUpload] = metadata.percent;
+            }
+        )
+        let zipBlob = new Blob([uintarray], { type: 'application/zip' });
+        console.log(zipBlob)
+        return zipBlob
     }
 
     render() {
@@ -163,7 +251,7 @@ export default class Uploader extends Component {
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toogleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries uploadModel={this.uploadModel} studiesReadyToUpload={this.uploadStudies} />
+                        <ControllerStudiesSeries ref={this.controlerStudiesSeriesRefs} uploadModel={this.uploadModel} />
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipPercent} uploadPercent={this.state.uploadPercent} />
                     </Card.Body>
                 </Card>

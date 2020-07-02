@@ -13,10 +13,9 @@
  */
 
 export default class Instance {
-  constructor (SOPInstanceUID, originalFilePath, file) {
+  constructor (SOPInstanceUID, fileObject) {
     this.SOPInstanceUID = SOPInstanceUID
-    this.originalFilePath = originalFilePath
-    this.file = file
+    this.fileObject = fileObject
   }
 
   toString () {
@@ -25,6 +24,6 @@ export default class Instance {
   }
 
   getFile () {
-    return this.file
+    return this.fileObject
   }
 }

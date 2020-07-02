@@ -52,14 +52,12 @@ export default class Uploader extends Component {
 
 
         this.uppy.use(Tus, {
-            endpoint: 'http://localhost:3000/scripts/tus_upload.php', // use your tus endpoint here
+            endpoint: '/tus', // use your tus endpoint here
             resume: true,
             autoRetry: true,
             chunkSize: 2000000,
             limit: 3,
-            headers:{
-                Location : 'http://localhost:3000/scripts/tus_upload.php'
-            },
+            headers:{},
             retryDelays: [0, 1000, 3000, 5000]
         })
 
@@ -99,68 +97,58 @@ export default class Uploader extends Component {
     /**
 	 * Read and parse dicom file
 	 */
-    read(file) {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(file);
-        reader.onload = () => {
-            // Retrieve file content as Uint8Array
-            const arrayBuffer = reader.result;
-            const byteArray = new Uint8Array(arrayBuffer);
-            try {
-                // Try to parse as dicom file
-                //Will throw exception if not dicom file (exeption from dicomParser)
-                let dataSet = dicomParser.parseDicom(byteArray)
-                //But read data in a DicomFile Object
-                let dicomFile = new DicomFile(file, dataSet);
-                let study;
-                let series;
+    async read(file) {
+        try{
+            let dicomFile = new DicomFile(file);
+            await dicomFile.readDicomFile()
+            let study;
+            let series;
 
-                //console.log(dicomFile)
-                let dicomStudyID = dicomFile.getStudyInstanceUID()
-                let dicomSeriesID = dicomFile.getSeriesInstanceUID()
-                let dicomInstanceID = dicomFile.getSOPInstanceUID()
+            //console.log(dicomFile)
+            let dicomStudyID = dicomFile.getStudyInstanceUID()
+            let dicomSeriesID = dicomFile.getSeriesInstanceUID()
+            let dicomInstanceID = dicomFile.getSOPInstanceUID()
 
-                if (!this.uploadModel.isExistingStudy(dicomStudyID)) {
-                    study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
-                        dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
-                        dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
-                    this.uploadModel.addStudy(study);
-                } else {
-                    study = this.uploadModel.getStudy(dicomStudyID)
-                }
-
-                if (!study.isExistingSeries(dicomSeriesID)) {
-                    series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
-                        dicomFile.getSeriesDescription(), dicomFile.getModality());
-                    study.addSeries(series);
-                } else {
-                    series = study.getSeries(dicomSeriesID)
-                }
-
-                if (!series.isExistingInstance(dicomInstanceID)) {
-                    series.addInstance(new Instance(dicomInstanceID, file));
-                    this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
-                } else {
-                    //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
-                    throw ("Existing instance")
-                }
-                series.checkSeries(dicomFile)
-
-            } catch (e) {
-                console.warn(e)
-                this.setState(state => {
-                    //SK ICI BUG IGNORE FILE A UN SEUL ITEM
-                    return {
-                        fileIgnored: state.fileIgnored++,
-                        ignoredFiles: {
-                            ...state.ignoredFiles,
-                            [file.name]: e
-                        }
-                    }
-                })
+            if (!this.uploadModel.isExistingStudy(dicomStudyID)) {
+                study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
+                    dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
+                    dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
+                this.uploadModel.addStudy(study);
+            } else {
+                study = this.uploadModel.getStudy(dicomStudyID)
             }
+
+            if (!study.isExistingSeries(dicomSeriesID)) {
+                series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
+                    dicomFile.getSeriesDescription(), dicomFile.getModality());
+                study.addSeries(series);
+            } else {
+                series = study.getSeries(dicomSeriesID)
+            }
+
+            if (!series.isExistingInstance(dicomInstanceID)) {
+                series.addInstance(new Instance(dicomInstanceID, file));
+                this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
+            } else {
+                //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
+                throw Error("Existing instance")
+            }
+            series.checkSeries(dicomFile)
+
+        }catch( error ){
+            console.warn(error)
+            this.setState(state => {
+                //SK ICI BUG IGNORE FILE A UN SEUL ITEM
+                return {
+                    fileIgnored: state.fileIgnored++,
+                    ignoredFiles: {
+                        ...state.ignoredFiles,
+                        [file.name]: error
+                    }
+                }
+            })
         }
-        //console.log(this.uploadModel)
+
     }
 
     /*Trigger ignored files panel if clicked*/
@@ -202,13 +190,15 @@ export default class Uploader extends Component {
         // Create a new jszip object with folders & dicom files
         let jszip = new JSZip();
         let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
+        let studyIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.304'
+        let seriesIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.610'
         let serieID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
-        let series = this.uploadModel.getStudy(studyID).getSeries(serieID)
+        let series = this.uploadModel.getStudy(studyIDSalim).getSeries(seriesIDSalim)
         let instances = series.getArrayInstances()
         for(let instance in instances){
             let dicomFile = new DicomFile(instances[instance].getFile())
             await dicomFile.readDicomFile()
-
+            dicomFile.anonymise()
             jszip.file(dicomFile.getFilePath(), dicomFile.byteArray);
         }
 

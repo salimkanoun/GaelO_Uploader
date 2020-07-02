@@ -15,112 +15,114 @@
 import dicomParser from 'dicom-parser'
 
 export default class DicomFile {
-  constructor (originalFile, dataSet = undefined) {
-    this.fileObject = originalFile
-    if(dataSet !== undefined){
-      this.dataSet = dataSet
-      this.byteArray = dataSet.byteArray
-    }
 
+  dicomDirSopValues = [
+    '1.2.840.10008.1.3.10'
+  ]
+
+  secondaryCaptureImgValues = [
+    '1.2.840.10008.5.1.4.1.1.7',
+    '1.2.840.10008.5.1.4.1.1.7.1',
+    '1.2.840.10008.5.1.4.1.1.7.2',
+    '1.2.840.10008.5.1.4.1.1.7.3',
+    '1.2.840.10008.5.1.4.1.1.7.4',
+    '1.2.840.10008.5.1.4.1.1.88.11',
+    '1.2.840.10008.5.1.4.1.1.88.22',
+    '1.2.840.10008.5.1.4.1.1.88.33',
+    '1.2.840.10008.5.1.4.1.1.88.40',
+    '1.2.840.10008.5.1.4.1.1.88.50',
+    '1.2.840.10008.5.1.4.1.1.88.59',
+    '1.2.840.10008.5.1.4.1.1.88.65',
+    '1.2.840.10008.5.1.4.1.1.88.67'
+  ]
+
+  tagsToErase = [
+    '00101005',	// Patient's Birth Name
+    '00100010', // Patient's Name
+    '00100020', // Patient's ID
+    '00100030',	// Patient's Birth Date
+    '00101040', // Patient's Address
+    '00080050',	// Accession Number
+    '00080080',	// Institution Name
+    '00080081',	// Institution Adress
+    '00080090',	// Referring Physician's Name
+    '00080092',	// Referring Physician's Adress
+    '00080094', // Refering Physician's Telephone Number
+    '00080096', // Referring Pysician ID Sequence
+    '00081040', // Institutional Departement Name
+    '00081048', // Physician Of Record
+    '00081049', // Physician Of Record ID Sequence
+    '00081050', // Performing Physician's Name
+    '00081052', // Performing Physicians ID Sequence
+    '00081060', // Name Of Physician Reading Study
+    '00081062', // Physician Reading Study ID Sequence
+    '00081070', // Operators Name
+    '00200010', // Study ID
+    '0040A123' // Person Name
+  ]
+
+  constructor(fileObject) {
+    this.fileObject = fileObject
   }
 
-  pFileReader(file){
+  __pFileReader(file) {
     console.log(file)
     return new Promise((resolve, reject) => {
-      var fr = new FileReader();  
+      var fr = new FileReader();
       fr.readAsArrayBuffer(file);
-      fr.onload = () =>{
-        resolve(fr); 
-      } // CHANGE to whatever function you want which would eventually call resolve
+      fr.onload = () => {
+        resolve(fr);
+      }
     });
   }
 
-  readDicomFile(){
+  readDicomFile() {
     let self = this
-    return this.pFileReader(this.fileObject).then(reader =>{
-        const arrayBuffer = reader.result;
-        const byteArray = new Uint8Array(arrayBuffer);
-        self.byteArray = byteArray
-        self.dataSet = dicomParser.parseDicom(byteArray)
+    return this.__pFileReader(this.fileObject).then(reader => {
+      const arrayBuffer = reader.result;
+      const byteArray = new Uint8Array(arrayBuffer);
+      self.byteArray = byteArray
+      self.dataSet = dicomParser.parseDicom(byteArray)
+    }).catch( (error)=>{
+      throw error
     })
 
   }
 
-  anonymise (tagsToErase) {
-    if (tagsToErase === undefined) {
-      tagsToErase = [
-        '00101005',	// Patient's Birth Name
-        '00100010', // Patient's Name
-        '00100020', // Patient's ID
-        '00100030',	// Patient's Birth Date
-        '00101040', // Patient's Address
-        '00080050',	// Accession Number
-        '00080080',	// Institution Name
-        '00080081',	// Institution Adress
-        '00080090',	// Referring Physician's Name
-        '00080092',	// Referring Physician's Adress
-        '00080094', // Refering Physician's Telephone Number
-        '00080096', // Referring Pysician ID Sequence
-        '00081040', // Institutional Departement Name
-        '00081048', // Physician Of Record
-        '00081049', // Physician Of Record ID Sequence
-        '00081050', // Performing Physician's Name
-        '00081052', // Performing Physicians ID Sequence
-        '00081060', // Name Of Physician Reading Study
-        '00081062', // Physician Reading Study ID Sequence
-        '00081070', // Operators Name
-        '00200010', // Study ID
-        '0040A123' // Person Name
-      ]
-    }
+  anonymise() {
 
-    const notFoundTags = []
-
-    for (const id of tagsToErase) {
+    for (let tag of this.tagsToErase) {
       try {
-        this.erase(id)
+        let id = tag.toLowerCase()
+        const element = this.dataSet.elements[`x${id}`]
+        if (element === undefined) {
+          throw Error(`Can't find ${id.toUpperCase()} while erasing.`)
+        }
+
+        if (element.vr === 'SQ') {
+          // Treat each item of sequence
+          element.items.forEach(item => {
+            const sequenceElement = item.dataSet.elements
+            const elementsInSeq = Object.keys(sequenceElement)
+            // erase each tag in this item
+            elementsInSeq.forEach(tag => {
+              this.__editElement(sequenceElement[tag], '*')
+            })
+          })
+        } else {
+          this.__editElement(element, '*')
+        }
       } catch (e) {
         // Only catch "Can't find tag id" error
-        if (e !== `Can't find ${id} while erasing.`) {
+        if (e !== `Can't find ${tag} while erasing.`) {
           throw e
         }
-        notFoundTags.push(id)
       }
     }
 
-    /* console.warn(`Couldn't find ${notFoundTags.toString()}`
-			+ ` while anonymising ${this.originalFile.name}`
-			+ ` => These tags will be skipped.`); */
   }
 
-  /**
-	 * Write unsignificant content at a specified tag in the dataset
-	 */
-  erase (id, newContent = '*') {
-    id = id.toLowerCase()
-
-    const element = this.dataSet.elements[`x${id}`]
-
-    if (element === undefined) {
-      throw `Can't find ${id.toUpperCase()} while erasing.`
-    }
-
-    if (element.vr === 'SQ') {
-      // Treat each item of sequence
-      element.items.forEach(item => {
-        const sequenceElement = item.dataSet.elements
-        const elementsInSeq = Object.keys(sequenceElement)
-        // erase each tag in this item
-        elementsInSeq.forEach(tag => {
-          this.__editElement(sequenceElement[tag], newContent)
-        })
-      })
-    } else {
-      this.__editElement(element, newContent)
-    }
-  }
-
-  __editElement (element, newContent) {
+  __editElement(element, newContent) {
     // Retrieve the index position of the element in the data set array
     const dataOffset = element.dataOffset
 
@@ -137,7 +139,7 @@ export default class DicomFile {
     }
   }
 
-  getRadiopharmaceuticalTag (tagAddress) {
+  getRadiopharmaceuticalTag(tagAddress) {
     try {
       const elmt = this.dataSet.elements.x00540016
       const radioPharmElements = elmt.items[0].dataSet.elements
@@ -148,7 +150,7 @@ export default class DicomFile {
     }
   }
 
-  _getDicomTag (tagAddress) {
+  _getDicomTag(tagAddress) {
     const elmt = this.dataSet.elements['x' + tagAddress]
     if (elmt !== undefined && elmt.length > 0) {
       // Return the value of the dicom attribute
@@ -156,75 +158,75 @@ export default class DicomFile {
     } else return undefined
   }
 
-  getAccessionNumber () {
+  getAccessionNumber() {
     return this._getDicomTag('00080050')
   }
 
-  getAcquisitionDate () {
+  getAcquisitionDate() {
     return this._getDicomTag('00080020')
   }
 
-  getInstanceNumber () {
+  getInstanceNumber() {
     return this._getDicomTag('00200013')
   }
 
-  getModality () {
+  getModality() {
     return this._getDicomTag('00080060')
   }
 
-  getPatientBirthDate () {
+  getPatientBirthDate() {
     return this._getDicomTag('00100030')
   }
 
-  getPatientID () {
+  getPatientID() {
     return this._getDicomTag('00100020')
   }
 
-  getPatientName () {
+  getPatientName() {
     return this._getDicomTag('00100010')
   }
 
-  getPatientSex () {
+  getPatientSex() {
     return this._getDicomTag('00100040')
   }
 
-  getSeriesInstanceUID () {
+  getSeriesInstanceUID() {
     return this._getDicomTag('0020000e')
   }
 
-  getSeriesDate () {
+  getSeriesDate() {
     return this._getDicomTag('00080021')
   }
 
-  getSeriesDescription () {
+  getSeriesDescription() {
     return this._getDicomTag('0008103e')
   }
 
-  getSOPInstanceUID () {
+  getSOPInstanceUID() {
     return this._getDicomTag('00080018')
   }
 
-  getSOPClassUID () {
+  getSOPClassUID() {
     return this._getDicomTag('00020002')
   }
 
-  getSeriesNumber () {
+  getSeriesNumber() {
     return this._getDicomTag('00200011')
   }
 
-  getStudyInstanceUID () {
+  getStudyInstanceUID() {
     return this._getDicomTag('0020000d')
   }
 
-  getStudyDate () {
+  getStudyDate() {
     return this._getDicomTag('00080020')
   }
 
-  getStudyID () {
+  getStudyID() {
     return this._getDicomTag('00200010')
   }
 
-  getStudyDescription () {
+  getStudyDescription() {
     return this._getDicomTag('00081030')
   }
 
@@ -232,15 +234,15 @@ export default class DicomFile {
 	 * Returns element contain as a string
 	 * @param {*} element element from the data set
 	 */
-  _getString (element) {
+  _getString(element) {
     let position = element.dataOffset
     const length = element.length
 
     if (length < 0) {
-      throw 'Negative length'
+      throw Error('Negative length')
     }
     if (position + length > this.byteArray.length) {
-      throw 'Out of range index'
+      throw Error('Out of range index')
     }
 
     var result = ''
@@ -257,42 +259,20 @@ export default class DicomFile {
     return result.trim()
   }
 
-  isSecondaryCaptureImg () {
-    const secondaryCaptureImgValues = [
-      '1.2.840.10008.5.1.4.1.1.7',
-      '1.2.840.10008.5.1.4.1.1.7.1',
-      '1.2.840.10008.5.1.4.1.1.7.2',
-      '1.2.840.10008.5.1.4.1.1.7.3',
-      '1.2.840.10008.5.1.4.1.1.7.4',
-      '1.2.840.10008.5.1.4.1.1.88.11',
-      '1.2.840.10008.5.1.4.1.1.88.22',
-      '1.2.840.10008.5.1.4.1.1.88.33',
-      '1.2.840.10008.5.1.4.1.1.88.40',
-      '1.2.840.10008.5.1.4.1.1.88.50',
-      '1.2.840.10008.5.1.4.1.1.88.59',
-      '1.2.840.10008.5.1.4.1.1.88.65',
-      '1.2.840.10008.5.1.4.1.1.88.67'
-    ]
-    return secondaryCaptureImgValues.includes(this.getSOPClassUID())
+  isSecondaryCaptureImg() {
+    return this.secondaryCaptureImgValues.includes(this.getSOPClassUID())
   }
 
-  isDicomDir () {
-    const dicomDirSopValues = [
-      '1.2.840.10008.1.3.10'
-    ]
-    return dicomDirSopValues.includes(this.getSOPClassUID())
-  }
-
-  getOriginalFilePath () {
-    return this.fileObject
+  isDicomDir() {
+    return this.dicomDirSopValues.includes(this.getSOPClassUID())
   }
 
   // SK A VOIR UTILITE
-  getDate (property) {
+  getDate(property) {
     try {
       const date = dicomParser.parseDA(this[property])
 
-      function intToString (integer, digits) {
+      function intToString(integer, digits) {
         while (integer.toString().length < digits) {
           integer = '0' + integer
         }
@@ -308,7 +288,7 @@ export default class DicomFile {
     }
   }
 
-  getPatientFirstName () {
+  getPatientFirstName() {
     if (this.getPatientName() !== undefined) {
       return this.getPatientName().split('^').pop()
     } else {
@@ -316,7 +296,7 @@ export default class DicomFile {
     }
   }
 
-  getPatientLastName () {
+  getPatientLastName() {
     if (this.getPatientName() !== undefined) {
       return this.getPatientName().substring(0, this.getPatientName().indexOf('^'))
     } else {
@@ -325,12 +305,12 @@ export default class DicomFile {
   }
 
   getFilePath() {
-		let res = this.fileObject.fullPath;
-		if (res === undefined) {
-			// Uploaded by folder selection,
-			//doesn't have a full path but has a webkitrelativepath
-			res = this.fileObject.webkitRelativePath;
-		}
-		return res;
-	}
+    let res = this.fileObject.fullPath;
+    if (res === undefined) {
+      // Uploaded by folder selection,
+      //doesn't have a full path but has a webkitrelativepath
+      res = this.fileObject.webkitRelativePath;
+    }
+    return res;
+  }
 }

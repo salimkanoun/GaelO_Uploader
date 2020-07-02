@@ -110,23 +110,23 @@ export default class Series {
 			if ((dicomFile.getModality()) == undefined) {
 				this.setWarning('missingTag00080060', 'Missing tag: Modality', true);
 			} else {
-				if ((dicomFile._getDicomTag('00080021') == undefined) && (dicomFile._getDicomTag('00080022') == undefined) ) {
+				if ((dicomFile._getDicomTag('00080021') === undefined) && (dicomFile._getDicomTag('00080022') == undefined) ) {
 					this.setWarning('missingTag00080022', 'Missing tag: SeriesDate', true);
 				}
-				if (this.modality == 'PT') {
-					if ( (dicomFile._getDicomTag('00101030')) == undefined ) {
+				if (this.modality === 'PT') {
+					if ( (dicomFile._getDicomTag('00101030')) === undefined ) {
 						this.setWarning('missingTag00101030', 'Missing tag: Patient Weight', true);
 					}
-					if ( (dicomFile._getDicomTag('00080031')) == undefined && (dicomFile._getDicomTag('00080032')) == undefined ) {
+					if ( (dicomFile._getDicomTag('00080031')) === undefined && (dicomFile._getDicomTag('00080032')) == undefined ) {
 						this.setWarning('missingTag00101031', 'Missing tag: Series Time', true);
 					}
-					if ( (dicomFile.getRadiopharmaceuticalTag('00181074')) == undefined) {
+					if ( (dicomFile.getRadiopharmaceuticalTag('00181074')) === undefined) {
 						this.setWarning('missingTag00181074', 'Missing tag: Radionuclide Total Dose', true);
 					}
-					if ((dicomFile.getRadiopharmaceuticalTag('00181072')) == undefined && (dicomFile.getRadiopharmaceuticalTag('00181078')) == undefined) {
+					if ((dicomFile.getRadiopharmaceuticalTag('00181072')) === undefined && (dicomFile.getRadiopharmaceuticalTag('00181078')) == undefined) {
 						this.setWarning('missingTag00181072', 'Missing tag: Radiopharmaceutical Start Time', true);
 					}
-					if ( (dicomFile.getRadiopharmaceuticalTag('00181075')) == undefined ) {
+					if ( (dicomFile.getRadiopharmaceuticalTag('00181075')) === undefined ) {
 						this.setWarning('missingTag00181075', 'Missing tag: Radionuclide Half Life', true);
 					}
 				}

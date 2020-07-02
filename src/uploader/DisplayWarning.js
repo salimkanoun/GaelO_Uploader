@@ -18,7 +18,7 @@ export default class DisplayWarning extends Component {
                 if (row.rowName === id) row[id]['valid'] = ignored
             })
         })
-        checkSeriesValidation(id)
+        this.checkObjectValidation(id)
     }
 
     columns = [
@@ -66,8 +66,8 @@ export default class DisplayWarning extends Component {
         }
     }
 
-    checkSeriesValidation(rowID) {
-        this.state.rows[id]( 
+    checkObjectValidation(rowID) {
+        this.state.rows[rowID]( 
             
         )
         this.setState((state) => { return { rows: !state.rows[rowID] } })

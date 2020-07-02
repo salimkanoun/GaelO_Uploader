@@ -210,7 +210,6 @@ export default class Uploader extends Component {
             await dicomFile.readDicomFile()
 
             jszip.file(dicomFile.getFilePath(), dicomFile.byteArray);
-            console.log(jszip)
         }
 
         let uintarray = await jszip.generateAsync(
@@ -229,7 +228,6 @@ export default class Uploader extends Component {
             }
         )
         let zipBlob = new Blob([uintarray], { type: 'application/zip' });
-        console.log(zipBlob)
         return zipBlob
     }
 

@@ -15,20 +15,35 @@
 import dicomParser from 'dicom-parser'
 
 export default class DicomFile {
-  constructor (originalFile, dataSet) {
-    this.originalFile = originalFile
-    this.dataSet = dataSet
-    this.header = this.retrieveHeaderData(dataSet.byteArray)
+  constructor (originalFile, dataSet = undefined) {
+    this.fileObject = originalFile
+    if(dataSet !== undefined){
+      this.dataSet = dataSet
+      this.byteArray = dataSet.byteArray
+    }
+
   }
 
-  retrieveHeaderData (byteArray) {
-    const pxData = this.dataSet.elements.x7fe00010
-    // If no pixel data return the full byte array
-    if (pxData === undefined) {
-      return byteArray.slice()
-    }
-    // if pixel data here return only header
-    return byteArray.slice(0, pxData.dataOffset - 1)
+  pFileReader(file){
+    console.log(file)
+    return new Promise((resolve, reject) => {
+      var fr = new FileReader();  
+      fr.readAsArrayBuffer(file);
+      fr.onload = () =>{
+        resolve(fr); 
+      } // CHANGE to whatever function you want which would eventually call resolve
+    });
+  }
+
+  readDicomFile(){
+    let self = this
+    return this.pFileReader(this.fileObject).then(reader =>{
+        const arrayBuffer = reader.result;
+        const byteArray = new Uint8Array(arrayBuffer);
+        self.byteArray = byteArray
+        self.dataSet = dicomParser.parseDicom(byteArray)
+    })
+
   }
 
   anonymise (tagsToErase) {
@@ -118,7 +133,7 @@ export default class DicomFile {
       const char = newContent.charCodeAt(i % newContent.length)
 
       // Write this char in the array
-      this.header[dataOffset + i] = char
+      this.byteArray[dataOffset + i] = char
     }
   }
 
@@ -224,7 +239,7 @@ export default class DicomFile {
     if (length < 0) {
       throw 'Negative length'
     }
-    if (position + length > this.header.length) {
+    if (position + length > this.byteArray.length) {
       throw 'Out of range index'
     }
 
@@ -232,7 +247,7 @@ export default class DicomFile {
     var byte
 
     for (var i = 0; i < length; i++) {
-      byte = this.header[position + i]
+      byte = this.byteArray[position + i]
       if (byte === 0) {
         position += length
         return result.trim()
@@ -269,7 +284,7 @@ export default class DicomFile {
   }
 
   getOriginalFilePath () {
-    return this.originalFile
+    return this.fileObject
   }
 
   // SK A VOIR UTILITE
@@ -308,4 +323,14 @@ export default class DicomFile {
       return null
     }
   }
+
+  getFilePath() {
+		let res = this.fileObject.fullPath;
+		if (res === undefined) {
+			// Uploaded by folder selection,
+			//doesn't have a full path but has a webkitrelativepath
+			res = this.fileObject.webkitRelativePath;
+		}
+		return res;
+	}
 }

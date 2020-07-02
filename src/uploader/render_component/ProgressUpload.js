@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'

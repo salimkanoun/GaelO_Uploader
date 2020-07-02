@@ -133,6 +133,7 @@ export default class Uploader extends Component {
                 //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
                 throw Error("Existing instance")
             }
+            //SK Vaut surement mieux attendre la fin du parse et faire les check de chaque series
             series.checkSeries(dicomFile)
 
         }catch( error ){

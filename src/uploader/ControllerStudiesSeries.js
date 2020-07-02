@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 import Row from 'react-bootstrap/Row'
@@ -23,38 +23,69 @@ export default class ControllerStudiesSeries extends Component {
     state = {
         selectedStudy: undefined,
         seriestoUpload: [],
+        studiesToUpload: {},
         selectedSeries: []
     }
 
     constructor(props) {
         super(props)
         this.updateSelectedSeries = this.updateSelectedSeries.bind(this)
+        this.setCurrentStudy = this.setCurrentStudy.bind(this)
     }
 
     prepareSeriesToUpload = () => {
-        //console.log(this.state.selectedSeries)
         let seriesIDs = this.state.selectedSeries
         let series = []
-            let study = this.props.uploadModel.getStudy(this.state.selectedStudy)['series']
-            seriesIDs.forEach( (serie) => {
-                    console.log(study[serie])
-                    series.push(study[serie])
-                
-                 } )
-    
-        console.log(series)
-        this.setState( { seriesToUpload: [...series] }, () => (console.log(this.state.seriesToUpload)) )
-        
+        let tempSeries = this.props.uploadModel.getStudy(this.state.selectedStudy)['series']
+        let studyID = this.props.uploadModel.getStudy(this.state.selectedStudy)['studyUID']
+        seriesIDs.forEach((serie) => {
+            //Check series validation
+            if (tempSeries[serie] !== undefined) series.push(tempSeries[serie])
+        })
+        this.setState((prevState) => ({
+            seriesToUpload: {
+                ...prevState.seriesToUpload,
+                [studyID]: { ...series }
+            }
+        }), () => (this.prepareStudiesToUpload()))
+    }
+
+    prepareStudiesToUpload = () => {
+        let studiesIDs = Object.values(this.state.selectedSeries)
+        console.log(studiesIDs)
+        let studiesReady = {}
+        studiesIDs.forEach(study => {
+            console.log(this)
+            let studyInfo = this.props.uploadModel.getStudy(study)
+            //Check if study's warnings have been bypassed      if (studyInfo)
+            console.log(study)
+            console.log(this.props.uploadModel.getStudy(study))
+            //delete studyInfo['series']
+            studiesReady[study] = studyInfo
+        }
+        )
+        studiesIDs.forEach( (studyID) => {
+        this.setState((prevState) => ({
+            studiesToUpload: {
+                ...prevState.studiesToUpload,
+                [studyID]: { ...studiesReady[studyID] }
+            }
+        }), () => (console.log(this.state.studiesToUpload)))
+    }
+        )
+    }
+
+    getValidatedItems = () => {
+        return 'ici'
+        //Return validated series only
     }
 
     updateSelectedSeries = (series) => {
-        console.log(series)
-        this.setState( {selectedSeries: series }, () => (this.prepareSeriesToUpload()))
+        this.setState({ selectedSeries: series }, () => (this.prepareSeriesToUpload()))
     }
 
     setCurrentStudy = (studyUID) => {
         this.setState({ selectedStudy: studyUID })
-
     }
 
     validateCheckPatient(studyUID) {
@@ -74,16 +105,16 @@ export default class ControllerStudiesSeries extends Component {
 
     render() {
         return (
-            <Fragment>
+            <>
                 <Row>
                     <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
                         studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
                 </Row>
                 <Row>
                     <DisplaySeries studyUID={this.state.selectedStudy} series={this.getSeries(this.state.selectedStudy)}
-                    selectedSeries={this.updateSelectedSeries} />
+                        selectedSeries={this.updateSelectedSeries} />
                 </Row>
-            </Fragment>
+            </>
         )
     }
 }

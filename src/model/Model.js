@@ -12,10 +12,6 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/*MOdele référencement des instances. Gérer les ressources. Puis front pour afficher les ressources. Ensuite partie upload des images (bcp de front et un peu de back
-   Contraintes de l'empreinte mémoire (d'abord au parsing ex: pas de pique à 1G de rame). A chaque fichier, on a besoin que des références.
-   Puis front en React avec Sylvain*/
-
 export default class Modele {
 
     data = {

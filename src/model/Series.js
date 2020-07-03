@@ -36,11 +36,13 @@ export default class Series {
 		}
 	}
 
-	addInstance(instanceObject) {
-		if (!this.isExistingInstance(instanceObject.SOPInstanceUID)) {
+	//Return if there is an error or not so that parent can handle Error
+	addInstance(instanceObject, dicomInstanceID) {
+		if (!this.isExistingInstance(dicomInstanceID)) {
 			this.instances[instanceObject.SOPInstanceUID] = instanceObject
+			return false
 		} else {
-			throw Error("Existing instance")
+			return true
 		}
 	}
 

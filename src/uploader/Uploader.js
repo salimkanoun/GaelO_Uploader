@@ -103,29 +103,46 @@ export default class Uploader extends Component {
             await dicomFile.readDicomFile()
             let study;
             let series;
-
+            let errorOnInstance;
             //console.log(dicomFile)
             let dicomStudyID = dicomFile.getStudyInstanceUID()
             let dicomSeriesID = dicomFile.getSeriesInstanceUID()
             let dicomInstanceID = dicomFile.getSOPInstanceUID()
 
-            study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
-                dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
-                dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
-            study = this.uploadModel.addStudy(study);
+            if (!this.uploadModel.isExistingStudy(dicomStudyID)) {
+                study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
+                    dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
+                    dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
+                this.uploadModel.addStudy(study);
+            } else {
+                study = this.uploadModel.getStudy(dicomStudyID)
+            }
 
-            series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
-                dicomFile.getSeriesDescription(), dicomFile.getModality());
-            series = study.addSeries(series);
+            if (!study.isExistingSeries(dicomSeriesID)) {
+                series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
+                    dicomFile.getSeriesDescription(), dicomFile.getModality());
+                study.addSeries(series);
+            } else {
+                series = study.getSeries(dicomSeriesID)
+            }
 
-            series.addInstance(new Instance(dicomInstanceID, file));
-            this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
-
+            if (!series.isExistingInstance(dicomInstanceID)) {
+                series.addInstance(new Instance(dicomInstanceID, file));
+                this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
+            } else {
+                //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
+                throw Error("Existing instance")
+            }
             //SK Vaut surement mieux attendre la fin du parse et faire les check de chaque series
             series.checkSeries(dicomFile)
 
         } catch (error) {
             console.warn(error)
+            console.log(typeof error)
+            //Save only message of error
+            if (typeof error == 'object') {
+                error = error.message
+            }
             this.setState(state => {
                 //SK ICI BUG IGNORE FILE A UN SEUL ITEM
                 return {

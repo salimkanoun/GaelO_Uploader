@@ -17,11 +17,11 @@ export default class Modele {
     data = {
     }
 
-    addStudy(studyObject) {
-        if (!this.isExistingStudy(studyObject.studyInstanceUID)) {
-            this.data[studyObject.studyUID] = studyObject;
-        }
-        return this.data[studyObject.studyUID]
+    addStudy(studyObject, dicomStudyID) {
+        if (!this.isExistingStudy(dicomStudyID)) {
+            this.data[studyObject.studyUID] = studyObject
+            return this.data[studyObject.studyUID]
+        } else return this.getStudy(dicomStudyID)
     }
 
     getStudy(studyUID) {
@@ -29,8 +29,8 @@ export default class Modele {
     }
 
     isExistingStudy(studyInstanceUID) {
-        let existingStudyUID = Object.keys(this.data);
-        return existingStudyUID.includes(studyInstanceUID);
+        let existingStudyUID = Object.keys(this.data)
+        return existingStudyUID.includes(studyInstanceUID)
     }
 
     getStudiesArray() {

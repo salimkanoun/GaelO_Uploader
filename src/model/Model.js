@@ -22,10 +22,13 @@ export default class Modele {
     }
 
     addStudy(studyObject) {
-        this.data[studyObject.studyUID] = studyObject;
+        if (!this.isExistingStudy(studyObject.studyInstanceUID)) {
+            this.data[studyObject.studyUID] = studyObject;
+        }
+        return this.data[studyObject.studyUID]
     }
 
-    getStudy(studyUID){
+    getStudy(studyUID) {
         return this.data[studyUID]
     }
 
@@ -36,7 +39,7 @@ export default class Modele {
 
     getStudiesArray() {
         let studyArray = []
-        for (let studyUID in this.data){
+        for (let studyUID in this.data) {
             studyArray.push(this.data[studyUID])
         }
         return studyArray

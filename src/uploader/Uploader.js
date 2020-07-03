@@ -43,8 +43,8 @@ export default class Uploader extends Component {
         this.ignoredFiles = {}
         this.controlerStudiesSeriesRefs = React.createRef();
 
-        this.uppy = Uppy({  
-            id: 'uppy', 
+        this.uppy = Uppy({
+            id: 'uppy',
             autoProceed: false,
             allowMultipleUploads: true,
             debug: true
@@ -57,7 +57,7 @@ export default class Uploader extends Component {
             autoRetry: true,
             chunkSize: 2000000,
             limit: 3,
-            headers:{},
+            headers: {},
             retryDelays: [0, 1000, 3000, 5000]
         })
 
@@ -98,7 +98,7 @@ export default class Uploader extends Component {
 	 * Read and parse dicom file
 	 */
     async read(file) {
-        try{
+        try {
             let dicomFile = new DicomFile(file);
             await dicomFile.readDicomFile()
             let study;
@@ -109,34 +109,22 @@ export default class Uploader extends Component {
             let dicomSeriesID = dicomFile.getSeriesInstanceUID()
             let dicomInstanceID = dicomFile.getSOPInstanceUID()
 
-            if (!this.uploadModel.isExistingStudy(dicomStudyID)) {
-                study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
-                    dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
-                    dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
-                this.uploadModel.addStudy(study);
-            } else {
-                study = this.uploadModel.getStudy(dicomStudyID)
-            }
+            study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
+                dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
+                dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
+            study = this.uploadModel.addStudy(study);
 
-            if (!study.isExistingSeries(dicomSeriesID)) {
-                series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
-                    dicomFile.getSeriesDescription(), dicomFile.getModality());
-                study.addSeries(series);
-            } else {
-                series = study.getSeries(dicomSeriesID)
-            }
+            series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
+                dicomFile.getSeriesDescription(), dicomFile.getModality());
+            series = study.addSeries(series);
 
-            if (!series.isExistingInstance(dicomInstanceID)) {
-                series.addInstance(new Instance(dicomInstanceID, file));
-                this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
-            } else {
-                //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
-                throw Error("Existing instance")
-            }
+            series.addInstance(new Instance(dicomInstanceID, file));
+            this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
+
             //SK Vaut surement mieux attendre la fin du parse et faire les check de chaque series
             series.checkSeries(dicomFile)
 
-        }catch( error ){
+        } catch (error) {
             console.warn(error)
             this.setState(state => {
                 //SK ICI BUG IGNORE FILE A UN SEUL ITEM
@@ -171,9 +159,9 @@ export default class Uploader extends Component {
         console.log(zipBlob)
         this.uppy.addFile(
             {
-            name: 'my-file.zip', // file name
-            type: 'application/zip', // file type
-            data: zipBlob// file blob
+                name: 'my-file.zip', // file name
+                type: 'application/zip', // file type
+                data: zipBlob// file blob
             }
         )
 
@@ -187,7 +175,7 @@ export default class Uploader extends Component {
 	 */
     async prepareZip() {
         console.log('Zipping files...');
-        
+
         // Create a new jszip object with folders & dicom files
         let jszip = new JSZip();
         let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
@@ -196,7 +184,7 @@ export default class Uploader extends Component {
         let serieID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
         let series = this.uploadModel.getStudy(studyIDSalim).getSeries(seriesIDSalim)
         let instances = series.getArrayInstances()
-        for(let instance in instances){
+        for (let instance in instances) {
             let dicomFile = new DicomFile(instances[instance].getFile())
             await dicomFile.readDicomFile()
             dicomFile.anonymise()

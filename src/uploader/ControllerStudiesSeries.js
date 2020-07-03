@@ -22,8 +22,7 @@ export default class ControllerStudiesSeries extends Component {
 
     state = {
         selectedStudy: undefined,
-        seriestoUpload: [],
-        studiesToUpload: {},
+        seriesToUpload: {},
         selectedSeries: []
     }
 
@@ -35,44 +34,26 @@ export default class ControllerStudiesSeries extends Component {
 
     prepareSeriesToUpload = () => {
         let seriesIDs = this.state.selectedSeries
-        let series = []
-        let tempSeries = this.props.uploadModel.getStudy(this.state.selectedStudy)['series']
-        let studyID = this.props.uploadModel.getStudy(this.state.selectedStudy)['studyUID']
-        seriesIDs.forEach((serie) => {
-            //Check series validation
-            if (tempSeries[serie] !== undefined) series.push(tempSeries[serie])
+        let series = {}
+        //Fetch series in the model
+        let studies = this.props.uploadModel.getStudiesArray()
+        studies.forEach(study => {
+            //Check study validation
+            // ...
+            let studyID = study.studyUID
+            Object.keys(study.series).forEach(seriesID => {
+                if (seriesIDs.includes(seriesID)) {
+                    if (series[studyID] === undefined) {
+                        series[studyID] = {}
+                    }
+                    series[studyID][seriesID] = study.series[seriesID]
+                }
+            })
         })
-        this.setState((prevState) => ({
-            seriesToUpload: {
-                ...prevState.seriesToUpload,
-                [studyID]: { ...series }
-            }
-        }), () => (this.prepareStudiesToUpload()))
-    }
-
-    prepareStudiesToUpload = () => {
-        let studiesIDs = Object.values(this.state.selectedSeries)
-        console.log(studiesIDs)
-        let studiesReady = {}
-        studiesIDs.forEach(study => {
-            console.log(this)
-            let studyInfo = this.props.uploadModel.getStudy(study)
-            //Check if study's warnings have been bypassed      if (studyInfo)
-            console.log(study)
-            console.log(this.props.uploadModel.getStudy(study))
-            //delete studyInfo['series']
-            studiesReady[study] = studyInfo
-        }
-        )
-        studiesIDs.forEach( (studyID) => {
-        this.setState((prevState) => ({
-            studiesToUpload: {
-                ...prevState.studiesToUpload,
-                [studyID]: { ...studiesReady[studyID] }
-            }
-        }), () => (console.log(this.state.studiesToUpload)))
-    }
-        )
+        console.log(series)
+        this.setState(
+            { seriesToUpload: series }
+        , () => console.log(this.state.seriesToUpload))
     }
 
     getValidatedItems = () => {

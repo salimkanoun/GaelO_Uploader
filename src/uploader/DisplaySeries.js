@@ -92,6 +92,7 @@ export default class DisplaySeries extends Component {
     }
 
     render() {
+        //console.log(this.props.series)
         return (
             <Container fluid>
                 <span class="title">Series</span>
@@ -108,12 +109,13 @@ export default class DisplaySeries extends Component {
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                        <DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.series : null}
-                            loaded={(this.props.series.length !== 0) ? true : false} />
+                        
                     </Col>
                 </Row>
             </Container>
         )
     }
-
 }
+
+/* <DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.series : null}
+                            loaded={(this.props.series.length !== 0) ? true : false} />*/

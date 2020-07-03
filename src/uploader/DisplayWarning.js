@@ -4,7 +4,7 @@ import ButtonIgnore from './render_component/ButtonIgnore'
 export default class DisplayWarning extends Component {
 
     state = {
-        rows: {}
+        rows: []
     }
     constructor(props) {
         super(props)
@@ -39,36 +39,24 @@ export default class DisplayWarning extends Component {
 
     /*Build the tab rows according to the type of object*/
     buildRow() {
-        if (this.props.loaded) {
-            if (this.props.type === 'studies') {
-                let rows = []
-                this.props.object.forEach(
-                    series => { rows.push({ series: series.warnings }) })
-                return rows
-            } else if (this.props.type === 'series') {
-                let series = this.props.object
-                series.forEach((sr) => {
-                    let srIUID = sr['seriesInstanceUID']
-                    sr = (sr['warnings'])
-                    for (let key in sr) {
-                        this.setState( { rows: { [this.rowsLength]:{seriesID: srIUID,
-                            warning: sr[key]['content'],
-                            ignoreButton: <ButtonIgnore id={srIUID} onClick={this.onClick} />,
-                            valid: (this.sr[key]['content'] === undefined) ? true : false } }
-                        } )
-                        this.rowsLength++
-                        //console.log(this.rowsLength)
-                    }
-                    //console.log(this.state.rows)
-                })
-                return []
-            }
+        if (this.props.type === 'studies') {
+            let rows = []
+            this.props.object.forEach(
+                series => { rows.push({ series: series.warnings }) })
+            return rows
+        } else if (this.props.type === 'series') {
+            let rows = []
+            console.log(this.props.object)
+            this.props.object.forEach(
+                series => { rows.push({ series: series.warnings }) })
+            return rows
         }
+
     }
 
     checkObjectValidation(rowID) {
-        this.state.rows[rowID]( 
-            
+        this.state.rows[rowID](
+
         )
         this.setState((state) => { return { rows: !state.rows[rowID] } })
     }
@@ -77,7 +65,7 @@ export default class DisplayWarning extends Component {
         if (this.props.loaded) {
             return (
                 <BootstrapTable
-                    keyField='warning'
+                    keyField='id'
                     classes="table table-borderless"
                     bodyClasses="du-warnings"
                     headerClasses="du-warnings th"

@@ -17,6 +17,7 @@ import JSZip from "jszip";
 
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
+import UppyDicomPlugin from '../model/UppyDicomPlugin'
 
 export default class Uploader extends Component {
 
@@ -60,6 +61,8 @@ export default class Uploader extends Component {
             headers: {},
             retryDelays: [0, 1000, 3000, 5000]
         })
+
+        this.uppy.use(UppyDicomPlugin,{id : 'csvChecker'})
 
         this.uppy.on('complete', (result) => {
             console.log(result)

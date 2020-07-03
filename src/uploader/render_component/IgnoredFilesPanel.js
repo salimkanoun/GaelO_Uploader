@@ -43,10 +43,9 @@ export default class IgnoredFilesPanel extends Component {
             rows.push( { 
                 key : Math.random(), 
                 file: ignoredFileName, 
-                reason: this.props.dataIgnoredFiles[ignoredFileName],
+                reason: this.props.dataIgnoredFiles[ignoredFileName].message,
             })            
         })
-        //console.log(rows)
         return rows
     }
 

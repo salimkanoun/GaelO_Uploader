@@ -16,6 +16,10 @@ import dicomParser from 'dicom-parser'
 
 export default class DicomFile {
 
+  constructor(fileObject) {
+    this.fileObject = fileObject
+  }
+
   dicomDirSopValues = [
     '1.2.840.10008.1.3.10'
   ]
@@ -61,10 +65,6 @@ export default class DicomFile {
     '0040A123' // Person Name
   ]
 
-  constructor(fileObject) {
-    this.fileObject = fileObject
-  }
-
   __pFileReader(file) {
     console.log(file)
     return new Promise((resolve, reject) => {
@@ -79,8 +79,8 @@ export default class DicomFile {
   readDicomFile() {
     let self = this
     return this.__pFileReader(this.fileObject).then(reader => {
-      const arrayBuffer = reader.result;
-      const byteArray = new Uint8Array(arrayBuffer);
+      const arrayBuffer = reader.result
+      const byteArray = new Uint8Array(arrayBuffer)
       self.byteArray = byteArray
       self.dataSet = dicomParser.parseDicom(byteArray)
     }).catch( (error)=>{
@@ -92,12 +92,10 @@ export default class DicomFile {
   anonymise() {
 
     for (let tag of this.tagsToErase) {
+      let id = tag.toLowerCase()
       try {
-        let id = tag.toLowerCase()
         const element = this.dataSet.elements[`x${id}`]
-        if (element === undefined) {
-          throw Error(`Can't find ${id.toUpperCase()} while erasing.`)
-        }
+        if(element === undefined) throw Error('Tag Not Found')
 
         if (element.vr === 'SQ') {
           // Treat each item of sequence
@@ -112,11 +110,13 @@ export default class DicomFile {
         } else {
           this.__editElement(element, '*')
         }
+
       } catch (e) {
-        // Only catch "Can't find tag id" error
-        if (e !== `Can't find ${tag} while erasing.`) {
-          throw e
+        if(e.message !== 'Tag Not Found'){
+            console.log('tag '+ id)
+            console.log(e)
         }
+
       }
     }
 

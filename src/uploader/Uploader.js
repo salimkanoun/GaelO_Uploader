@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import Card from 'react-bootstrap/Card'
 import Dropzone from 'react-dropzone'
-import dicomParser from 'dicom-parser'
 import DicomFile from '../model/DicomFile'
 import Model from '../model/Model'
 import Study from '../model/Study'
@@ -13,11 +12,10 @@ import ProgressUpload from './render_component/ProgressUpload'
 import IgnoredFilesPanel from './render_component/IgnoredFilesPanel'
 import WarningPatient from './render_component/WarningPatient'
 import { getAets, logIn, registerStudy } from '../services/api'
-import JSZip from "jszip";
 
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
-import UppyDicomPlugin from '../model/UppyDicomPlugin'
+import DicomBatchUploader from '../model/DicomBatchUploader'
 
 export default class Uploader extends Component {
 
@@ -62,8 +60,6 @@ export default class Uploader extends Component {
             retryDelays: [0, 1000, 3000, 5000]
         })
 
-        this.uppy.use(UppyDicomPlugin,{id : 'csvChecker'})
-
         this.uppy.on('complete', (result) => {
             console.log(result)
         })
@@ -88,7 +84,7 @@ export default class Uploader extends Component {
     }
 
     addFile(files) {
-        this.setState((previousState) => { return { fileLoaded: previousState.fileLoaded++ } })
+        this.setState((previousState) => { return { fileLoaded: (previousState.fileLoaded+files.length) } })
         console.log('Added file', files)
         files.forEach(file => {
             this.read(file)
@@ -172,62 +168,21 @@ export default class Uploader extends Component {
     }
 
     async onUploadClick(e) {
-        console.log(this.controlerStudiesSeriesRefs)
-        console.log(this.controlerStudiesSeriesRefs.current.getValidatedItems())
-        console.log('upload clicked')
-        let zipBlob = await this.prepareZip()
-        console.log(zipBlob)
-        this.uppy.addFile(
-            {
-                name: 'my-file.zip', // file name
-                type: 'application/zip', // file type
-                data: zipBlob// file blob
-            }
-        )
 
-        this.uppy.upload()
-    }
-
-
-    /**
-	 * Add the dicom files contained in the queued series of 'study'
-	 * to a JSZip object
-	 */
-    async prepareZip() {
-        console.log('Zipping files...');
-
-        // Create a new jszip object with folders & dicom files
-        let jszip = new JSZip();
         let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
         let studyIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.304'
         let seriesIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.610'
         let serieID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
         let series = this.uploadModel.getStudy(studyIDSalim).getSeries(seriesIDSalim)
         let instances = series.getArrayInstances()
-        for (let instance in instances) {
-            let dicomFile = new DicomFile(instances[instance].getFile())
-            await dicomFile.readDicomFile()
-            dicomFile.anonymise()
-            jszip.file(dicomFile.getFilePath(), dicomFile.byteArray);
-        }
 
-        let uintarray = await jszip.generateAsync(
-            // Zipping options
-            {
-                type: "uint8array",
-                compression: "DEFLATE",
-                compressionOptions: {
-                    level: 3,
-                    streamFiles: true
-                }
-            },
-            // Callback on update
-            (metadata) => {
-                //this.v.zippingProgress[indexStudyToUpload] = metadata.percent;
-            }
-        )
-        let zipBlob = new Blob([uintarray], { type: 'application/zip' });
-        return zipBlob
+        let fileArray = instances.map(instance => {
+            return instance.getFile()
+        })
+
+        let uploader = new DicomBatchUploader(this.uppy, fileArray)
+        uploader.startUpload()
+
     }
 
     render() {

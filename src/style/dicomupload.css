@@ -179,12 +179,14 @@
 .du-series table {
 	font-size: 13px;
 	background-color: #fff;
+	display:table;
 }
 
 .du-studies td,
 .du-series td,
 .du-warnings td {
 	padding: 2px 6px;
+	max-width: 100%;
 }
 
 .du-studies :not(.row-clicked).row-clickable:hover,
@@ -227,13 +229,28 @@
 .du-warnings {
 	background-color: #fef5e7;
 	color: #810909;
+	width: 100%;
+	display:table;
 }
 
+.du-warnings td {
+	max-width:100% ;
+	overflow: auto;
+}
+
+.du-warnings td:last-of-type{
+	display:inline-block;
+	width: auto;
+	white-space: nowrap;
+
+}
 .du-warnings td button {
 	color: white;
 	background-color: #4a4848;
 	border-radius: 4px;
 	border: 0;
+	width: 100%;
+	white-space: nowrap;
 }
 
 .du-warnings td button:hover {

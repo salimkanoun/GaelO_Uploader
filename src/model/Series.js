@@ -12,8 +12,10 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-const minNbOfInstances = 30
+ import {MISSING_TAG_00080060, MISSING_TAG_00080022, MISSING_TAG_00101030, MISSING_TAG_00101031, MISSING_TAG_00181074, MISSING_TAG_00181072, MISSING_TAG_00181075, LESS_THAN_MINIMAL_INSTANCES} from './Warning'
 
+const minNbOfInstances = 30
+ 
 export default class Series {
 
 	instances = {}
@@ -25,7 +27,7 @@ export default class Series {
 		this.seriesDate = this.getDate(seriesDate);
 		this.seriesDescription = seriesDescription;
 		this.modality = modality;
-		this.warnings = {};
+		this.warnings = [];
 	}
 
 	getDate(rawDate) {
@@ -36,7 +38,6 @@ export default class Series {
 		}
 	}
 
-	//Return if there is an error or not so that parent can handle Error
 	addInstance(instanceObject, dicomInstanceID) {
 		if (!this.isExistingInstance(dicomInstanceID)) {
 			this.instances[instanceObject.SOPInstanceUID] = instanceObject
@@ -78,6 +79,43 @@ export default class Series {
 		return nbConsideredWarnings > 0;
 	}
 
+	checkSeries(dicomFile) {
+		// Check missing tags
+		if ((dicomFile.getModality()) === undefined) {
+			this.warnings.push(new MISSING_TAG_00080060);
+			console.log()
+		} else {
+			if ((dicomFile._getDicomTag('00080021') === undefined) && (dicomFile._getDicomTag('00080022') === undefined)) {
+				this.warnings.push(new MISSING_TAG_00080022);
+			}
+			if (this.modality === 'PT') {
+				if ((dicomFile._getDicomTag('00101030')) === undefined) {
+					this.warnings.push(new MISSING_TAG_00101030);
+				}
+				if ((dicomFile._getDicomTag('00080031')) === undefined && (dicomFile._getDicomTag('00080032')) === undefined) {
+					this.warnings.push(new MISSING_TAG_00101031);
+				}
+				if ((dicomFile.getRadiopharmaceuticalTag('00181074')) === undefined) {
+					this.warnings.push(new MISSING_TAG_00181074);
+				}
+				if ((dicomFile.getRadiopharmaceuticalTag('00181072')) === undefined && (dicomFile.getRadiopharmaceuticalTag('00181078')) === undefined) {
+					this.warnings.push(new MISSING_TAG_00181072);
+				}
+				if ((dicomFile.getRadiopharmaceuticalTag('00181075')) === undefined) {
+					this.warnings.push(new MISSING_TAG_00181075);
+				}
+			}
+		}
+		console.log(this.warnings)
+		// Check number of instances
+		if (this.getNbInstances() < minNbOfInstances) {
+			console.log("HERE")
+			this.warnings.push(new MISSING_TAG_00181075);
+		} else {
+			delete this.warnings[MISSING_TAG_00181075];
+		}
+	}
+
 	setWarning(name, content, ignorable = false, critical = true, visible = true) {
 		if (this.warnings[name] === undefined) {
 			this.warnings[name] = {
@@ -98,14 +136,6 @@ export default class Series {
 
 	considerWarning(name) {
 		this.warnings[name].ignore = false;
-	}
-
-	toString() {
-		return ("\nInstance number: " + this.seriesNumber
-			+ "\nModality: " + this.modality
-			+ "\nSeries instance UID: " + this.seriesInstanceUID
-			+ "\nSeries date: " + this.seriesDate
-			+ "\nSeries description: " + this.seriesDescription);
 	}
 
 	checkSeries(dicomFile) {

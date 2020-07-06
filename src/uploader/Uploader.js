@@ -100,10 +100,10 @@ export default class Uploader extends Component {
         try {
             let dicomFile = new DicomFile(file);
             await dicomFile.readDicomFile()
+
             let study;
             let series;
-            let errorOnInstance;
-            //console.log(dicomFile)
+
             let dicomStudyID = dicomFile.getStudyInstanceUID()
             let dicomSeriesID = dicomFile.getSeriesInstanceUID()
             let dicomInstanceID = dicomFile.getSOPInstanceUID()
@@ -112,23 +112,15 @@ export default class Uploader extends Component {
                     dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
                     dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
             study = this.uploadModel.addStudy(study, dicomStudyID);
-
             series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
                     dicomFile.getSeriesDescription(), dicomFile.getModality());
             series = study.addSeries(series, dicomSeriesID);
-            errorOnInstance = series.addInstance(new Instance(dicomInstanceID, file), dicomInstanceID);
-            if (errorOnInstance) {
-                this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
-            } else {
-                throw Error("Existing instance")
-            }
-
-            //SK Vaut surement mieux attendre la fin du parse et faire les check de chaque series
-            series.checkSeries(dicomFile)
+            series.addInstance(new Instance(dicomInstanceID, file, dicomFile), dicomInstanceID);
+            
+            this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
 
         } catch (error) {
             console.warn(error)
-            console.log(typeof error)
             //Save only message of error
             if (typeof error == 'object') {
                 error = error.message
@@ -143,6 +135,20 @@ export default class Uploader extends Component {
                     }
                 }
             })
+        }
+
+        //Check series
+        for (let studies in this.uploadModel.getStudiesArray()) {
+            let study = this.uploadModel.getStudiesArray()[studies].getSeriesArray()
+            for (let series in study) {
+                let dicomFile
+                let instances = study[series].getArrayInstances()
+                for (let instance in instances) {
+                    dicomFile = instances[instance].getDicomFile()
+                }   
+                study[series].checkSeries(dicomFile)
+            }
+            
         }
 
     }

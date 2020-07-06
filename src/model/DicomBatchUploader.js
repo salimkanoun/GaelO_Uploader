@@ -5,39 +5,71 @@ const JSZip = require('jszip')
 
 export default class DicomBatchUploader {
 
-    constructor (uppy, files) {
+    constructor (uppy, files, onUploadDone) {
         this.uppy = uppy
         this.files = files
+        this.onUploadDone = onUploadDone
         this.buildBatches()
 
         this.uppy.on('upload-success', (file, response) => {
-            //SK ou lancer quand prog >10%
             this.compressNextBatch()
             this.currentBatchUpload = ++this.currentBatchUpload
-            
         })
 
         this.uppy.on('upload-progress', (file, progress) => {
-            this.currentUploadProgress =  (progress.bytesUploaded / progress.bytesTotal)*100
-            console.log('uploadProgress' + this.currentUploadProgress)
+            let currentUploadProgress =  (progress.bytesUploaded / progress.bytesTotal)*100
+            let fractionUploaded = ( this.currentBatchUpload * this.batchValue)
+            this.uploadProgress = Math.min(fractionUploaded + ( (currentUploadProgress/100) * this.batchValue), 100)
+            console.log(this.uploadProgress)
         })
     }
 
-    startUpload(){
-        this.compressNextBatch()
+    getProgess(){
+        if(this.zipProgress>=100 && this.uploadProgress >= 100) this.onUploadDone()
+        return{
+            uploadProgress : Math.round(this.uploadProgress),
+            zipProgress : Math.round(this.zipProgress)
+        }
+    }
+
+    async startUpload(){
+        await this.compressNextBatch()
+        await this.compressNextBatch()
     }
 
     buildBatches(){
         this.batches = []
         this.currentBatchZip = 0
         this.currentBatchUpload = 0
-        while(this.files.length) {
-            this.batches.push(this.files.splice(0,10))
+
+        let index = 0
+        do{
+            
+            index = this.makeBatch(index)
+            console.log(index)
+
+        }while( index < (this.files.length ) )
+
+        this.batchValue = 100 / this.batches.length
+
+    }
+
+    makeBatch(index){
+        let cummulativeSize = 0
+        let batch = []
+        while( cummulativeSize < 50000000 && index < this.files.length ){
+            cummulativeSize = cummulativeSize + this.files[index].size
+            batch.push(this.files[index])
+            index = ++index
         }
+        console.log(cummulativeSize)
+        this.batches.push(batch)
+        return index
 
     }
 
     async compressNextBatch(){
+        console.log('Compressing batch'+this.currentBatchZip)
         if (this.currentBatchZip < this.batches.length) {
             let blobZip = await this.zipFiles(this.batches[this.currentBatchZip])
             this.startUploadBatch(blobZip, this.currentBatchZip)
@@ -63,10 +95,9 @@ export default class DicomBatchUploader {
 
 
     async zipFiles(files){
-        console.log(files)
+
         let jszip = new JSZip();
         for (let file of files){
-            console.log(file)
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
             dicomFile.anonymise()
@@ -85,8 +116,8 @@ export default class DicomBatchUploader {
             },
             // Callback on update
             (metadata) => {
-                this.currentZipProgress = metadata.percent;
-                console.log(this.currentZipProgress)
+                let fractionZipped = ( this.currentBatchZip * this.batchValue)
+                this.zipProgress = Math.min( (fractionZipped + (metadata.percent/100) * this.batchValue), 100)
             }
         )
         let zipBlob = new Blob([uintarray], { type: 'application/zip' });

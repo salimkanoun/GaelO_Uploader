@@ -20,7 +20,7 @@ export default class Modele {
     addStudy(studyObject, dicomStudyID) {
         if (!this.isExistingStudy(dicomStudyID)) {
             this.data[studyObject.studyUID] = studyObject
-            return this.data[studyObject.studyUID]
+            return studyObject
         } else return this.getStudy(dicomStudyID)
     }
 

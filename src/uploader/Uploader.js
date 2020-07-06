@@ -108,30 +108,21 @@ export default class Uploader extends Component {
             let dicomSeriesID = dicomFile.getSeriesInstanceUID()
             let dicomInstanceID = dicomFile.getSOPInstanceUID()
 
-            if (!this.uploadModel.isExistingStudy(dicomStudyID)) {
-                study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
+            study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
                     dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
                     dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
-                this.uploadModel.addStudy(study);
-            } else {
-                study = this.uploadModel.getStudy(dicomStudyID)
-            }
+            study = this.uploadModel.addStudy(study, dicomStudyID);
 
-            if (!study.isExistingSeries(dicomSeriesID)) {
-                series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
+            series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
                     dicomFile.getSeriesDescription(), dicomFile.getModality());
-                study.addSeries(series);
-            } else {
-                series = study.getSeries(dicomSeriesID)
-            }
-
-            if (!series.isExistingInstance(dicomInstanceID)) {
-                series.addInstance(new Instance(dicomInstanceID, file));
+            series = study.addSeries(series, dicomSeriesID);
+            errorOnInstance = series.addInstance(new Instance(dicomInstanceID, file), dicomInstanceID);
+            if (errorOnInstance) {
                 this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
             } else {
-                //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
                 throw Error("Existing instance")
             }
+
             //SK Vaut surement mieux attendre la fin du parse et faire les check de chaque series
             series.checkSeries(dicomFile)
 

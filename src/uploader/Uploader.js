@@ -45,7 +45,7 @@ export default class Uploader extends Component {
 
         this.uppy = Uppy({
             id: 'uppy',
-            autoProceed: false,
+            autoProceed: true,
             allowMultipleUploads: true,
             debug: true
         })
@@ -60,21 +60,11 @@ export default class Uploader extends Component {
             headers: {},
             retryDelays: [0, 1000, 3000, 5000]
         })
-
-        this.uppy.on('complete', (result) => {
-            console.log(result)
-        })
-
         this.uppy.on('upload-error', (file, error, response) => {
             console.log('error with file:', file.id)
             console.log('error message:', error)
         })
 
-        this.uppy.on('upload-progress', (file, progress) => {
-            // file: { id, name, type, ... }
-            // progress: { uploader, bytesUploaded, bytesTotal }
-            console.log(file.id, progress.bytesUploaded, progress.bytesTotal)
-        })
     }
 
     async componentDidMount() {
@@ -180,9 +170,9 @@ export default class Uploader extends Component {
 
         let uploader = new DicomBatchUploader(this.uppy, fileArray, this.onUploadDone)
         this.intervalProgress = setInterval(() => {
-            console.log(uploader.getProgess())
+            console.log(uploader.getProgress())
             this.setState({
-                ...uploader.getProgess()
+                ...uploader.getProgress()
             })
         } , 200)
         

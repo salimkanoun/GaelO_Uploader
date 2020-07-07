@@ -26,8 +26,8 @@ export default class Uploader extends Component {
         showIgnoredFiles: false,
         ignoredFiles: {},
         showWarning: false,
-        zipPercent: 50,
-        uploadPercent: 30,
+        zipProgress: 0,
+        uploadProgress: 0,
     }
 
     constructor(props) {
@@ -39,6 +39,7 @@ export default class Uploader extends Component {
         this.toogleShowIgnoreFile = this.toogleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
+        this.onUploadDone = this.onUploadDone.bind(this)
         this.ignoredFiles = {}
         this.controlerStudiesSeriesRefs = React.createRef();
 
@@ -177,9 +178,22 @@ export default class Uploader extends Component {
             return instance.getFile()
         })
 
-        let uploader = new DicomBatchUploader(this.uppy, fileArray)
+        let uploader = new DicomBatchUploader(this.uppy, fileArray, this.onUploadDone)
+        this.intervalProgress = setInterval(() => {
+            console.log(uploader.getProgess())
+            this.setState({
+                ...uploader.getProgess()
+            })
+        } , 200)
+        
+            
         uploader.startUpload()
 
+    }
+
+    onUploadDone(){
+        clearInterval(this.intervalProgress)
+        console.log("upload Finished")
     }
 
     render() {
@@ -201,7 +215,7 @@ export default class Uploader extends Component {
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
                         <ControllerStudiesSeries ref={this.controlerStudiesSeriesRefs} uploadModel={this.uploadModel} />
-                        <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipPercent} uploadPercent={this.state.uploadPercent} />
+                        <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </Card.Body>
                 </Card>
             </Fragment>

@@ -1,39 +1,34 @@
 import React, { Component } from "react";
 import BootstrapTable from 'react-bootstrap-table-next'
 import ButtonIgnore from './render_component/ButtonIgnore'
-export default class DisplayWarning extends Component {
-
-    state = {
-        rows: []
-    }
-    constructor(props) {
-        super(props)
-        this.rowsLength = Object.keys(this.state.rows).length
-        this.onClick = this.onClick.bind(this)
-    }
-
-    onClick(id, ignored) {
-        this.setState(state => {
-            state.forEach(row => {
-                if (row.rowName === id) row[id]['valid'] = ignored
-            })
-        })
-        this.checkObjectValidation(id)
-    }
+//Redux
+import { connect } from 'react-redux';
+import { updateWarningSeries } from './actions/StudiesSeries'
+class DisplayWarning extends Component {
 
     columns = [
         {
-            dataField: 'id',
+            dataField: 'key',
             isDummyField: true,
             hidden: true,
         },
         {
-            dataField: 'warning',
+            dataField: 'content',
             text: 'Warnings',
+        },
+        {
+            dataField: 'dismissed',
+            hidden: true
         },
         {
             dataField: 'ignoreButton',
             text: '',
+            formatter: (cell, row, rowIndex, extraData) => (
+                <ButtonIgnore onClick={() => {
+                    this.props.updateWarningSeries(row)
+                    console.log(this.props.mySeries[row.objectID])
+                }} />
+            ),
         },
     ]
 
@@ -46,9 +41,10 @@ export default class DisplayWarning extends Component {
             return rows
         } else if (this.props.type === 'series') {
             let rows = []
-            console.log(this.props.object)
-            this.props.object.forEach(
-                series => { rows.push({ series: series.warnings }) })
+            this.props.object.forEach((object) => {
+                rows.push(...object.getArrayWarnings())
+            })
+            rows = [...rows]
             return rows
         }
 
@@ -62,10 +58,10 @@ export default class DisplayWarning extends Component {
     }
 
     render() {
-        if (this.props.loaded) {
+        if (this.props.object !== null) {
             return (
                 <BootstrapTable
-                    keyField='id'
+                    keyField='key'
                     classes="table table-borderless"
                     bodyClasses="du-warnings"
                     headerClasses="du-warnings th"
@@ -78,3 +74,14 @@ export default class DisplayWarning extends Component {
         }
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        mySeries: state.StudiesSeries.series
+    }
+}
+const mapDispatchToProps = {
+    updateWarningSeries
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DisplayWarning)

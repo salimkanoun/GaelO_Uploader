@@ -17,14 +17,10 @@ import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
-
 import StudiesTab from './StudiesTab'
 
 export default class DisplayStudies extends Component {
   render() {
-    /* if (this.props.studies.length !== 0) {
-            console.log(this.props.studies[0]['warnings'])
-        } */
     return (
       <>
         <Container fluid>
@@ -37,7 +33,7 @@ export default class DisplayStudies extends Component {
               />
             </Col>
             <Col xs={6} md={4}>
-              
+            <DisplayWarning type='studies' object={(this.props.studies.length !== 0) ? this.props.studies : null} />
             </Col>
           </Row>
         </Container>
@@ -45,6 +41,3 @@ export default class DisplayStudies extends Component {
     )
   }
 }
-
-/* <DisplayWarning type='studies' object={(this.props.studies.length !== 0) ? this.props.studies : null}
-                loaded={(this.props.studies.length !== 0) ? true : false} /> */

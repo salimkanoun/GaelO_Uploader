@@ -13,15 +13,17 @@
  */
 
 import React, { Component } from 'react'
-import DisplayStudies from './DisplayStudies.js'
+import DisplayStudies from './render_component/DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 import Row from 'react-bootstrap/Row'
+//Redux
+import { connect } from 'react-redux';
+import { selectStudy } from './actions/DisplayTables'
 
-
-export default class ControllerStudiesSeries extends Component {
+class ControllerStudiesSeries extends Component {
 
     state = {
-        selectedStudy: undefined,
+        update:false,
         seriesToUpload: {},
         selectedSeries: []
     }
@@ -29,9 +31,14 @@ export default class ControllerStudiesSeries extends Component {
     constructor(props) {
         super(props)
         this.updateSelectedSeries = this.updateSelectedSeries.bind(this)
-        this.setCurrentStudy = this.setCurrentStudy.bind(this)
     }
 
+    componentDidUpdate (prevProps) {
+        console.log("update!")
+        if (this.props.uploadModel !== prevProps.uploadModel) {
+            this.setState( (prevState) => ( {update: !prevState.update} ) )
+        }
+    }
     prepareSeriesToUpload = () => {
         let seriesIDs = this.state.selectedSeries
         let series = {}
@@ -65,8 +72,7 @@ export default class ControllerStudiesSeries extends Component {
         this.setState({ selectedSeries: series }, () => (this.prepareSeriesToUpload()))
     }
 
-    setCurrentStudy = (studyUID) => {
-        this.setState({ selectedStudy: studyUID })
+    setCurrentStudy() {
     }
 
     validateCheckPatient(studyUID) {
@@ -77,9 +83,12 @@ export default class ControllerStudiesSeries extends Component {
 
     }
 
-    getSeries(studyUID) {
-        if (studyUID !== undefined) {
-            return this.props.uploadModel.getStudy(studyUID).getSeriesArray()
+    getSeries() {
+        console.log("called!")
+        console.log(this.props.selectedStudy)
+        if (this.props.selectedStudy !== undefined && this.props.selectedStudy !== null) {
+            console.log("here")
+            return this.props.uploadModel.getStudy(this.props.selectedStudy).getSeriesArray()
         }
         else return []
     }
@@ -92,10 +101,20 @@ export default class ControllerStudiesSeries extends Component {
                         studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
                 </Row>
                 <Row>
-                    <DisplaySeries studyUID={this.state.selectedStudy} series={this.getSeries(this.state.selectedStudy)}
-                        selectedSeries={this.updateSelectedSeries} />
+                    <DisplaySeries series={this.getSeries()} selectedSeries={this.updateSelectedSeries} />
                 </Row>
             </>
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        selectedStudy: state.DisplayTables.selectedStudy
+    }
+}
+const mapDispatchToProps = {
+    selectStudy
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

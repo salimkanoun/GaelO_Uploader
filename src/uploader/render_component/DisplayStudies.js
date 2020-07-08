@@ -16,8 +16,8 @@ import React, { Component } from 'react'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import DisplayWarning from './DisplayWarning'
-import StudiesTab from './StudiesTab'
+import DisplayWarning from '../DisplayWarning'
+import StudiesTab from '../StudiesTab'
 
 export default class DisplayStudies extends Component {
   render() {

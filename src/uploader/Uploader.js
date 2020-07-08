@@ -26,6 +26,7 @@ class Uploader extends Component {
         fileIgnored: 0,
         fileParsed: 0,
         fileLoaded: 0,
+        parseFinished: false,
         showIgnoredFiles: false,
         ignoredFiles: {},
         showWarning: false,
@@ -158,10 +159,7 @@ class Uploader extends Component {
                 //Update Redux model
                 this.props.addWarningSeries(study[series].seriesInstanceUID, ...study[series].getArrayWarnings())
             }
-
         }
-
-        //UPDATE REDUX MODEL
     }
 
     /*Trigger ignored files panel if clicked*/

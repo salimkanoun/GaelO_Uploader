@@ -19,15 +19,11 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 
 import DisplayWarning from './DisplayWarning'
-
 export default class DisplaySeries extends Component {
 
+    //USE REDUX STATE
     state = {
         selectedSeries: []
-    }
-
-    constructor(props) {
-        super(props)
     }
 
     columns = [
@@ -60,7 +56,6 @@ export default class DisplaySeries extends Component {
             dataField: 'numberOfInstances',
             text: 'Nb of Instances',
         },
-
     ];
 
     selectRow = {
@@ -76,7 +71,6 @@ export default class DisplaySeries extends Component {
                 this.setState((prevState) => ({ selectedSeries: prevState.selectedSeries.filter(thisRow => thisRow !== row.seriesInstanceUID) }),
                     () => (this.props.selectedSeries(this.state.selectedSeries)))
             }
-
         }
     }
 
@@ -92,7 +86,7 @@ export default class DisplaySeries extends Component {
     }
 
     render() {
-        //console.log(this.props.series)
+        console.log(this.props.series)
         return (
             <Container fluid>
                 <span class="title">Series</span>
@@ -109,13 +103,11 @@ export default class DisplaySeries extends Component {
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                        
+                    <DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.series : null} 
+                    />
                     </Col>
                 </Row>
             </Container>
         )
     }
 }
-
-/* <DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.series : null}
-                            loaded={(this.props.series.length !== 0) ? true : false} />*/

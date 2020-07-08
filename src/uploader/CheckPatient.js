@@ -61,12 +61,7 @@ export default class CheckPatient extends Component {
     ]
 
     onClick(id, ignored) {
-        this.setState(state => {
-            state.forEach(row => {
-                if (row.rowName === id) row[id]['valid'] = ignored
-            })
-
-        })
+        
     }
 
     checkRow(expected, current) {
@@ -124,3 +119,4 @@ export default class CheckPatient extends Component {
         )
     }
 }
+//LINK CONFIRM BUTTON TO PATIENT CHECKED

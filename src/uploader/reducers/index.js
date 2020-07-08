@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux'
-import WarningDisplay from './WarningDisplay'
 import StudiesSeries from './StudiesSeries'
+import DisplayTables from './DisplayTables'
 import CheckPatient from './CheckPatient'
 
 export default combineReducers({
-  WarningDisplay,
   StudiesSeries,
+  DisplayTables,
   CheckPatient
 })

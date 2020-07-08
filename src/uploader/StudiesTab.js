@@ -16,8 +16,11 @@ import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
 import Button from 'react-bootstrap/Button'
 import CheckPatient from './CheckPatient'
+//Redux
+import { connect } from 'react-redux';
+import { selectStudy } from './actions/DisplayTables'
 
-export default class StudiesTab extends Component {
+class StudiesTab extends Component {
 
     state = {
         isCheck: false,
@@ -36,7 +39,7 @@ export default class StudiesTab extends Component {
             isDummyField: true,
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => (
-                <Button onClick={() => { this.toggleCheckPatient(row); this.selectedStudy = row.studyUID; }}>
+                <Button onClick={() => { this.toggleCheckPatient(row); }}>
                     Check Patient
                 </Button>
             ),
@@ -69,7 +72,9 @@ export default class StudiesTab extends Component {
         hideSelectColumn: true,
         bgColor: 'lightgrey',
         onSelect: (row) => {
-            this.props.onSelectChange(row.studyUID)
+            this.props.selectStudy(row.studyUID)
+            //Warn controller that tabs are to be updated
+            this.props.onSelectChange()
         }
     };
 
@@ -79,6 +84,7 @@ export default class StudiesTab extends Component {
     }
 
     render() {
+        console.log("this has been called")
         return (
             <>
                 <BootstrapTable
@@ -98,3 +104,14 @@ export default class StudiesTab extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        selectedStudy: state.DisplayTables.selectedStudy
+    }
+}
+const mapDispatchToProps = {
+    selectStudy
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

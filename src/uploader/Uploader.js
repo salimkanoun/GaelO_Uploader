@@ -156,7 +156,7 @@ class Uploader extends Component {
                 study[series].checkSeries(dicomFile)
 
                 //Update Redux model
-
+                this.props.addWarningSeries(study[series].seriesInstanceUID, ...study[series].getArrayWarnings())
             }
 
         }
@@ -235,7 +235,8 @@ class Uploader extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.studies,
+        studies: state.StudiesSeries.studies,
+        series: state.StudiesSeries.series
     }
 }
 const mapDispatchToProps = {

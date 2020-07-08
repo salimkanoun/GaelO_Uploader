@@ -17,7 +17,10 @@ import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
 import DicomBatchUploader from '../model/DicomBatchUploader'
 
-export default class Uploader extends Component {
+import { connect } from 'react-redux';
+import { addSeries, addWarningSeries, addWarningStudies } from './actions/StudiesSeries'
+
+class Uploader extends Component {
 
     state = {
         fileIgnored: 0,
@@ -85,7 +88,7 @@ export default class Uploader extends Component {
     }
 
     addFile(files) {
-        this.setState((previousState) => { return { fileLoaded: (previousState.fileLoaded+files.length) } })
+        this.setState((previousState) => { return { fileLoaded: (previousState.fileLoaded + files.length) } })
         console.log('Added file', files)
         files.forEach(file => {
             this.read(file)
@@ -110,15 +113,18 @@ export default class Uploader extends Component {
             let dicomInstanceID = dicomFile.getSOPInstanceUID()
 
             study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
-                    dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
-                    dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
+                dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
+                dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
             study = this.uploadModel.addStudy(study, dicomStudyID);
             series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
-                    dicomFile.getSeriesDescription(), dicomFile.getModality());
+                dicomFile.getSeriesDescription(), dicomFile.getModality());
             series = study.addSeries(series, dicomSeriesID);
             series.addInstance(new Instance(dicomInstanceID, file, dicomFile), dicomInstanceID);
-            
+
             this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
+
+            //Populate Redux model
+            this.props.addSeries(study.studyUID, series.seriesInstanceUID)
 
         } catch (error) {
             console.warn(error)
@@ -146,12 +152,16 @@ export default class Uploader extends Component {
                 let instances = study[series].getArrayInstances()
                 for (let instance in instances) {
                     dicomFile = instances[instance].getDicomFile()
-                }   
+                }
                 study[series].checkSeries(dicomFile)
+
+                //Update Redux model
+
             }
-            
+
         }
 
+        //UPDATE REDUX MODEL
     }
 
     /*Trigger ignored files panel if clicked*/
@@ -184,14 +194,14 @@ export default class Uploader extends Component {
             this.setState({
                 ...uploader.getProgess()
             })
-        } , 200)
-        
-            
+        }, 200)
+
+
         uploader.startUpload()
 
     }
 
-    onUploadDone(){
+    onUploadDone() {
         clearInterval(this.intervalProgress)
         console.log("upload Finished")
     }
@@ -222,3 +232,16 @@ export default class Uploader extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        studies: state.studies,
+    }
+}
+const mapDispatchToProps = {
+    addSeries,
+    addWarningSeries,
+    addWarningStudies
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

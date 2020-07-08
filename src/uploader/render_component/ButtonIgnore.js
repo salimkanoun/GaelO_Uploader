@@ -17,26 +17,23 @@ import Button from 'react-bootstrap/Button'
 
 export default class ButtonIgnore extends Component {
 
-    state = { ignored: false }
+    state = {
+        ignored: false
+    }
 
     constructor(props) {
         super(props)
-        this.id = this.props.id
         this.onClick = this.onClick.bind(this)
     }
 
     onClick() {
-        this.setState( (state) => { 
-            this.props.onClick(this.id, !state.ignored)
-            return { ignored: !state.ignored } 
-        })
+        this.props.onClick()
+        this.setState( (prevState) => ( {ignored: !prevState.ignored}))
     }
 
     render() {
         return (
-            <Button onClick={this.onClick}> { this.state.ignored ?  'Ignore' : 'Consider' } </Button>
+            <Button onClick={this.onClick}> { this.state.ignored ? 'Consider' : 'Ignore' } </Button>
         )
     }
 }
-
-//SK Ce composant est pas completement stateless, devrait le devenir à l'implementation du REDUX

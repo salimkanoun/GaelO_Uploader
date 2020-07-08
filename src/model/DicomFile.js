@@ -66,7 +66,6 @@ export default class DicomFile {
   ]
 
   __pFileReader(file) {
-    console.log(file)
     return new Promise((resolve, reject) => {
       var fr = new FileReader();
       fr.readAsArrayBuffer(file);

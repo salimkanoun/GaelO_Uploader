@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux'
-import Model from './Model'
+import Series from './Series'
+import Studies from './Studies'
 import DisplayTables from './DisplayTables'
 
 export default combineReducers({
-  Model,
+  Series,
+  Studies,
   DisplayTables
 })

@@ -12,17 +12,12 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+import DicomFile from "./DicomFile"
+
 export default class Instance {
-  constructor (SOPInstanceUID, fileObject, dicomFile) {
+  constructor (fileObject, SOPInstanceUID) {
     this.SOPInstanceUID = SOPInstanceUID
     this.fileObject = fileObject
-    this.dicomFile = dicomFile
-  }
-
-  toString () {
-    return ('\nSOP Instance UID: ' + this.SOPInstanceUID +
-      '\nFile: ' + Object.entries(this.fileObject) +
-      '\nDicomFile: ' + Object.keys(this.dicomFile))
   }
 
   getFile () {
@@ -30,6 +25,6 @@ export default class Instance {
   }
 
   getDicomFile () {
-    return this.dicomFile
+    return new DicomFile(this.fileObject)
   }
 }

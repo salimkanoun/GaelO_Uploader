@@ -12,12 +12,13 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
+import { connect } from 'react-redux'
+
+import Row from 'react-bootstrap/Row'
+
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
-import Row from 'react-bootstrap/Row'
-//Redux
-import { connect } from 'react-redux';
 
 class ControllerStudiesSeries extends Component {
 
@@ -25,10 +26,6 @@ class ControllerStudiesSeries extends Component {
         update: false,
         seriesToUpload: {},
         selectedSeries: []
-    }
-
-    constructor(props) {
-        super(props)
     }
 
     prepareSeriesToUpload = () => {
@@ -55,35 +52,29 @@ class ControllerStudiesSeries extends Component {
             , () => console.log(this.state.seriesToUpload))
     }
 
-    getValidatedItems = () => {
-        return 'ici'
-        //Return validated series only
-    }
-
     render() {
         return (
-            <>
+            <Fragment>
                 <Row>
                     <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}/>
                 </Row>
                 <Row>
                     <DisplaySeries selectedStudy = {this.props.selectedStudy} />
                 </Row>
-            </>
+            </Fragment>
         )
     }
 }
 
-/*
 
-*/
 const mapStateToProps = state => {
     return {
-        studies: state.Model.studies,
-        series: state.Model.series,
+        studies: state.Studies,
+        series: state.Series,
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }
+
 const mapDispatchToProps = {
     
 }

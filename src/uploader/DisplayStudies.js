@@ -122,7 +122,7 @@ class StudiesTab extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Model.studies,
+        studies: state.Studies,
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }

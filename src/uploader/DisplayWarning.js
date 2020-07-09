@@ -3,7 +3,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import ButtonIgnore from './render_component/ButtonIgnore'
 //Redux
 import { connect } from 'react-redux';
-import { updateWarningSeries } from './actions/Model'
+import { updateWarningSeries } from './actions/StudiesSeries'
 class DisplayWarning extends Component {
 
     columns = [
@@ -80,8 +80,8 @@ class DisplayWarning extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Model.studies,
-        series: state.Model.series
+        studies: state.Studies,
+        series: state.Series
     }
 }
 const mapDispatchToProps = {

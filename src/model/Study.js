@@ -40,11 +40,11 @@ export default class Study {
 
     }
 
-    addSeries(seriesObject, dicomSeriesID) {
-        if (!this.isExistingSeries(dicomSeriesID)) {
+    addSeries(seriesObject, seriesInstanceUID) {
+        if (!this.isExistingSeries(seriesInstanceUID)) {
             this.series[seriesObject.seriesInstanceUID] = seriesObject
             return seriesObject
-        } else return this.getSeries(dicomSeriesID)
+        } else return this.getSeries(seriesInstanceUID)
     }
 
     isExistingSeries(seriesInstanceUID) {

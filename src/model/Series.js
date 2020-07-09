@@ -38,7 +38,7 @@ export default class Series {
 		}
 	}
 
-	addInstance(instanceObject, dicomInstanceID) {
+	addInstance( dicomInstanceID, instanceObject ) {
 		if (!this.isExistingInstance(dicomInstanceID)) {
 			this.instances[instanceObject.SOPInstanceUID] = instanceObject
 		} else {

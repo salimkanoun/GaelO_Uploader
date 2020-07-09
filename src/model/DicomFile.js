@@ -13,6 +13,8 @@
  */
 
 import dicomParser from 'dicom-parser'
+import Study from './Study'
+import Series from './Series'
 
 export default class DicomFile {
 
@@ -311,5 +313,16 @@ export default class DicomFile {
       res = this.fileObject.webkitRelativePath;
     }
     return res;
+  }
+
+  getStudyObject(){
+    return new Study(this.getStudyInstanceUID(), this.getStudyID(), this.getStudyDate(), this.getStudyDescription(),
+              this.getAccessionNumber(), this.getPatientID(), this.getPatientFirstName(), this.getPatientLastName(),
+              this.getPatientBirthDate(), this.getPatientSex(), this.getAcquisitionDate())
+  }
+
+  getSeriesObject(){
+    return new Series(this.getSeriesInstanceUID, this.getSeriesNumber(), this.getSeriesDate(),
+    this.getSeriesDescription(), this.getModality());
   }
 }

@@ -17,9 +17,12 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-
 import DisplayWarning from './DisplayWarning'
-export default class DisplaySeries extends Component {
+//Redux
+import { connect } from 'react-redux';
+import { selectSeries } from './actions/DisplayTables'
+
+class DisplaySeries extends Component {
 
     //USE REDUX STATE
     state = {
@@ -85,6 +88,10 @@ export default class DisplaySeries extends Component {
         return rows
     }
 
+    getSeries() {
+        return Object.values(this.props.series)
+    }
+
     render() {
         console.log(this.props.series)
         return (
@@ -98,7 +105,7 @@ export default class DisplaySeries extends Component {
                             headerClasses="du-series th"
                             rowClasses="du-series td"
                             keyField='seriesInstanceUID'
-                            data={this.buildRows()}
+                            data={this.getSeries()}
                             columns={this.columns}
                             selectRow={this.selectRow} />
                     </Col>
@@ -111,3 +118,15 @@ export default class DisplaySeries extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        series: state.Model.series,
+        selectedSeries: state.DisplayTables.selectedSeries
+    }
+}
+const mapDispatchToProps = {
+    selectSeries
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DisplaySeries)

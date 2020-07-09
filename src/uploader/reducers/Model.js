@@ -49,12 +49,12 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                 let studyToAdd
                 if (studies[studyUID] == undefined) {
                     studyToAdd = {
-                        patientName, studyDescription, accessionNumber, acquisitionDate, firstName, lastName, birthDate, sex,
+                        studyUID, patientName, studyDescription, accessionNumber, acquisitionDate, firstName, lastName, birthDate, sex,
                         series: [series]
                     }
                 } else {
                     studyToAdd = {
-                        patientName, studyDescription, accessionNumber, acquisitionDate, firstName, lastName, birthDate, sex,
+                        studyUID, patientName, studyDescription, accessionNumber, acquisitionDate, firstName, lastName, birthDate, sex,
                         series: [series]
                     }
                 }
@@ -69,11 +69,11 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                     numberOfInstances = series.numberOfInstances
                     if (state.series[seriesInstanceUID] == undefined) {
                         series = {
-                            seriesDescription, modality, seriesNumber, seriesDate, numberOfInstances
+                            seriesInstanceUID, seriesDescription, modality, seriesNumber, seriesDate, numberOfInstances
                         }
                     } else {
                         series = {
-                            seriesDescription, modality, seriesNumber, seriesDate, numberOfInstances
+                            seriesInstanceUID, seriesDescription, modality, seriesNumber, seriesDate, numberOfInstances
                         }
                     }
                     seriesList[seriesInstanceUID] = {...series}

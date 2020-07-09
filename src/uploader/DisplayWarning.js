@@ -60,14 +60,7 @@ class DisplayWarning extends Component {
     render() {
         if (this.props.object !== null) {
             return (
-                <BootstrapTable
-                    keyField='key'
-                    classes="table table-borderless"
-                    bodyClasses="du-warnings"
-                    headerClasses="du-warnings th"
-                    data={this.buildRow()}
-                    columns={this.columns}
-                />
+                 null
             )
         } else {
             return null;
@@ -75,10 +68,19 @@ class DisplayWarning extends Component {
     }
 }
 
+/*<BootstrapTable
+                    keyField='key'
+                    classes="table table-borderless"
+                    bodyClasses="du-warnings"
+                    headerClasses="du-warnings th"
+                    data={this.props.series}
+                    columns={this.columns}
+                />
+*/
 const mapStateToProps = state => {
     return {
-        studies: state.model,
-        series: state.model.series
+        studies: state.Model.studies,
+        series: state.Model.series
     }
 }
 const mapDispatchToProps = {

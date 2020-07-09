@@ -83,6 +83,10 @@ class StudiesTab extends Component {
         return row
     }
 
+    getStudies() {
+        return Object.values(this.props.studies)
+    }
+
     render() {
         return (
             <>
@@ -92,7 +96,7 @@ class StudiesTab extends Component {
                     bodyClasses="du-studies-tbody"
                     headerClasses="du-studies th"
                     rowClasses="du-studies td"
-                    data={this.props.studies}
+                    data={this.getStudies()}
                     columns={this.columns}
                     selectRow={this.selectRow}
                 />
@@ -106,7 +110,7 @@ class StudiesTab extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Model.model.getStudiesArray(),
+        studies: state.Model.studies,
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }

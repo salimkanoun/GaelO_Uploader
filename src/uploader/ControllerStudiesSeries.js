@@ -23,7 +23,7 @@ import { selectStudy } from './actions/DisplayTables'
 class ControllerStudiesSeries extends Component {
 
     state = {
-        update:false,
+        update: false,
         seriesToUpload: {},
         selectedSeries: []
     }
@@ -54,7 +54,7 @@ class ControllerStudiesSeries extends Component {
         console.log(series)
         this.setState(
             { seriesToUpload: series }
-        , () => console.log(this.state.seriesToUpload))
+            , () => console.log(this.state.seriesToUpload))
     }
 
     getValidatedItems = () => {
@@ -90,20 +90,20 @@ class ControllerStudiesSeries extends Component {
     render() {
         return (
             <>
-                
-            </>
-        )
-    }
-}
-
-/*
-<Row>
+                <Row>
                     <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
                         onSelectChange={this.setCurrentStudy} />
                 </Row>
                 <Row>
                     <DisplaySeries series={this.getSeries()} selectedSeries={this.updateSelectedSeries} />
                 </Row>
+            </>
+        )
+    }
+}
+
+/*
+
 */
 const mapStateToProps = state => {
     return {

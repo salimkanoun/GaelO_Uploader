@@ -13,7 +13,7 @@
  */
 
 import React, { Component } from 'react'
-import DisplayStudies from './render_component/DisplayStudies.js'
+import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 import Row from 'react-bootstrap/Row'
 //Redux
@@ -60,9 +60,6 @@ class ControllerStudiesSeries extends Component {
         //Return validated series only
     }
 
-    setCurrentStudy() {
-    }
-
     validateCheckPatient(studyUID) {
         //console.log(studyUID)
     }
@@ -75,11 +72,10 @@ class ControllerStudiesSeries extends Component {
         return (
             <>
                 <Row>
-                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
-                        onSelectChange={this.setCurrentStudy}/>
+                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}/>
                 </Row>
                 <Row>
-                    <DisplaySeries/>
+                    <DisplaySeries selectedStudy={this.props.selectedStudy}/>
                 </Row>
             </>
         )

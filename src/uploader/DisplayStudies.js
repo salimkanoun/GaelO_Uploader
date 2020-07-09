@@ -16,6 +16,10 @@ import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
 import Button from 'react-bootstrap/Button'
 import CheckPatient from './CheckPatient'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import DisplayWarning from './DisplayWarning'
 //Redux
 import { connect } from 'react-redux';
 import { selectStudy } from './actions/DisplayTables'
@@ -29,7 +33,6 @@ class StudiesTab extends Component {
     constructor(props) {
         super(props)
         this.toggleCheckPatient = this.toggleCheckPatient.bind(this)
-        this.selectedStudy = null;
     }
 
     columns = [
@@ -88,19 +91,30 @@ class StudiesTab extends Component {
     render() {
         return (
             <>
-                <BootstrapTable
-                    keyField='studyUID'
-                    classes="table table-borderless"
-                    bodyClasses="du-studies-tbody"
-                    headerClasses="du-studies th"
-                    rowClasses="du-studies td"
-                    data={this.getStudies()}
-                    columns={this.columns}
-                    selectRow={this.selectRow}
-                />
-                <CheckPatient studyUID={this.selectedStudy} validateCheckPatient={this.props.validateCheckPatient}
-                    show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)}
-                    expectedStudy={this.props.studies} currentStudy={this.props.studies} />
+                <Container fluid>
+                    <span class='title'>Studies</span>
+                    <Row>
+                        <Col xs={12} md={8}>
+                            <BootstrapTable
+                                keyField='studyUID'
+                                classes="table table-borderless"
+                                bodyClasses="du-studies-tbody"
+                                headerClasses="du-studies th"
+                                rowClasses="du-studies td"
+                                data={this.getStudies()}
+                                columns={this.columns}
+                                selectRow={this.selectRow}
+                            />
+                            <CheckPatient studyUID={this.selectedStudy} validateCheckPatient={this.props.validateCheckPatient}
+                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)}
+                                expectedStudy={this.props.studies} currentStudy={this.props.studies} />
+                        </Col>
+                        <Col xs={6} md={4}>
+                            <DisplayWarning type='studies' />
+                        </Col>
+                    </Row>
+                </Container>
+
             </>
         )
     }

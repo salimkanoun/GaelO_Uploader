@@ -93,6 +93,7 @@ class DisplaySeries extends Component {
     }
 
     render() {
+        console.log("disp series called")
         return (
             <Container fluid>
                 <span class="title">Series</span>
@@ -122,7 +123,6 @@ const mapStateToProps = state => {
     return {
         selectedStudy: state.Model.selectedStudy,
         series: state.Model.series,
-        selectedSeries: state.DisplayTables.selectedSeries
     }
 }
 const mapDispatchToProps = {

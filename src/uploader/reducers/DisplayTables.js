@@ -13,6 +13,8 @@ export default function DisplayTablesReducer(state = initialState, action) {
     switch (action.type) {
 
         case SELECT_STUDY:
+            console.log("study selected")
+            console.log(state.selectedStudy)
             return {
                 ...state,
                 selectedStudy: action.payload

@@ -10,9 +10,9 @@ import thunk from 'redux-thunk'
 import reducers from './uploader/reducers'
 
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
-
+const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 ReactDOM.render(
-    <Provider store={createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())}>
+    <Provider store={store}>
       <App />
     </Provider>,
   document.getElementById('root')

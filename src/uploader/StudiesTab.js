@@ -84,7 +84,6 @@ class StudiesTab extends Component {
     }
 
     render() {
-        console.log("this has been called")
         return (
             <>
                 <BootstrapTable
@@ -107,6 +106,7 @@ class StudiesTab extends Component {
 
 const mapStateToProps = state => {
     return {
+        studies: state.Model.model.getStudiesArray(),
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }

@@ -33,12 +33,6 @@ class ControllerStudiesSeries extends Component {
         this.updateSelectedSeries = this.updateSelectedSeries.bind(this)
     }
 
-    componentDidUpdate (prevProps) {
-        console.log("update!")
-        if (this.props.uploadModel !== prevProps.uploadModel) {
-            this.setState( (prevState) => ( {update: !prevState.update} ) )
-        }
-    }
     prepareSeriesToUpload = () => {
         let seriesIDs = this.state.selectedSeries
         let series = {}
@@ -84,8 +78,8 @@ class ControllerStudiesSeries extends Component {
     }
 
     getSeries() {
-        console.log("called!")
-        console.log(this.props.selectedStudy)
+        //console.log("called!")
+        //console.log(this.props.selectedStudy)
         if (this.props.selectedStudy !== undefined && this.props.selectedStudy !== null) {
             console.log("here")
             return this.props.uploadModel.getStudy(this.props.selectedStudy).getSeriesArray()
@@ -96,20 +90,24 @@ class ControllerStudiesSeries extends Component {
     render() {
         return (
             <>
-                <Row>
-                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
-                        studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
-                </Row>
-                <Row>
-                    <DisplaySeries series={this.getSeries()} selectedSeries={this.updateSelectedSeries} />
-                </Row>
+                
             </>
         )
     }
 }
 
+/*
+<Row>
+                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
+                        onSelectChange={this.setCurrentStudy} />
+                </Row>
+                <Row>
+                    <DisplaySeries series={this.getSeries()} selectedSeries={this.updateSelectedSeries} />
+                </Row>
+*/
 const mapStateToProps = state => {
     return {
+        uploadModel: state.Model.model,
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }

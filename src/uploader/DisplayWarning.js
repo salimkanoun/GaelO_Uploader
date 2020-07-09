@@ -3,7 +3,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import ButtonIgnore from './render_component/ButtonIgnore'
 //Redux
 import { connect } from 'react-redux';
-import { updateWarningSeries } from './actions/StudiesSeries'
+import { updateWarningSeries } from './actions/Model'
 class DisplayWarning extends Component {
 
     columns = [
@@ -36,7 +36,7 @@ class DisplayWarning extends Component {
     buildRow() {
         if (this.props.type === 'studies') {
             let rows = []
-            this.props.object.forEach(
+            this.props.studies.forEach(
                 series => { rows.push({ series: series.warnings }) })
             return rows
         } else if (this.props.type === 'series') {
@@ -77,7 +77,8 @@ class DisplayWarning extends Component {
 
 const mapStateToProps = state => {
     return {
-        mySeries: state.StudiesSeries.series
+        studies: state.model,
+        series: state.model.series
     }
 }
 const mapDispatchToProps = {

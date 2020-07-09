@@ -6,16 +6,16 @@ import * as serviceWorker from './serviceWorker'
 
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
-import index from './uploader/reducers'
+import thunk from 'redux-thunk'
+import reducers from './uploader/reducers'
 
-const store = createStore(index, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
+    <Provider store={createStoreWithMiddleware(reducers, window.REDUX_DEVTOOLS_EXTENSION && window.REDUX_DEVTOOLS_EXTENSION())}>
       <App />
-    </Provider>
-  </React.StrictMode>,
+    </Provider>,
   document.getElementById('root')
 )
 

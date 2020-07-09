@@ -28,12 +28,12 @@ export default class DisplayStudies extends Component {
           <Row>
             <Col xs={12} md={8}>
               <StudiesTab
-                studies={this.props.studies} onSelectChange={this.props.onSelectChange}
+                onSelectChange={this.props.onSelectChange}
                 validateCheckPatient={this.props.validateCheckPatient}
               />
             </Col>
             <Col xs={6} md={4}>
-            <DisplayWarning type='studies' object={(this.props.studies.length !== 0) ? this.props.studies : null} />
+            <DisplayWarning type='studies'/>
             </Col>
           </Row>
         </Container>

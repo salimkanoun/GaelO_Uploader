@@ -18,7 +18,7 @@ import Tus from '@uppy/tus'
 import DicomBatchUploader from '../model/DicomBatchUploader'
 
 import { connect } from 'react-redux';
-import { addSeries, addWarningSeries, addWarningStudies } from './actions/StudiesSeries'
+import { addStudy, addSeries, addInstance, addWarningSeries } from './actions/Model'
 
 class Uploader extends Component {
 
@@ -40,7 +40,7 @@ class Uploader extends Component {
 
         this.uploadModel = new Model();
 
-        this.toogleShowIgnoreFile = this.toogleShowIgnoreFile.bind(this)
+        this.toogleShowIgnoreFile = this.toggleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
         this.onUploadDone = this.onUploadDone.bind(this)
@@ -98,6 +98,7 @@ class Uploader extends Component {
 
             let study;
             let series;
+            let instance
 
             let dicomStudyID = dicomFile.getStudyInstanceUID()
             let dicomSeriesID = dicomFile.getSeriesInstanceUID()
@@ -110,12 +111,12 @@ class Uploader extends Component {
             series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
                 dicomFile.getSeriesDescription(), dicomFile.getModality());
             series = study.addSeries(series, dicomSeriesID);
-            series.addInstance(new Instance(dicomInstanceID, file, dicomFile), dicomInstanceID);
+            instance = new Instance(dicomInstanceID, file, dicomFile)
+            series.addInstance(instance, dicomInstanceID);
 
             this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
 
-            //Populate Redux model
-            this.props.addSeries(study.studyUID, series.seriesInstanceUID)
+            this.props.addInstance(study, series, instance)
 
         } catch (error) {
             console.warn(error)
@@ -145,15 +146,15 @@ class Uploader extends Component {
                     dicomFile = instances[instance].getDicomFile()
                 }
                 study[series].checkSeries(dicomFile)
-
                 //Update Redux model
-                this.props.addWarningSeries(study[series].seriesInstanceUID, ...study[series].getArrayWarnings())
+                //this.props.addWarningSeries(study[series].seriesInstanceUID, ...study[series].getArrayWarnings())
             }
         }
+
     }
 
     /*Trigger ignored files panel if clicked*/
-    toogleShowIgnoreFile() {
+    toggleShowIgnoreFile() {
         this.setState(((state) => { return { showIgnoredFiles: !state.showIgnoredFiles } }))
     }
 
@@ -209,10 +210,10 @@ class Uploader extends Component {
                                 </section>
                             )}
                         </Dropzone>
-                        <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toogleShowIgnoreFile} />
-                        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
+                        <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
+                        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries ref={this.controlerStudiesSeriesRefs} uploadModel={this.uploadModel} />
+                        <ControllerStudiesSeries ref={this.controlerStudiesSeriesRefs} />
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </Card.Body>
                 </Card>
@@ -223,14 +224,16 @@ class Uploader extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.StudiesSeries.studies,
-        series: state.StudiesSeries.series
+        studies: state.Model.studies,
+        series: state.Model.series,
+        instances: state.Model.instances
     }
 }
 const mapDispatchToProps = {
+    addStudy,
     addSeries,
-    addWarningSeries,
-    addWarningStudies
+    addInstance,
+    addWarningSeries
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

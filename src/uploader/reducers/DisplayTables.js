@@ -13,7 +13,10 @@ export default function DisplayTablesReducer(state = initialState, action) {
     switch (action.type) {
 
         case SELECT_STUDY:
-            return Object.assign(state.selectedStudy, action.payload)
+            return {
+                ...state,
+                selectedStudy: action.payload
+                }
 
         case SELECT_SERIES:
             return {

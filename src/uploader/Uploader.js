@@ -222,7 +222,6 @@ const mapStateToProps = state => {
     return {
         studies: state.Model.studies,
         series: state.Model.series,
-        instances: state.Model.instances
     }
 }
 const mapDispatchToProps = {

@@ -1,23 +1,9 @@
-import { ADD_STUDY, ADD_SERIES, ADD_INSTANCE, ADD_WARNING_SERIES, UPDATE_WARNING_SERIES, UPDATE_WARNING_STUDY } from './actions-types'
+import { ADD_STUDIES_SERIES, ADD_WARNING_SERIES, UPDATE_WARNING_SERIES, UPDATE_WARNING_STUDY } from './actions-types'
 
-export function addStudy(study) {
+export function addStudiesSeries(studies) {
     return {
-        type: ADD_STUDY,
-        payload: study
-    }
-}
-
-export function addSeries(series) {
-    return {
-        type: ADD_SERIES,
-        payload: series
-    }
-}
-
-export function addInstance(study, series, instance) {
-    return {
-        type: ADD_INSTANCE,
-        payload: {study, series, instance}
+        type: ADD_STUDIES_SERIES,
+        payload: studies
     }
 }
 

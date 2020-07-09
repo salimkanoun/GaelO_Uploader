@@ -18,7 +18,7 @@ import Tus from '@uppy/tus'
 import DicomBatchUploader from '../model/DicomBatchUploader'
 
 import { connect } from 'react-redux';
-import { addStudy, addSeries, addInstance, addWarningSeries } from './actions/Model'
+import { addStudiesSeries, addWarningSeries } from './actions/Model'
 
 class Uploader extends Component {
 
@@ -40,7 +40,7 @@ class Uploader extends Component {
 
         this.uploadModel = new Model();
 
-        this.toogleShowIgnoreFile = this.toggleShowIgnoreFile.bind(this)
+        this.toggleShowIgnoreFile = this.toggleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
         this.onUploadDone = this.onUploadDone.bind(this)
@@ -114,9 +114,7 @@ class Uploader extends Component {
             instance = new Instance(dicomInstanceID, file, dicomFile)
             series.addInstance(instance, dicomInstanceID);
 
-            this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
-
-            this.props.addInstance(study, series, instance)
+            this.setState((previousState) => { return { fileParsed: ++previousState.fileParsed } })
 
         } catch (error) {
             console.warn(error)
@@ -127,7 +125,7 @@ class Uploader extends Component {
             this.setState(state => {
                 //SK ICI BUG IGNORE FILE A UN SEUL ITEM
                 return {
-                    fileIgnored: state.fileIgnored++,
+                    fileIgnored: ++state.fileIgnored,
                     ignoredFiles: {
                         ...state.ignoredFiles,
                         [file.name]: error
@@ -150,7 +148,7 @@ class Uploader extends Component {
                 //this.props.addWarningSeries(study[series].seriesInstanceUID, ...study[series].getArrayWarnings())
             }
         }
-
+        this.props.addStudiesSeries(this.uploadModel.data)
     }
 
     /*Trigger ignored files panel if clicked*/
@@ -230,9 +228,7 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
-    addStudy,
-    addSeries,
-    addInstance,
+    addStudiesSeries,
     addWarningSeries
 }
 

@@ -1,9 +1,9 @@
-//Series & Studies
+// Series & Studies
 export const ADD_STUDIES_SERIES = 'ADD_STUDIES_SERIES'
 export const ADD_WARNING_SERIES = 'ADD_WARNING_SERIES'
 export const UPDATE_WARNING_SERIES = 'UPDATE_WARNING_SERIES'
 export const UPDATE_WARNING_STUDY = 'UPDATE_WARNING_STUDY'
 
-//Tables
+// Tables
 export const SELECT_STUDY = 'SELECT_STUDY'
 export const SELECT_SERIES = 'SELECT_SERIES'

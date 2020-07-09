@@ -78,8 +78,6 @@ class DisplayWarning extends Component {
     }
 }
 
-/*
-*/
 const mapStateToProps = state => {
     return {
         studies: state.Model.studies,

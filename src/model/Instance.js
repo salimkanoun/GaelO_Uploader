@@ -13,23 +13,23 @@
  */
 
 export default class Instance {
-  constructor(SOPInstanceUID, fileObject, dicomFile) {
+  constructor (SOPInstanceUID, fileObject, dicomFile) {
     this.SOPInstanceUID = SOPInstanceUID
     this.fileObject = fileObject
     this.dicomFile = dicomFile
   }
 
-  toString() {
+  toString () {
     return ('\nSOP Instance UID: ' + this.SOPInstanceUID +
       '\nFile: ' + Object.entries(this.fileObject) +
       '\nDicomFile: ' + Object.keys(this.dicomFile))
   }
 
-  getFile() {
+  getFile () {
     return this.fileObject
   }
 
-  getDicomFile() {
+  getDicomFile () {
     return this.dicomFile
   }
 }

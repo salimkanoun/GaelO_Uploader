@@ -60,14 +60,6 @@ class ControllerStudiesSeries extends Component {
         //Return validated series only
     }
 
-    validateCheckPatient(studyUID) {
-        //console.log(studyUID)
-    }
-
-    ignoreStudyWarning(studyUID) {
-
-    }
-
     render() {
         return (
             <>

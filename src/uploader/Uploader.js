@@ -144,8 +144,6 @@ class Uploader extends Component {
                     dicomFile = instances[instance].getDicomFile()
                 }
                 study[series].checkSeries(dicomFile)
-                //Update Redux model
-                //this.props.addWarningSeries(study[series].seriesInstanceUID, ...study[series].getArrayWarnings())
             }
         }
         this.props.addStudiesSeries(this.uploadModel.data)

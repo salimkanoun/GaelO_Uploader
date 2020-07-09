@@ -25,6 +25,7 @@ export default function StudiesSeriesReducer(state = initialState, action) {
             let birthDate
             let sex
             let series
+            let studyWarnings = {}
 
             //Info necessary for Series table
             let seriesInstanceUID
@@ -33,6 +34,7 @@ export default function StudiesSeriesReducer(state = initialState, action) {
             let seriesNumber
             let seriesDate
             let numberOfInstances
+            let seriesWarnings = {}
 
             for (let stID in action.payload) {
                 let study = action.payload[stID]
@@ -45,17 +47,18 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                 lastName = study.lastName
                 birthDate = study.birthDate
                 sex = study.sex
+                studyWarnings = study.warnings
                 series = Object.keys(study.series)
                 let studyToAdd
                 if (studies[studyUID] == undefined) {
                     studyToAdd = {
                         studyUID, patientName, studyDescription, accessionNumber, acquisitionDate, firstName, lastName, birthDate, sex,
-                        series: [series]
+                        warnings:{...studyWarnings}, series: [series]
                     }
                 } else {
                     studyToAdd = {
                         studyUID, patientName, studyDescription, accessionNumber, acquisitionDate, firstName, lastName, birthDate, sex,
-                        series: [series]
+                        warnings:{...studyWarnings}, series: [series]
                     }
                 }
                 studies[studyUID] = { ...studyToAdd }
@@ -67,13 +70,14 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                     seriesNumber = series.seriesNumber
                     seriesDate = series.seriesDate
                     numberOfInstances = series.numberOfInstances
+                    seriesWarnings = series.warnings
                     if (state.series[seriesInstanceUID] == undefined) {
                         series = {
-                            seriesInstanceUID, seriesDescription, modality, seriesNumber, seriesDate, numberOfInstances
+                            seriesInstanceUID, seriesDescription, modality, seriesNumber, seriesDate, numberOfInstances, warnings:{...seriesWarnings}
                         }
                     } else {
                         series = {
-                            seriesInstanceUID, seriesDescription, modality, seriesNumber, seriesDate, numberOfInstances
+                            seriesInstanceUID, seriesDescription, modality, seriesNumber, seriesDate, numberOfInstances, warnings:{...seriesWarnings}
                         }
                     }
                     seriesList[seriesInstanceUID] = {...series}
@@ -107,17 +111,6 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                         ...state.series[seriesID_W],
                         [warningCopy.key]: { ...warningCopy }
                     }
-                }
-            }
-
-        case ADD_WARNING_SERIES:
-            let seriesID = action.payload.seriesID
-            let seriesWarnings = action.payload.warnings
-            return {
-                ...state,
-                series: {
-                    ...state.series,
-                    [seriesID]: { ...state.series[seriesID], [seriesWarnings.key]: { ...seriesWarnings } }
                 }
             }
 

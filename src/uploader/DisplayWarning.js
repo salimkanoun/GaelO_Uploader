@@ -36,17 +36,22 @@ class DisplayWarning extends Component {
     buildRow() {
         if (this.props.type === 'studies') {
             let rows = []
-            this.props.studies.forEach(
-                series => { rows.push({ series: series.warnings }) })
+            for (let study in this.props.studies){
+                rows.push(this.props.studies[study].warnings)
+
+                for(let warning in this.props.studies[study]) {
+                }
+            }
             return rows
         } else if (this.props.type === 'series') {
             let rows = []
-            this.props.object.forEach((object) => {
-                rows.push(...object.getArrayWarnings())
-            })
-            rows = [...rows]
-            return rows
-        }
+            for (let series in this.props.series){
+                rows.push(this.props.series[series].warnings)
+
+                for(let warning in this.props.series[series]) {
+                }
+            }
+            return rows        }
 
     }
 
@@ -60,7 +65,14 @@ class DisplayWarning extends Component {
     render() {
         if (this.props.object !== null) {
             return (
-                 null
+                <BootstrapTable
+                    keyField='key'
+                    classes="table table-borderless"
+                    bodyClasses="du-warnings"
+                    headerClasses="du-warnings th"
+                    data={this.buildRow()}
+                    columns={this.columns}
+                />
             )
         } else {
             return null;
@@ -68,14 +80,7 @@ class DisplayWarning extends Component {
     }
 }
 
-/*<BootstrapTable
-                    keyField='key'
-                    classes="table table-borderless"
-                    bodyClasses="du-warnings"
-                    headerClasses="du-warnings th"
-                    data={this.props.series}
-                    columns={this.columns}
-                />
+/*
 */
 const mapStateToProps = state => {
     return {

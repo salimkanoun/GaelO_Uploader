@@ -31,7 +31,6 @@ export default class CheckPatient extends Component {
 
     async componentDidMount() {
         await (this.props.currentStudy.length !== 0)
-        console.log(this.props.currentStudy)
         this.generateRows()
         
     }
@@ -75,7 +74,6 @@ export default class CheckPatient extends Component {
     }
 
     generateRows() {
-        console.log('Generating rows...')
         let labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
         let keys = ['firstName, lastName', 'birthDate', 'sex', 'acquisitionDate']
         let currentStudy = this.props.currentStudy
@@ -88,8 +86,6 @@ export default class CheckPatient extends Component {
                     ignoreButton: <ButtonIgnore id={labels[i]} onClick={this.onClick} />,
                     valid: this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]]) } ] } )
             }
-        console.log(this.state.rows)
-
     }
 
     render() {

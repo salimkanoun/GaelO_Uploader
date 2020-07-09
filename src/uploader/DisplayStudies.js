@@ -32,6 +32,7 @@ class StudiesTab extends Component {
 
     constructor(props) {
         super(props)
+        this.validateCheckPatient = this.validateCheckPatient.bind(this)
         this.toggleCheckPatient = this.toggleCheckPatient.bind(this)
     }
 
@@ -79,6 +80,10 @@ class StudiesTab extends Component {
         }
     };
 
+    validateCheckPatient = (studyUID) => {  
+
+    }
+
     toggleCheckPatient(row) {
         this.setState((state) => { return { isCheck: !state.isCheck } })
         return row
@@ -105,7 +110,7 @@ class StudiesTab extends Component {
                                 columns={this.columns}
                                 selectRow={this.selectRow}
                             />
-                            <CheckPatient studyUID={this.selectedStudy} validateCheckPatient={this.props.validateCheckPatient}
+                            <CheckPatient studyUID={this.selectedStudy} validateCheckPatient={this.validateCheckPatient}
                                 show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)}
                                 expectedStudy={this.props.studies} currentStudy={this.props.studies} />
                         </Col>

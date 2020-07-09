@@ -67,13 +67,7 @@ class DisplaySeries extends Component {
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
             //ICI FAIRE REMONTER L INFO QUE L UPLAD EST A FAIREs
-            if (isSelect) {
-                this.setState((prevState) => ({ selectedSeries: [...prevState.selectedSeries, row.seriesInstanceUID] }),
-                    () => (this.props.selectedSeries(this.state.selectedSeries)))
-            } else {
-                this.setState((prevState) => ({ selectedSeries: prevState.selectedSeries.filter(thisRow => thisRow !== row.seriesInstanceUID) }),
-                    () => (this.props.selectedSeries(this.state.selectedSeries)))
-            }
+            this.props.selectSeries(row, isSelect)
         }
     }
 
@@ -109,7 +103,7 @@ class DisplaySeries extends Component {
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                    <DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.seriesFromParent : null} 
+                    <DisplayWarning type='series' object={this.props.selectedStudy !== null ? this.props.studies[this.props.selectedStudy].series : null} 
                     />
                     </Col>
                 </Row>

@@ -110,7 +110,7 @@ class StudiesTab extends Component {
                                 expectedStudy={this.props.studies} currentStudy={this.props.studies} />
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='studies' />
+                            <DisplayWarning type='studies' selectedStudy={this.props.selectStudy} />
                         </Col>
                     </Row>
                 </Container>

@@ -155,7 +155,6 @@ class Uploader extends Component {
 
     /*Trigger hide warning if closed*/
     onHideWarning() {
-        console.log(this.state.onHideWarning)
         this.setState((state) => { return { showWarning: !state.showWarning } });
     }
 

@@ -45,7 +45,7 @@ class DisplayWarning extends Component {
             return rows
         } else if (this.props.type === 'series') {
             let rows = []
-            for (let series in this.props.series){
+            for (let series in this.props.object){
                 rows.push(this.props.series[series].warnings)
 
                 for(let warning in this.props.series[series]) {

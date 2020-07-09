@@ -3,7 +3,7 @@ import { SELECT_STUDY, SELECT_SERIES } from '../actions/actions-types'
 
 const initialState = {
     selectedStudy: null,
-    series: {
+    selectedSeries: {
 
     }
 }
@@ -21,7 +21,8 @@ export default function DisplayTablesReducer(state = initialState, action) {
         case SELECT_SERIES:
             return {
                 ...state,
-                series: { [state.selectedStudy]: [action.payload] }
+                series: { ...state.selectedSeries,
+                    [state.selectedStudy]: [action.payload] }
             }
 
         default:

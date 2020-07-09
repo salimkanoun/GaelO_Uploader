@@ -107,9 +107,12 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                 ...state,
                 series: {
                     ...state.series,
-                    [seriesID_W]: {
-                        ...state.series[seriesID_W],
+                    warnings: {
+                        ...state.series.warnings,
+                        [seriesID_W]: {
+                            ...state.series.warnings[seriesID_W],
                         [warningCopy.key]: { ...warningCopy }
+                        }
                     }
                 }
             }

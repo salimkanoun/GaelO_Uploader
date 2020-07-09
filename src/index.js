@@ -9,7 +9,6 @@ import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import reducers from './uploader/reducers'
 
-
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
 
 ReactDOM.render(

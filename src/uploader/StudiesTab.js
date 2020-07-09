@@ -73,8 +73,6 @@ class StudiesTab extends Component {
         bgColor: 'lightgrey',
         onSelect: (row) => {
             this.props.selectStudy(row.studyUID)
-            //Warn controller that tabs are to be updated
-            this.props.onSelectChange()
         }
     };
 

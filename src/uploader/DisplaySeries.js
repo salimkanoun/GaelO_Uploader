@@ -79,17 +79,13 @@ class DisplaySeries extends Component {
 
     buildRows() {
         let rows = []
-        this.props.series.forEach(series => {
+        this.props.seriesFromParent.forEach(series => {
             rows.push({
-                ...series,
-                numberOfInstances: Object.keys(series.instances).length
+                ...this.props.series[series],
+                numberOfInstances: this.props.series.numberOfInstances
             })
         })
         return rows
-    }
-
-    getSeries() {
-        return Object.values(this.props.series)
     }
 
     render() {
@@ -105,12 +101,12 @@ class DisplaySeries extends Component {
                             headerClasses="du-series th"
                             rowClasses="du-series td"
                             keyField='seriesInstanceUID'
-                            data={this.getSeries()}
+                            data={this.buildRows()}
                             columns={this.columns}
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                    <DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.series : null} 
+                    <DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.seriesFromParent : null} 
                     />
                     </Col>
                 </Row>

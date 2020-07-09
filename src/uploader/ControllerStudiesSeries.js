@@ -18,7 +18,6 @@ import DisplaySeries from './DisplaySeries.js'
 import Row from 'react-bootstrap/Row'
 //Redux
 import { connect } from 'react-redux';
-import { selectStudy } from './actions/DisplayTables'
 
 class ControllerStudiesSeries extends Component {
 
@@ -77,12 +76,13 @@ class ControllerStudiesSeries extends Component {
 
     }
 
-    getSeries() {
-        //console.log("called!")
-        //console.log(this.props.selectedStudy)
+    getSeriesToDisplay() {
         if (this.props.selectedStudy !== undefined && this.props.selectedStudy !== null) {
-            console.log("here")
-            return this.props.uploadModel.getStudy(this.props.selectedStudy).getSeriesArray()
+            let seriesArray = []
+            for (let seriesID in this.props.studies.series) {
+                seriesArray.push(this.props.series[seriesID])
+            }            
+            return seriesArray
         }
         else return []
     }
@@ -92,10 +92,10 @@ class ControllerStudiesSeries extends Component {
             <>
                 <Row>
                     <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
-                        onSelectChange={this.setCurrentStudy} />
+                        onSelectChange={this.setCurrentStudy}/>
                 </Row>
                 <Row>
-                    <DisplaySeries series={this.getSeries()} selectedSeries={this.updateSelectedSeries} />
+                    <DisplaySeries seriesFromParent={this.getSeriesToDisplay()} selectedSeries={this.updateSelectedSeries} />
                 </Row>
             </>
         )
@@ -107,12 +107,13 @@ class ControllerStudiesSeries extends Component {
 */
 const mapStateToProps = state => {
     return {
-        uploadModel: state.Model.model,
+        studies: state.Model.studies,
+        series: state.Model.series,
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }
 const mapDispatchToProps = {
-    selectStudy
+    
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

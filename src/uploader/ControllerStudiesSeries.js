@@ -75,7 +75,7 @@ class ControllerStudiesSeries extends Component {
                     <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}/>
                 </Row>
                 <Row>
-                    <DisplaySeries selectedStudy={this.props.selectedStudy}/>
+                    <DisplaySeries selectedStudy = {this.props.selectedStudy} />
                 </Row>
             </>
         )

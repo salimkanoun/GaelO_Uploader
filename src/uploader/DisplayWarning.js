@@ -26,7 +26,6 @@ class DisplayWarning extends Component {
             formatter: (cell, row, rowIndex, extraData) => (
                 <ButtonIgnore onClick={() => {
                     this.props.updateWarningSeries(row)
-                    console.log(this.props.mySeries[row.objectID])
                 }} />
             ),
         },
@@ -46,9 +45,8 @@ class DisplayWarning extends Component {
         } else if (this.props.type === 'series') {
             let rows = []
             for (let series in this.props.object){
-                rows.push(this.props.series[series].warnings)
-
-                for(let warning in this.props.series[series]) {
+                for(let warning in this.props.series[this.props.object[series]].warnings) {
+                    rows.push(this.props.series[this.props.object[series]].warnings[warning])
                 }
             }
             return rows        }

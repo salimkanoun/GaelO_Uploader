@@ -77,19 +77,22 @@ class DisplaySeries extends Component {
         }
     }
 
-    buildRows() {
-        let rows = []
-        this.props.seriesFromParent.forEach(series => {
-            rows.push({
-                ...this.props.series[series],
-                numberOfInstances: this.props.series.numberOfInstances
-            })
-        })
-        return rows
+    buildRows(selectedStudy) {
+        if (selectedStudy !== null && selectedStudy !== undefined) {
+            let seriesArray = []
+            for (let seriesID in this.props.studies.selectedStudy.series) {
+                seriesArray.push({
+                    ...this.props.series[seriesID],
+                    numberOfInstances: this.props.series.numberOfInstances
+                })
+            }            
+
+            return seriesArray
+        }
+        else return []
     }
 
     render() {
-        console.log(this.props.series)
         return (
             <Container fluid>
                 <span class="title">Series</span>
@@ -101,7 +104,7 @@ class DisplaySeries extends Component {
                             headerClasses="du-series th"
                             rowClasses="du-series td"
                             keyField='seriesInstanceUID'
-                            data={this.buildRows()}
+                            data={this.buildRows(this.props.selectedStudy)}
                             columns={this.columns}
                             selectRow={this.selectRow} />
                     </Col>
@@ -117,6 +120,7 @@ class DisplaySeries extends Component {
 
 const mapStateToProps = state => {
     return {
+        selectedStudy: state.Model.selectedStudy,
         series: state.Model.series,
         selectedSeries: state.DisplayTables.selectedSeries
     }

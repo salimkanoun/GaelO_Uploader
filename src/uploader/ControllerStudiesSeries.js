@@ -29,7 +29,6 @@ class ControllerStudiesSeries extends Component {
 
     constructor(props) {
         super(props)
-        this.updateSelectedSeries = this.updateSelectedSeries.bind(this)
     }
 
     prepareSeriesToUpload = () => {
@@ -61,10 +60,6 @@ class ControllerStudiesSeries extends Component {
         //Return validated series only
     }
 
-    updateSelectedSeries = (series) => {
-        this.setState({ selectedSeries: series }, () => (this.prepareSeriesToUpload()))
-    }
-
     setCurrentStudy() {
     }
 
@@ -76,17 +71,6 @@ class ControllerStudiesSeries extends Component {
 
     }
 
-    getSeriesToDisplay() {
-        if (this.props.selectedStudy !== undefined && this.props.selectedStudy !== null) {
-            let seriesArray = []
-            for (let seriesID in this.props.studies.series) {
-                seriesArray.push(this.props.series[seriesID])
-            }            
-            return seriesArray
-        }
-        else return []
-    }
-
     render() {
         return (
             <>
@@ -95,7 +79,7 @@ class ControllerStudiesSeries extends Component {
                         onSelectChange={this.setCurrentStudy}/>
                 </Row>
                 <Row>
-                    <DisplaySeries seriesFromParent={this.getSeriesToDisplay()} selectedSeries={this.updateSelectedSeries} />
+                    <DisplaySeries/>
                 </Row>
             </>
         )

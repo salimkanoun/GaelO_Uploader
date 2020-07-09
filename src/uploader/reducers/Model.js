@@ -84,8 +84,6 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                 }
             }
 
-            console.log(state)
-
             return {
                 ...state,
                 studies: {
@@ -102,7 +100,6 @@ export default function StudiesSeriesReducer(state = initialState, action) {
             let warningCopy = action.payload
             let seriesID_W = action.payload.objectID
             warningCopy.dismissed = !warningCopy.dismissed
-            console.log(state.series[seriesID_W])
             return {
                 ...state,
                 series: {

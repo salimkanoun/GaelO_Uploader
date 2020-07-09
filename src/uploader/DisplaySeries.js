@@ -80,20 +80,19 @@ class DisplaySeries extends Component {
     buildRows(selectedStudy) {
         if (selectedStudy !== null && selectedStudy !== undefined) {
             let seriesArray = []
-            for (let seriesID in this.props.series[selectedStudy].series) {
+            for (let i in this.props.studies[selectedStudy].series) {
+                let seriesID = this.props.studies[selectedStudy].series[i]
                 seriesArray.push({
                     ...this.props.series[seriesID],
-                    numberOfInstances: this.props.series.numberOfInstances
+                    numberOfInstances: this.props.series[seriesID].numberOfInstances
                 })
             }            
-
             return seriesArray
         }
         else return []
     }
 
     render() {
-        console.log("disp series called")
         return (
             <Container fluid>
                 <span class="title">Series</span>
@@ -122,6 +121,7 @@ class DisplaySeries extends Component {
 const mapStateToProps = state => {
     return {
         series: state.Model.series,
+        studies: state.Model.studies
     }
 }
 const mapDispatchToProps = {

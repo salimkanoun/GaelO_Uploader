@@ -53,12 +53,12 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                 if (studies[studyUID] == undefined) {
                     studyToAdd = {
                         studyUID, patientName, studyDescription, accessionNumber, acquisitionDate, firstName, lastName, birthDate, sex,
-                        warnings:{...studyWarnings}, series: [series]
+                        warnings:{...studyWarnings}, series: [...series]
                     }
                 } else {
                     studyToAdd = {
                         studyUID, patientName, studyDescription, accessionNumber, acquisitionDate, firstName, lastName, birthDate, sex,
-                        warnings:{...studyWarnings}, series: [series]
+                        warnings:{...studyWarnings}, series: [...series]
                     }
                 }
                 studies[studyUID] = { ...studyToAdd }
@@ -69,7 +69,7 @@ export default function StudiesSeriesReducer(state = initialState, action) {
                     modality = series.modality
                     seriesNumber = series.seriesNumber
                     seriesDate = series.seriesDate
-                    numberOfInstances = series.numberOfInstances
+                    numberOfInstances = Object.keys(series.instances).length
                     seriesWarnings = series.warnings
                     if (state.series[seriesInstanceUID] == undefined) {
                         series = {

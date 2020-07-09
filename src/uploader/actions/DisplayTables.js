@@ -7,9 +7,9 @@ export function selectStudy(studyID) {
     }
 }
 
-export function selectSeries(seriesArray) {
+export function selectSeries(row, isSelected) {
     return {
         type: 'SELECT_SERIES',
-        payload: seriesArray
+        payload: {row, isSelected}
     }
 }

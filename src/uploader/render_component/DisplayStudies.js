@@ -28,7 +28,7 @@ export default class DisplayStudies extends Component {
           <Row>
             <Col xs={12} md={8}>
               <StudiesTab
-                onSelectChange={this.props.onSelectChange}
+
                 validateCheckPatient={this.props.validateCheckPatient}
               />
             </Col>

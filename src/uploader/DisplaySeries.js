@@ -80,7 +80,7 @@ class DisplaySeries extends Component {
     buildRows(selectedStudy) {
         if (selectedStudy !== null && selectedStudy !== undefined) {
             let seriesArray = []
-            for (let seriesID in this.props.studies.selectedStudy.series) {
+            for (let seriesID in this.props.selectedStudy.series) {
                 seriesArray.push({
                     ...this.props.series[seriesID],
                     numberOfInstances: this.props.series.numberOfInstances
@@ -120,7 +120,6 @@ class DisplaySeries extends Component {
 
 const mapStateToProps = state => {
     return {
-        selectedStudy: state.Model.selectedStudy,
         series: state.Model.series,
         selectedSeries: state.DisplayTables.selectedSeries
     }

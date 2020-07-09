@@ -79,7 +79,7 @@ class ControllerStudiesSeries extends Component {
                         onSelectChange={this.setCurrentStudy}/>
                 </Row>
                 <Row>
-                    <DisplaySeries/>
+                    <DisplaySeries selectedStudy = {this.props.selectedStudy} />
                 </Row>
             </>
         )

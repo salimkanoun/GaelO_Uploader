@@ -45,7 +45,6 @@ class Uploader extends Component {
         this.onUploadClick = this.onUploadClick.bind(this)
         this.onUploadDone = this.onUploadDone.bind(this)
         this.ignoredFiles = {}
-        this.controlerStudiesSeriesRefs = React.createRef();
 
         this.uppy = Uppy({
             id: 'uppy',
@@ -84,7 +83,7 @@ class Uploader extends Component {
         files.forEach(file => {
             this.read(file)
         })
-
+        this.props.addStudiesSeries(this.uploadModel.data)
         //console.log(this.uploadModel)
     }
 
@@ -146,7 +145,7 @@ class Uploader extends Component {
                 study[series].checkSeries(dicomFile)
             }
         }
-        this.props.addStudiesSeries(this.uploadModel.data)
+       
     }
 
     /*Trigger ignored files panel if clicked*/
@@ -209,7 +208,7 @@ class Uploader extends Component {
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries ref={this.controlerStudiesSeriesRefs} />
+                        <ControllerStudiesSeries />
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </Card.Body>
                 </Card>

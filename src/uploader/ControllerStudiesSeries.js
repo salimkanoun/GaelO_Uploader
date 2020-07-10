@@ -26,19 +26,16 @@ class ControllerStudiesSeries extends Component {
         seriesToUpload: {},
     }
 
-<<<<<<< HEAD
     constructor(props) {
         super(props)
     }
 
     componentDidUpdate(prevState){
         if (prevState.selectedSeries !== this.props.selectedSeries){
-            this.prepareSeriesToUpload()
+            //this.prepareSeriesToUpload()
         }
     }
 
-=======
->>>>>>> aa381b9a92f4d1ef89a389d62c0af4500d9dd579
     prepareSeriesToUpload = () => {
         let seriesIDs = this.props.selectedSeries
         let series = {}
@@ -66,7 +63,7 @@ class ControllerStudiesSeries extends Component {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
+                    <DisplayStudies studies={this.props.studies} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
                 </Row>
                 <Row>
                     <DisplaySeries selectedStudy={this.props.selectedStudy} />
@@ -79,8 +76,8 @@ class ControllerStudiesSeries extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Studies,
-        series: state.Series,
+        studies: state.Studies.studies,
+        series: state.Series.series,
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }

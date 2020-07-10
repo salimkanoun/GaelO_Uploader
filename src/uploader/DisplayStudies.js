@@ -92,7 +92,7 @@ class StudiesTab extends Component {
     }
 
     getStudies() {
-
+        console.log("called")
         let studies = []
         if(Object.keys(this.props.studies).length > 0){
             studies = Object.values(this.props.studies)
@@ -134,7 +134,6 @@ class StudiesTab extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Studies,
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }

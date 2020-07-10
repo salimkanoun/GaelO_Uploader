@@ -18,7 +18,7 @@ import Tus from '@uppy/tus'
 import DicomBatchUploader from '../model/DicomBatchUploader'
 
 import { connect } from 'react-redux';
-import { addSeries, addWarningSeries } from './actions/StudiesSeries'
+import { addStudy, addSeries, addWarningSeries } from './actions/StudiesSeries'
 
 class Uploader extends Component {
 
@@ -118,7 +118,6 @@ class Uploader extends Component {
                 errorMessage = error.message
             }
             this.setState(state => {
-                //SK ICI BUG IGNORE FILE A UN SEUL ITEM
                 return {
                     fileIgnored: ++state.fileIgnored,
                     ignoredFiles: {
@@ -148,8 +147,12 @@ class Uploader extends Component {
         //ICI A VOIR DIFFEREMENT IL FAUT QUE LE CONTROLEUR INJECTE SEPARAMENT 
         //LES NOUVELLES STUDIES + WARNING SI PATIENT NE MATCH PAS PATIENT ATTENDU
         // LES NOUVELLES SERIES + LES WARNING
-        this.props.addStudiesSeries(this.uploadModel.data)
-
+        this.props.addStudy(this.uploadModel.data)
+        for(let study in this.uploadModel.data){
+            for (let series in this.uploadModel.data[study].series) {
+                this.props.addSeries(this.uploadModel.data[study].series[series])
+            }
+        }
     }
 
     /*Trigger ignored files panel if clicked*/
@@ -223,12 +226,13 @@ class Uploader extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Model.studies,
-        series: state.Model.series,
+        studies: state.Studies.studies,
+        series: state.Series.series,
         selectedSeries: state.DisplayTables.selectedSeries
     }
 }
 const mapDispatchToProps = {
+    addStudy,
     addSeries,
     addWarningSeries
 }

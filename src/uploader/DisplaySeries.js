@@ -76,17 +76,13 @@ class DisplaySeries extends Component {
 
             let seriesArray = []
 
-            let seriesToDisplay = this.props.series.filter(series =>{
-                return series.studyInstanceUID === selectedStudy
-            })
-
+            let seriesToDisplay = Object.keys(this.props.studies[selectedStudy].series)
             seriesToDisplay.forEach( (series) => {
                     seriesArray.push({
-                        ...series
+                        ...this.props.series[series]
                     })
                 }  
             )  
-
             return seriesArray
         }
         else return []
@@ -120,8 +116,8 @@ class DisplaySeries extends Component {
 
 const mapStateToProps = state => {
     return {
-        series: state.Model.series,
-        studies: state.Model.studies,
+        series: state.Series.series,
+        studies: state.Studies.studies,
         selectedSeries: state.DisplayTables.selectedSeries
     }
 }

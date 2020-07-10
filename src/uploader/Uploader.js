@@ -1,22 +1,24 @@
 import React, { Component, Fragment } from 'react'
+import { connect } from 'react-redux'
+
 import Card from 'react-bootstrap/Card'
 import Dropzone from 'react-dropzone'
-import DicomFile from '../model/DicomFile'
+import Uppy from '@uppy/core'
+import Tus from '@uppy/tus'
+
 import Model from '../model/Model'
-import Instance from '../model/Instance'
+import DicomFile from '../model/DicomFile'
+import DicomBatchUploader from '../model/DicomBatchUploader'
+
 import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import IgnoredFilesPanel from './render_component/IgnoredFilesPanel'
 import WarningPatient from './render_component/WarningPatient'
+
 import { getAets, logIn, registerStudy } from '../services/api'
 
-import Uppy from '@uppy/core'
-import Tus from '@uppy/tus'
-import DicomBatchUploader from '../model/DicomBatchUploader'
-
-import { connect } from 'react-redux';
-import { addStudy, addSeries } from './actions/StudiesSeries'
+import { addSeries, addStudy } from './actions/StudiesSeries'
 
 class Uploader extends Component {
 
@@ -35,14 +37,12 @@ class Uploader extends Component {
     constructor(props) {
 
         super(props)
-
         this.uploadModel = new Model();
 
         this.toggleShowIgnoreFile = this.toggleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
         this.onUploadDone = this.onUploadDone.bind(this)
-        this.ignoredFiles = {}
 
         this.uppy = Uppy({
             id: 'uppy',
@@ -50,7 +50,6 @@ class Uploader extends Component {
             allowMultipleUploads: true,
             debug: true
         })
-
 
         this.uppy.use(Tus, {
             endpoint: '/tus', // use your tus endpoint here
@@ -61,6 +60,7 @@ class Uploader extends Component {
             headers: {},
             retryDelays: [0, 1000, 3000, 5000]
         })
+
         this.uppy.on('upload-error', (file, error, response) => {
             console.log('error with file:', file.id)
             console.log('error message:', error)
@@ -95,21 +95,28 @@ class Uploader extends Component {
             let dicomFile = new DicomFile(file);
             await dicomFile.readDicomFile()
 
+            let studyInstanceUID = dicomFile.getStudyInstanceUID()
+            let seriesInstanceUID = dicomFile.getSeriesInstanceUID()
+
             let study
+            if( ! this.uploadModel.isExistingStudy(studyInstanceUID)){
+                study = this.uploadModel.addStudy(dicomFile.getStudyObject() )
+            }else {
+                study = this.uploadModel.getStudy(studyInstanceUID)
+            }
+            
             let series
+            if(! study.isExistingSeries(seriesInstanceUID)) {
+                series = study.addSeries(dicomFile.getSeriesObject())
+            }else {
+                series = study.getSeries(seriesInstanceUID)
+            }
 
-            let dicomStudyID = dicomFile.getStudyInstanceUID()
-            let dicomSeriesID = dicomFile.getSeriesInstanceUID()
-            let dicomInstanceID = dicomFile.getSOPInstanceUID()
-
-            study = this.uploadModel.addStudy(dicomFile.getStudyObject(), dicomStudyID)
-            series = study.addSeries(dicomFile.getSeriesObject(), dicomSeriesID)
-            series.addInstance(new Instance(dicomInstanceID, file), dicomInstanceID);
+            series.addInstance( dicomFile.getInstanceObject() )
 
             this.setState((previousState) => { return { fileParsed: ++previousState.fileParsed } })
 
         } catch (error) {
-            console.warn(error)
             //Save only message of error
             let errorMessage = error
             if (typeof error === 'object') {

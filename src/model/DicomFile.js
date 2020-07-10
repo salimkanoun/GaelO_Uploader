@@ -15,6 +15,7 @@
 import dicomParser from 'dicom-parser'
 import Study from './Study'
 import Series from './Series'
+import Instance from './Instance'
 
 export default class DicomFile {
 
@@ -84,6 +85,8 @@ export default class DicomFile {
       const byteArray = new Uint8Array(arrayBuffer)
       self.byteArray = byteArray
       self.dataSet = dicomParser.parseDicom(byteArray)
+      self.studyInstanceUID = self.getStudyInstanceUID()
+      self.seriesInstanceUID = self.getSeriesInstanceUID()
     }).catch( (error)=>{
       throw error
     })
@@ -324,5 +327,9 @@ export default class DicomFile {
   getSeriesObject(){
     return new Series(this.getSeriesInstanceUID(), this.getSeriesNumber(), this.getSeriesDate(),
     this.getSeriesDescription(), this.getModality());
+  }
+
+  getInstanceObject(){
+    return new Instance( this.fileObject, this.getSOPInstanceUID() )
   }
 }

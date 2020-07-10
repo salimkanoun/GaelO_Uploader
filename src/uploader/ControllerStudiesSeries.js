@@ -32,12 +32,13 @@ class ControllerStudiesSeries extends Component {
 
     componentDidUpdate(prevState){
         if (prevState.selectedSeries !== this.props.selectedSeries){
-            //this.prepareSeriesToUpload()
+            this.prepareSeriesToUpload()
         }
     }
 
     prepareSeriesToUpload = () => {
         let seriesIDs = this.props.selectedSeries
+        //console.log(seriesIDs)
         let series = {}
         //Fetch series in the model
         let studies = Object.values(this.props.studies)
@@ -57,6 +58,7 @@ class ControllerStudiesSeries extends Component {
         this.setState(
             { seriesToUpload: series }
             , () => this.state.seriesToUpload)
+        //console.log(this.state.seriesToUpload)
     }
 
     render() {

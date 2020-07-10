@@ -196,8 +196,7 @@
 	background-color: #e7f0f8;
 }
 
-.du-studies .row-clicked,
-.du-series .row-clicked {
+.row-clicked {
 	font-weight: bold;
 }
 

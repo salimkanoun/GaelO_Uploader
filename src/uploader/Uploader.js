@@ -144,7 +144,7 @@ class Uploader extends Component {
             for(let serieInstance of series){
                 //SK DICOMFILE et INSTANCE A REVOIR
                 let firstInstance = serieInstance.getArrayInstances()[0]
-                await serieInstance.checkSeries(new DicomFile(firstInstance.SOPInstanceUID,firstInstance.getFile()))
+                await serieInstance.checkSeries(new DicomFile(firstInstance.getFile()))
 
             }
         }
@@ -175,8 +175,8 @@ class Uploader extends Component {
         let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
         let studyIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.304'
         let seriesIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.610'
-        let serieID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
-        let series = this.uploadModel.getStudy(studyIDSalim).getSeries(seriesIDSalim)
+        let seriesID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
+        let series = this.uploadModel.getStudy(studyID).getSeries(seriesID)
         let instances = series.getArrayInstances()
 
         

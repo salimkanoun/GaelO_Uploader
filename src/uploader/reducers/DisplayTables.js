@@ -16,7 +16,7 @@ export default function DisplayTablesReducer (state = initialState, action) {
       }
 
     case SELECT_SERIES:
-      if ( action.paylod !==undefined && action.payload.isSelect) {
+      if ( action.payload !==undefined && action.payload.isSelect) {
         return {
           ...state,
           selectedSeries: [...state.selectedSeries, action.payload.row.seriesInstanceUID]

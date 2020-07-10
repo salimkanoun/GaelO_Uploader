@@ -3,8 +3,6 @@ import Card from 'react-bootstrap/Card'
 import Dropzone from 'react-dropzone'
 import DicomFile from '../model/DicomFile'
 import Model from '../model/Model'
-import Study from '../model/Study'
-import Series from '../model/Series'
 import Instance from '../model/Instance'
 import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
@@ -18,7 +16,7 @@ import Tus from '@uppy/tus'
 import DicomBatchUploader from '../model/DicomBatchUploader'
 
 import { connect } from 'react-redux';
-import { addStudy, addSeries, addWarningSeries } from './actions/StudiesSeries'
+import { addStudy, addSeries } from './actions/StudiesSeries'
 
 class Uploader extends Component {
 
@@ -234,7 +232,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     addStudy,
     addSeries,
-    addWarningSeries
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

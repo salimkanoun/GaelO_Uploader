@@ -56,7 +56,7 @@ class ControllerStudiesSeries extends Component {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}/>
+                    <DisplayStudies ignoreStudyWarning={this.ignoreStudyWarning}/>
                 </Row>
                 <Row>
                     <DisplaySeries selectedStudy = {this.props.selectedStudy} />

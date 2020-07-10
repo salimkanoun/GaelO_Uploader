@@ -33,23 +33,7 @@ class DisplayWarning extends Component {
 
     /*Build the tab rows according to the type of object*/
     buildRow() {
-        if (this.props.type === 'studies') {
-            let rows = []
-            for (let study in this.props.studies){
-                rows.push(this.props.studies[study].warnings)
-
-                for(let warning in this.props.studies[study]) {
-                }
-            }
-            return rows
-        } else if (this.props.type === 'series') {
-            let rows = []
-            for (let series in this.props.object){
-                for(let warning in this.props.series[this.props.object[series]].warnings) {
-                    rows.push(this.props.series[this.props.object[series]].warnings[warning])
-                }
-            }
-            return rows        }
+        return []
 
     }
 

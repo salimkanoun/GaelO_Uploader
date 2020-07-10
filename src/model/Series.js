@@ -38,7 +38,7 @@ export default class Series {
 		}
 	}
 
-	addInstance( dicomInstanceID, instanceObject ) {
+	addInstance( instanceObject, dicomInstanceID ) {
 		if (!this.isExistingInstance(dicomInstanceID)) {
 			this.instances[instanceObject.SOPInstanceUID] = instanceObject
 		} else {
@@ -79,7 +79,8 @@ export default class Series {
 		return nbConsideredWarnings > 0;
 	}
 
-	checkSeries(dicomFile) {
+	async checkSeries(dicomFile) {
+		await dicomFile.readDicomFile()
 		// Check missing tags
 		if ((dicomFile.getModality()) === undefined) {
 			this.warnings[MISSING_TAG_00080060.key] = MISSING_TAG_00080060;

@@ -131,20 +131,23 @@ class Uploader extends Component {
        
     }
 
-    checkSeriesAndSendData(){
+    async checkSeriesAndSendData(){
         //Check series to send warning
-        for (let studies in this.uploadModel.getStudiesArray()) {
-            let study = this.uploadModel.getStudiesArray()[studies].getSeriesArray()
-            for (let series in study) {
-                let dicomFile
-                let instances = study[series].getArrayInstances()
-                for (let instance in instances) {
-                    dicomFile = instances[instance].getDicomFile()
-                }
-                study[series].checkSeries(dicomFile)
+        //SK ICI A AMELIORER NE TESTER QUE LES NOUVELLE SERIES DEPUIS LE PARSE
+        let studies = this.uploadModel.getStudiesArray()
+        for( let study of studies){
+            let series = study.getSeriesArray()
+            for(let serieInstance of series){
+                //SK DICOMFILE et INSTANCE A REVOIR
+                let firstInstance = serieInstance.getArrayInstances()[0]
+                await serieInstance.checkSeries(new DicomFile(firstInstance.SOPInstanceUID,firstInstance.getFile()))
+
             }
         }
-
+        
+        //ICI A VOIR DIFFEREMENT IL FAUT QUE LE CONTROLEUR INJECTE SEPARAMENT 
+        //LES NOUVELLES STUDIES + WARNING SI PATIENT NE MATCH PAS PATIENT ATTENDU
+        // LES NOUVELLES SERIES + LES WARNING
         this.props.addStudiesSeries(this.uploadModel.data)
 
     }

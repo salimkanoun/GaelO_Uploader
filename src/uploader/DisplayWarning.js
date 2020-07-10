@@ -33,7 +33,23 @@ class DisplayWarning extends Component {
 
     /*Build the tab rows according to the type of object*/
     buildRow() {
-        return []
+        if (this.props.selectionID !== undefined && this.props.selectionID !== null){
+            let rows = []
+            switch(this.props.type) {
+                case 'studies':
+                    for (let warning in this.props.studies[this.props.selectionID].warnings) {
+                        rows.push(this.props.studies[this.props.selectionID].warnings[warning].content)
+                    }
+                    return rows
+                case 'series':
+                    for (let warning in this.props.series[this.props.selectionID].warnings) {
+                        rows.push(this.props.series[this.props.selectionID].warnings[warning])
+                    }
+                    return rows
+            }
+        } else {
+            return []
+        }
 
     }
 
@@ -64,8 +80,8 @@ class DisplayWarning extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Studies,
-        series: state.Series
+        studies: state.Studies.studies,
+        series: state.Series.series
     }
 }
 const mapDispatchToProps = {

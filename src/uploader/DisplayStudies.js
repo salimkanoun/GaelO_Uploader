@@ -76,7 +76,7 @@ class StudiesTab extends Component {
         mode: 'radio',
         clickToSelect: true,
         hideSelectColumn: true,
-        bgColor: 'lightgrey',
+        classes: "row-clicked",
         onSelect: (row) => {
             this.props.selectStudy(row.studyUID)
         }
@@ -92,17 +92,33 @@ class StudiesTab extends Component {
     }
 
     getStudies() {
-        console.log("called")
         let studies = []
         if(Object.keys(this.props.studies).length > 0){
             for (let study in this.props.studies) {
                 let tempStudy = this.props.studies[study]
-                tempStudy['status'] = (this.props.studies.warnings == {}) ? 'Valid' : 'Rejected'
+                tempStudy['status'] = (this.warningsPassed(study)) ? 'Valid' : 'Rejected'
                 studies.push((tempStudy))
-                console.log(studies)
             }
         }        
         return studies
+    }
+
+    warningsPassed(study) {
+        //Check for warnings in study
+        for (let warning in this.props.studies[study].warnings) {
+            if (!this.props.studies[study].warnings[warning].dismissed) {
+                return false
+            }
+        }
+        //Check for warnings in series
+        for(let series in this.props.studies[study].series) {
+            for (let warning in this.props.studies[study].series[series].warnings) {
+                if (!this.props.studies[study].series[series].warnings[warning].dismissed) {
+                    return false
+                }
+            } 
+        }
+        return true
     }
 
     render() {

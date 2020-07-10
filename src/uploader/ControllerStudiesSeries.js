@@ -19,7 +19,7 @@ import Row from 'react-bootstrap/Row'
 
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
-
+import { seriesReady } from './actions/DisplayTables'
 class ControllerStudiesSeries extends Component {
 
     state = {
@@ -38,7 +38,6 @@ class ControllerStudiesSeries extends Component {
 
     prepareSeriesToUpload = () => {
         let seriesIDs = this.props.selectedSeries
-        //console.log(seriesIDs)
         let series = {}
         //Fetch series in the model
         let studies = Object.values(this.props.studies)
@@ -46,20 +45,17 @@ class ControllerStudiesSeries extends Component {
             //Check study validation
             // ...
             let studyID = study.studyUID
-            Object.values(study.series).forEach(seriesID => {
-                if (seriesIDs.includes(seriesID)) {
+            Object.values(study.series).forEach(theSeries => {
+                if (seriesIDs.includes(theSeries.seriesInstanceUID)) {
                     if (series[studyID] === undefined) {
                         series[studyID] = []
                     }
-                    series[studyID].push(seriesID)
+                    series[studyID].push(theSeries.seriesInstanceUID)
                 }
             })
         })
-        this.setState(
-            { seriesToUpload: series }
-            , () => this.state.seriesToUpload)
-        //console.log(this.state.seriesToUpload)
-    }
+        this.props.seriesValidated(series)
+    }    
 
     render() {
         return (
@@ -85,7 +81,7 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-
+    seriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

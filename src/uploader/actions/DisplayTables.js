@@ -1,4 +1,4 @@
-import { SELECT_STUDY, SELECT_SERIES } from './actions-types'
+import { SELECT_STUDY, SELECT_SERIES, SERIES_READY } from './actions-types'
 
 export function selectStudy (studyID) {
   return {
@@ -18,5 +18,12 @@ export function validateCheckPatient(id){
   return {
     type : SELECT_SERIES,
     payload : id
+  }
+}
+
+export function seriesReady(validSeries) {
+  return {
+    type: SERIES_READY,
+    payload: validSeries
   }
 }

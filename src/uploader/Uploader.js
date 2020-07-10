@@ -32,6 +32,7 @@ class Uploader extends Component {
         showWarning: false,
         zipProgress: 0,
         uploadProgress: 0,
+        seriesValidated: {}
     }
 
     constructor(props) {
@@ -43,6 +44,7 @@ class Uploader extends Component {
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
         this.onUploadDone = this.onUploadDone.bind(this)
+        this.seriesValidated = this.seriesValidated.bind(this)
 
         this.uppy = Uppy({
             id: 'uppy',
@@ -170,17 +172,30 @@ class Uploader extends Component {
         this.setState((state) => { return { showWarning: !state.showWarning } });
     }
 
+    seriesValidated = (series) => {
+        this.setState( () => { return {seriesValidated: {...series}}}, () => console.log(this.state.seriesValidated))
+    }
+
     async onUploadClick(e) {
 
-        let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
+        /*let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
         let studyIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.304'
         let seriesIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.610'
         let seriesID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
         let series = this.uploadModel.getStudy(studyID).getSeries(seriesID)
-        let instances = series.getArrayInstances()
+        let instances = series.getArrayInstances()*/
+        let instancesToUpload = []
 
-        
-        let fileArray = instances.map(instance => {
+        //Gather all instances to upload
+        for(let studyID in this.state.seriesValidated) {
+            for(let seriesID in this.state.seriesValidated[studyID]) {
+                seriesID = this.state.seriesValidated[studyID][seriesID]
+                let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
+                instancesToUpload.push(...mySeries.getArrayInstances())
+            }
+        }
+
+        let fileArray = instancesToUpload.map(instance => {
             return instance.getFile()
         })
 
@@ -220,7 +235,7 @@ class Uploader extends Component {
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries selectedSeries={this.props.selectedSeries} seriesReadyToUpload={this.props.seriesReadyToUpload}/>
+                        <ControllerStudiesSeries selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated}/>
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </Card.Body>
                 </Card>
@@ -233,7 +248,7 @@ const mapStateToProps = state => {
     return {
         studies: state.Studies.studies,
         series: state.Series.series,
-        selectedSeries: state.DisplayTables.selectedSeries
+        selectedSeries: state.DisplayTables.selectedSeries,
     }
 }
 const mapDispatchToProps = {

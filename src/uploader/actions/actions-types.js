@@ -11,3 +11,4 @@ export const UPDATE_WARNING_SERIES = 'UPDATE_WARNING_SERIES'
 // Tables Select Actions
 export const SELECT_STUDY = 'SELECT_STUDY'
 export const SELECT_SERIES = 'SELECT_SERIES'
+export const SERIES_READY = 'SERIES_READY'

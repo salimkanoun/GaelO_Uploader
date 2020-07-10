@@ -24,11 +24,6 @@ import { selectSeries } from './actions/DisplayTables'
 
 class DisplaySeries extends Component {
 
-    //USE REDUX STATE
-    state = {
-        selectedSeries: []
-    }
-
     columns = [
         {
             dataField: 'seriesInstanceUID',
@@ -64,6 +59,7 @@ class DisplaySeries extends Component {
     selectRow = {
         mode: 'checkbox',
         clickToSelect: true,
+        classes: "row-clicked",
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
             //ICI FAIRE REMONTER L INFO QUE L UPLAD EST A FAIREs
@@ -73,19 +69,28 @@ class DisplaySeries extends Component {
 
     buildRows(selectedStudy) {
         if (selectedStudy !== null && selectedStudy !== undefined) {
-
             let seriesArray = []
-
             let seriesToDisplay = Object.keys(this.props.studies[selectedStudy].series)
-            seriesToDisplay.forEach( (series) => {
-                    seriesArray.push({
-                        ...this.props.series[series]
-                    })
-                }  
-            )  
+            seriesToDisplay.forEach((series) => {
+                let seriesToPush = this.props.series[series]
+                seriesToPush['status'] = (this.warningsPassed(series)) ? 'Valid' : 'Rejected'
+                seriesArray.push({
+                    ...seriesToPush
+                })
+            }
+            )
             return seriesArray
         }
         else return []
+    }
+
+    warningsPassed(series) {
+        for (let warning in this.props.series[series].warnings) {
+            if (!this.props.series[series].warnings[warning].dismissed) {
+                return false
+            }
+        }
+        return true
     }
 
     render() {
@@ -105,8 +110,7 @@ class DisplaySeries extends Component {
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                    <DisplayWarning type='series' object={this.props.selectedStudy !== null ? this.props.studies[this.props.selectedStudy].series : null} 
-                    />
+                        <DisplayWarning type='series' selectionID={this.props.selectedSeries[(this.props.selectedSeries.length)-1]} />
                     </Col>
                 </Row>
             </Container>

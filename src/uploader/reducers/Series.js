@@ -10,6 +10,7 @@ export default function SeriesReducer (state = initialState, action) {
     //Ajouter une series au reducer
     case ADD_SERIES:
         let seriesObject = action.payload
+        seriesObject['numberOfInstances'] = Object.keys(seriesObject.instances).length
         return {
             ...state,
             series : {

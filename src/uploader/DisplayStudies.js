@@ -24,6 +24,8 @@ import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
 import { selectStudy } from './actions/DisplayTables'
 
+import {validateCheckPatient} from './actions/StudiesSeries'
+
 class StudiesTab extends Component {
 
     state = {
@@ -90,7 +92,12 @@ class StudiesTab extends Component {
     }
 
     getStudies() {
-        return Object.values(this.props.studies)
+
+        let studies = []
+        if(Object.keys(this.props.studies).length > 0){
+            studies = Object.values(this.props.studies)
+        }
+        return studies
     }
 
     render() {
@@ -127,12 +134,13 @@ class StudiesTab extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Model.studies,
+        studies: state.Studies,
         selectedStudy: state.DisplayTables.selectedStudy
     }
 }
 const mapDispatchToProps = {
-    selectStudy
+    selectStudy,
+    validateCheckPatient
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

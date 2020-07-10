@@ -13,3 +13,10 @@ export function selectSeries (row, isSelect) {
     payload: { row, isSelect }
   }
 }
+
+export function validateCheckPatient(id){
+  return {
+    type : SELECT_SERIES,
+    payload : id
+  }
+}

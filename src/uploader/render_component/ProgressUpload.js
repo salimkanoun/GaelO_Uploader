@@ -12,14 +12,15 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 
 export default class ProgressUpload extends Component {
-  render () {
+
+  render() {
     const fullProgression = Math.max(this.props.uploadPercent, this.props.zipPercent)
     let uploadedFraction = 0
     let zippedFraction = 0
@@ -30,8 +31,7 @@ export default class ProgressUpload extends Component {
     }
 
     return (
-
-      <>
+      <Fragment>
         <Row>
           <Col md='auto'>
             <Button variant='primary' onClick={this.props.onUploadClick}> Upload </Button>
@@ -43,7 +43,8 @@ export default class ProgressUpload extends Component {
             </ProgressBar>
           </Col>
         </Row>
-      </>
+      </Fragment>
     )
   }
+
 }

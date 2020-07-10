@@ -18,7 +18,7 @@ import Tus from '@uppy/tus'
 import DicomBatchUploader from '../model/DicomBatchUploader'
 
 import { connect } from 'react-redux';
-import { addStudiesSeries, addWarningSeries } from './actions/Model'
+import { addSeries, addWarningSeries } from './actions/StudiesSeries'
 
 class Uploader extends Component {
 
@@ -80,9 +80,13 @@ class Uploader extends Component {
     addFile(files) {
         this.setState((previousState) => { return { fileLoaded: (previousState.fileLoaded + files.length) } })
         console.log('Added file', files)
-        files.forEach(file => {
-            this.read(file)
+        let readPromises = files.map( (file) => {
+            return this.read(file)
         })
+        Promise.all(readPromises).then(()=>{
+            this.checkSeriesAndSendData()
+        })
+        
     }
 
     /**
@@ -93,31 +97,25 @@ class Uploader extends Component {
             let dicomFile = new DicomFile(file);
             await dicomFile.readDicomFile()
 
-            let study;
-            let series;
-            let instance
+            let study
+            let series
 
             let dicomStudyID = dicomFile.getStudyInstanceUID()
             let dicomSeriesID = dicomFile.getSeriesInstanceUID()
             let dicomInstanceID = dicomFile.getSOPInstanceUID()
 
-            study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
-                dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
-                dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
-            study = this.uploadModel.addStudy(study, dicomStudyID);
-            series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
-                dicomFile.getSeriesDescription(), dicomFile.getModality());
-            series = study.addSeries(series, dicomSeriesID);
-            instance = new Instance(dicomInstanceID, file, dicomFile)
-            series.addInstance(instance, dicomInstanceID);
+            study = this.uploadModel.addStudy(dicomFile.getStudyObject(), dicomStudyID)
+            series = study.addSeries(dicomFile.getSeriesObject(), dicomSeriesID)
+            series.addInstance(new Instance(dicomInstanceID, file), dicomInstanceID);
 
             this.setState((previousState) => { return { fileParsed: ++previousState.fileParsed } })
 
         } catch (error) {
             console.warn(error)
             //Save only message of error
-            if (typeof error == 'object') {
-                error = error.message
+            let errorMessage = error
+            if (typeof error === 'object') {
+                errorMessage = error.message
             }
             this.setState(state => {
                 //SK ICI BUG IGNORE FILE A UN SEUL ITEM
@@ -125,27 +123,33 @@ class Uploader extends Component {
                     fileIgnored: ++state.fileIgnored,
                     ignoredFiles: {
                         ...state.ignoredFiles,
-                        [file.name]: error
+                        [file.name]: errorMessage
                     }
                 }
             })
         }
+       
+    }
 
-        //Check series
-        for (let studies in this.uploadModel.getStudiesArray()) {
-            let study = this.uploadModel.getStudiesArray()[studies].getSeriesArray()
-            for (let series in study) {
-                let dicomFile
-                let instances = study[series].getArrayInstances()
-                for (let instance in instances) {
-                    dicomFile = instances[instance].getDicomFile()
-                }
-                study[series].checkSeries(dicomFile)
+    async checkSeriesAndSendData(){
+        //Check series to send warning
+        //SK ICI A AMELIORER NE TESTER QUE LES NOUVELLE SERIES DEPUIS LE PARSE
+        let studies = this.uploadModel.getStudiesArray()
+        for( let study of studies){
+            let series = study.getSeriesArray()
+            for(let serieInstance of series){
+                //SK DICOMFILE et INSTANCE A REVOIR
+                let firstInstance = serieInstance.getArrayInstances()[0]
+                await serieInstance.checkSeries(new DicomFile(firstInstance.SOPInstanceUID,firstInstance.getFile()))
+
             }
         }
-
+        
+        //ICI A VOIR DIFFEREMENT IL FAUT QUE LE CONTROLEUR INJECTE SEPARAMENT 
+        //LES NOUVELLES STUDIES + WARNING SI PATIENT NE MATCH PAS PATIENT ATTENDU
+        // LES NOUVELLES SERIES + LES WARNING
         this.props.addStudiesSeries(this.uploadModel.data)
-       
+
     }
 
     /*Trigger ignored files panel if clicked*/
@@ -225,7 +229,7 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
-    addStudiesSeries,
+    addSeries,
     addWarningSeries
 }
 

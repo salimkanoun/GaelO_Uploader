@@ -73,14 +73,20 @@ class DisplaySeries extends Component {
 
     buildRows(selectedStudy) {
         if (selectedStudy !== null && selectedStudy !== undefined) {
+
             let seriesArray = []
-            for (let i in this.props.studies[selectedStudy].series) {
-                let seriesID = this.props.studies[selectedStudy].series[i]
-                seriesArray.push({
-                    ...this.props.series[seriesID],
-                    numberOfInstances: this.props.series[seriesID].numberOfInstances
-                })
-            }            
+
+            let seriesToDisplay = this.props.series.filter(series =>{
+                return series.studyInstanceUID === selectedStudy
+            })
+
+            seriesToDisplay.forEach( (series) => {
+                    seriesArray.push({
+                        ...series
+                    })
+                }  
+            )  
+
             return seriesArray
         }
         else return []

@@ -22,37 +22,40 @@ import { connect } from 'react-redux';
 class ControllerStudiesSeries extends Component {
 
     state = {
-        update: false,
         seriesToUpload: {},
-        selectedSeries: []
     }
 
     constructor(props) {
         super(props)
     }
 
+    componentDidUpdate(prevState){
+        if (prevState.selectedSeries !== this.props.selectedSeries){
+            this.prepareSeriesToUpload()
+        }
+    }
+
     prepareSeriesToUpload = () => {
-        let seriesIDs = this.state.selectedSeries
+        let seriesIDs = this.props.selectedSeries
         let series = {}
         //Fetch series in the model
-        let studies = this.props.uploadModel.getStudiesArray()
+        let studies = Object.values(this.props.studies)
         studies.forEach(study => {
             //Check study validation
             // ...
             let studyID = study.studyUID
-            Object.keys(study.series).forEach(seriesID => {
+            Object.values(study.series).forEach(seriesID => {
                 if (seriesIDs.includes(seriesID)) {
                     if (series[studyID] === undefined) {
-                        series[studyID] = {}
+                        series[studyID] = []
                     }
-                    series[studyID][seriesID] = study.series[seriesID]
+                    series[studyID].push(seriesID)
                 }
             })
         })
-        console.log(series)
         this.setState(
             { seriesToUpload: series }
-            , () => console.log(this.state.seriesToUpload))
+            , () => this.state.seriesToUpload)
     }
 
     getValidatedItems = () => {
@@ -64,10 +67,10 @@ class ControllerStudiesSeries extends Component {
         return (
             <>
                 <Row>
-                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}/>
+                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
                 </Row>
                 <Row>
-                    <DisplaySeries selectedStudy = {this.props.selectedStudy} />
+                    <DisplaySeries selectedStudy={this.props.selectedStudy} />
                 </Row>
             </>
         )
@@ -81,11 +84,11 @@ const mapStateToProps = state => {
     return {
         studies: state.Model.studies,
         series: state.Model.series,
-        selectedStudy: state.DisplayTables.selectedStudy
+        selectedStudy: state.DisplayTables.selectedStudy,
     }
 }
 const mapDispatchToProps = {
-    
+
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

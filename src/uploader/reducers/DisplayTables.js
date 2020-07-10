@@ -26,13 +26,6 @@ export default function DisplayTablesReducer (state = initialState, action) {
           selectedSeries: state.selectedSeries.filter(thisRow => thisRow !== action.payload.row.seriesInstanceUID)
         }
       }
-      return {
-        ...state,
-        series: {
-          ...state.selectedSeries,
-          [state.selectedStudy]: [action.payload]
-        }
-      }
 
     default:
       return state

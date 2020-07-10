@@ -167,6 +167,7 @@ class Uploader extends Component {
         let series = this.uploadModel.getStudy(studyIDSalim).getSeries(seriesIDSalim)
         let instances = series.getArrayInstances()
 
+        
         let fileArray = instances.map(instance => {
             return instance.getFile()
         })
@@ -207,7 +208,7 @@ class Uploader extends Component {
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries />
+                        <ControllerStudiesSeries selectedSeries={this.props.selectedSeries} seriesReadyToUpload={this.props.seriesReadyToUpload}/>
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </Card.Body>
                 </Card>
@@ -220,6 +221,7 @@ const mapStateToProps = state => {
     return {
         studies: state.Model.studies,
         series: state.Model.series,
+        selectedSeries: state.DisplayTables.selectedSeries
     }
 }
 const mapDispatchToProps = {

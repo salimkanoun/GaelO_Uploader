@@ -115,7 +115,8 @@ class DisplaySeries extends Component {
 const mapStateToProps = state => {
     return {
         series: state.Model.series,
-        studies: state.Model.studies
+        studies: state.Model.studies,
+        selectedSeries: state.DisplayTables.selectedSeries
     }
 }
 const mapDispatchToProps = {

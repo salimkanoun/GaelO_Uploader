@@ -95,8 +95,13 @@ class StudiesTab extends Component {
         console.log("called")
         let studies = []
         if(Object.keys(this.props.studies).length > 0){
-            studies = Object.values(this.props.studies)
-        }
+            for (let study in this.props.studies) {
+                let tempStudy = this.props.studies[study]
+                tempStudy['status'] = (this.props.studies.warnings == {}) ? 'Valid' : 'Rejected'
+                studies.push((tempStudy))
+                console.log(studies)
+            }
+        }        
         return studies
     }
 
@@ -122,7 +127,7 @@ class StudiesTab extends Component {
                                 expectedStudy={this.props.studies} currentStudy={this.props.studies} />
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='studies' selectedStudy={this.props.selectStudy} />
+                            <DisplayWarning type='studies' selectionID={this.props.selectedStudy} />
                         </Col>
                     </Row>
                 </Container>

@@ -40,11 +40,11 @@ export default class Study {
 
     }
 
-    addSeries(seriesObject, seriesInstanceUID) {
-        if (!this.isExistingSeries(seriesInstanceUID)) {
+    addSeries(seriesObject) {
+        if (!this.isExistingSeries(seriesObject.seriesInstanceUID)) {
             this.series[seriesObject.seriesInstanceUID] = seriesObject
             return seriesObject
-        } else return this.getSeries(seriesInstanceUID)
+        } else throw new Error('Existing Series')
     }
 
     isExistingSeries(seriesInstanceUID) {

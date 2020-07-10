@@ -17,11 +17,11 @@ export default class Modele {
     data = {
     }
 
-    addStudy(studyObject, dicomStudyID) {
-        if (!this.isExistingStudy(dicomStudyID)) {
+    addStudy( studyObject ) {
+        if (!this.isExistingStudy(studyObject.studyUID)) {
             this.data[studyObject.studyUID] = studyObject
             return studyObject
-        } else return this.getStudy(dicomStudyID)
+        } else throw new Error('Existing Study')
     }
 
     getStudy(studyUID) {

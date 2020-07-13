@@ -80,13 +80,13 @@ class Uploader extends Component {
     addFile(files) {
         this.setState((previousState) => { return { fileLoaded: (previousState.fileLoaded + files.length) } })
         console.log('Added file', files)
-        let readPromises = files.map( (file) => {
+        let readPromises = files.map((file) => {
             return this.read(file)
         })
-        Promise.all(readPromises).then(()=>{
+        Promise.all(readPromises).then(() => {
             this.checkSeriesAndSendData()
         })
-        
+
     }
 
     /**
@@ -101,20 +101,20 @@ class Uploader extends Component {
             let seriesInstanceUID = dicomFile.getSeriesInstanceUID()
 
             let study
-            if( ! this.uploadModel.isExistingStudy(studyInstanceUID)){
-                study = this.uploadModel.addStudy(dicomFile.getStudyObject() )
-            }else {
+            if (!this.uploadModel.isExistingStudy(studyInstanceUID)) {
+                study = this.uploadModel.addStudy(dicomFile.getStudyObject())
+            } else {
                 study = this.uploadModel.getStudy(studyInstanceUID)
             }
-            
+
             let series
-            if(! study.isExistingSeries(seriesInstanceUID)) {
+            if (!study.isExistingSeries(seriesInstanceUID)) {
                 series = study.addSeries(dicomFile.getSeriesObject())
-            }else {
+            } else {
                 series = study.getSeries(seriesInstanceUID)
             }
 
-            series.addInstance( dicomFile.getInstanceObject() )
+            series.addInstance(dicomFile.getInstanceObject())
 
             this.setState((previousState) => { return { fileParsed: ++previousState.fileParsed } })
 
@@ -134,29 +134,30 @@ class Uploader extends Component {
                 }
             })
         }
-       
+
     }
 
-    async checkSeriesAndSendData(){
+    async checkSeriesAndSendData() {
         //Check series to send warning
         //SK ICI A AMELIORER NE TESTER QUE LES NOUVELLE SERIES DEPUIS LE PARSE
         let studies = this.uploadModel.getStudiesArray()
-        for( let study of studies){
+        for (let study of studies) {
             let series = study.getSeriesArray()
-            for(let serieInstance of series){
+            for (let serieInstance of series) {
                 //SK DICOMFILE et INSTANCE A REVOIR
                 let firstInstance = serieInstance.getArrayInstances()[0]
                 await serieInstance.checkSeries(new DicomFile(firstInstance.getFile()))
 
             }
         }
-        
+
         //ICI A VOIR DIFFEREMENT IL FAUT QUE LE CONTROLEUR INJECTE SEPARAMENT 
         //LES NOUVELLES STUDIES + WARNING SI PATIENT NE MATCH PAS PATIENT ATTENDU
         // LES NOUVELLES SERIES + LES WARNING
+        console.log(this.uploadModel.data)
         this.props.addStudy(this.uploadModel.data)
-        for(let study in this.uploadModel.data){
-            for (let series in this.uploadModel.data[study].series) {
+        for (let study in this.uploadModel.data) {
+            for (let series in this.uploadModel.data[study].series) {
                 this.props.addSeries(this.uploadModel.data[study].series[series])
             }
         }
@@ -173,7 +174,7 @@ class Uploader extends Component {
     }
 
     seriesValidated = (series) => {
-        this.setState( () => { return {seriesValidated: {...series}}}, () => console.log(this.state.seriesValidated))
+        this.setState(() => { return { seriesValidated: { ...series } } })
     }
 
     async onUploadClick(e) {
@@ -187,11 +188,11 @@ class Uploader extends Component {
         let instancesToUpload = []
 
         //Gather all instances to upload
-        for(let studyID in this.state.seriesValidated) {
-            for(let seriesID in this.state.seriesValidated[studyID]) {
-                seriesID = this.state.seriesValidated[studyID][seriesID]
-                let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
-                instancesToUpload.push(...mySeries.getArrayInstances())
+        for (let studyID in this.state.seriesValidated) {
+            for (let seriesID in this.state.seriesValidated[studyID]) {
+                    seriesID = this.state.seriesValidated[studyID][seriesID]
+                    let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
+                    instancesToUpload.push(...mySeries.getArrayInstances())
             }
         }
 
@@ -235,7 +236,7 @@ class Uploader extends Component {
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated}/>
+                        <ControllerStudiesSeries selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
                         <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </Card.Body>
                 </Card>

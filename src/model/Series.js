@@ -72,7 +72,7 @@ export default class Series {
 	hasWarnings() {
 		let nbConsideredWarnings = 0;
 		for (let w in this.warnings) {
-			if (!this.warnings[w].ignore) {
+			if (!this.warnings[w].dismissed) {
 				nbConsideredWarnings++;
 			}
 		}
@@ -81,6 +81,7 @@ export default class Series {
 
 	async checkSeries(dicomFile) {
 		await dicomFile.readDicomFile()
+		console.log("checkingseries")
 		// Check missing tags
 		if ((dicomFile.getModality()) === undefined) {
 			this.warnings[MISSING_TAG_00080060.key] = MISSING_TAG_00080060;
@@ -112,10 +113,6 @@ export default class Series {
 		} else {
 			delete this.warnings[LESS_THAN_MINIMAL_INSTANCES]
 		}
-		//Add reference to the study for warning display
-		for (let warningKey in this.warnings) {
-			this.warnings[warningKey]['objectID'] = this.seriesInstanceUID
-		}
 	}
 
 	getArrayWarnings() {
@@ -124,13 +121,5 @@ export default class Series {
 
 	setWarningStatus(key, dismissed) {
 		this.warnings[key]['dismissed'] = dismissed
-	}
-
-	ignoreWarning(name) {
-		this.warnings[name].ignore = true;
-	}
-
-	considerWarning(name) {
-		this.warnings[name].ignore = false;
 	}
 }

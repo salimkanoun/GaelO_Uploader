@@ -21,8 +21,20 @@ export default function SeriesReducer (state = initialState, action) {
 
     //Ignore warning at series level
     case UPDATE_WARNING_SERIES:
+      let seriesWarning = action.payload.key
+      let seriesID = action.payload.objectID
         return{
-            ...state
+            ...state,
+            series : {
+              ...state.series,
+              [seriesID] : {
+                ...state.series[seriesID],
+                warnings : {
+                  ...state.series[seriesID].warnings,
+                  [seriesWarning]: { ...state.series[seriesID].warnings[seriesWarning], dismissed: !state.series[seriesID].warnings[seriesWarning].dismissed}
+                }
+              }
+            }
         }
 
     default:

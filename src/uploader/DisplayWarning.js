@@ -8,6 +8,10 @@ class DisplayWarning extends Component {
 
     columns = [
         {
+            dataField: 'objectID',
+            hidden: true,
+        },
+        {
             dataField: 'key',
             isDummyField: true,
             hidden: true,
@@ -18,14 +22,15 @@ class DisplayWarning extends Component {
         },
         {
             dataField: 'dismissed',
-            hidden: true
+            hidden: false
         },
         {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => (
-                <ButtonIgnore onClick={() => {
-                    this.props.updateWarningSeries(row)
+                <ButtonIgnore warning={this.props.series[row.objectID].warnings[row.key].dismissed} 
+                onClick={async () => {
+                    await this.props.updateWarningSeries(row)
                 }} />
             ),
         },
@@ -38,12 +43,13 @@ class DisplayWarning extends Component {
             switch(this.props.type) {
                 case 'studies':
                     for (let warning in this.props.studies[this.props.selectionID].warnings) {
-                        rows.push(this.props.studies[this.props.selectionID].warnings[warning].content)
+                        rows.push(this.props.studies[this.props.selectionID].warnings[warning])
                     }
                     return rows
                 case 'series':
+                    let selID = this.props.selectionID
                     for (let warning in this.props.series[this.props.selectionID].warnings) {
-                        rows.push(this.props.series[this.props.selectionID].warnings[warning])
+                        rows.push({objectID: selID, ...this.props.series[this.props.selectionID].warnings[warning]})
                     }
                     return rows
             }

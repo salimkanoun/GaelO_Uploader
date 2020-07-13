@@ -30,8 +30,8 @@ class ControllerStudiesSeries extends Component {
         super(props)
     }
 
-    componentDidUpdate(prevState){
-        if (prevState.selectedSeries !== this.props.selectedSeries){
+    componentDidUpdate(prevState) {
+        if (prevState.selectedSeries !== this.props.selectedSeries) {
             this.prepareSeriesToUpload()
         }
     }
@@ -42,26 +42,28 @@ class ControllerStudiesSeries extends Component {
         //Fetch series in the model
         let studies = Object.values(this.props.studies)
         studies.forEach(study => {
-            //Check study validation
-            // ...
             let studyID = study.studyUID
-            Object.values(study.series).forEach(theSeries => {
-                if (seriesIDs.includes(theSeries.seriesInstanceUID)) {
-                    if (series[studyID] === undefined) {
-                        series[studyID] = []
+            //Check if there is no warning on study level
+            if (this.props.studies[studyID].warnings = {}) {
+                //If there isn't, series are OK to be uploaded
+                Object.values(study.series).forEach(theSeries => {
+                    if (seriesIDs.includes(theSeries.seriesInstanceUID)) {
+                        if (series[studyID] === undefined) {
+                            series[studyID] = []
+                        }
+                        series[studyID].push(theSeries.seriesInstanceUID)
                     }
-                    series[studyID].push(theSeries.seriesInstanceUID)
-                }
-            })
+                })
+            }
         })
         this.props.seriesValidated(series)
-    }    
+    }
 
     render() {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies studies={this.props.studies} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
+                    <DisplayStudies studies={this.props.studies} series={this.props.series} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
                 </Row>
                 <Row>
                     <DisplaySeries selectedStudy={this.props.selectedStudy} />

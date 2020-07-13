@@ -20,7 +20,7 @@ import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
 //Redux
 import { connect } from 'react-redux';
-import { selectSeries } from './actions/DisplayTables'
+import { selectSeries, seriesReady } from './actions/DisplayTables'
 
 class DisplaySeries extends Component {
 
@@ -28,7 +28,8 @@ class DisplaySeries extends Component {
         {
             dataField: 'seriesInstanceUID',
             isDummyField: true,
-            hidden: true
+            hidden: true,
+            
         },
         {
             dataField: 'status',
@@ -64,6 +65,9 @@ class DisplaySeries extends Component {
         onSelect: (row, isSelect) => {
             //ICI FAIRE REMONTER L INFO QUE L UPLAD EST A FAIREs
             this.props.selectSeries(row, isSelect)
+            if (row.dismissed) {
+                this.props.seriesReady(row, isSelect)
+            }
         }
     }
 
@@ -126,7 +130,8 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
-    selectSeries
+    selectSeries,
+    seriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplaySeries)

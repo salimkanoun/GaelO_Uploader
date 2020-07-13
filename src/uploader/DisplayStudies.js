@@ -24,7 +24,7 @@ import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
 import { selectStudy } from './actions/DisplayTables'
 
-import {validateCheckPatient} from './actions/StudiesSeries'
+import { validateCheckPatient } from './actions/StudiesSeries'
 
 class StudiesTab extends Component {
 
@@ -41,7 +41,6 @@ class StudiesTab extends Component {
     columns = [
         {
             dataField: 'studyUID',
-            text: '',
             isDummyField: true,
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => (
@@ -82,7 +81,7 @@ class StudiesTab extends Component {
         }
     };
 
-    validateCheckPatient = (studyUID) => {  
+    validateCheckPatient = (studyUID) => {
 
     }
 
@@ -93,32 +92,43 @@ class StudiesTab extends Component {
 
     getStudies() {
         let studies = []
-        if(Object.keys(this.props.studies).length > 0){
+        if (Object.keys(this.props.studies).length > 0) {
             for (let study in this.props.studies) {
                 let tempStudy = this.props.studies[study]
-                tempStudy['status'] = (this.warningsPassed(study)) ? 'Valid' : 'Rejected'
-                studies.push((tempStudy))
+                tempStudy['status'] = this.warningsPassed(study)
+                studies.push({...tempStudy})
             }
-        }        
+        }
+        console.log(studies)
         return studies
     }
 
+    componentDidUpdate(prevState) {
+        if (this.props.selectedStudy != undefined && prevState.series != this.props.series) {
+            console.log("RERENDERING")
+            this.render()
+        }
+    }
+
     warningsPassed(study) {
+        let studyStatus = 'Valid'
         //Check for warnings in study
         for (let warning in this.props.studies[study].warnings) {
             if (!this.props.studies[study].warnings[warning].dismissed) {
-                return false
+                studyStatus = 'Rejected'
             }
         }
         //Check for warnings in series
-        for(let series in this.props.studies[study].series) {
-            for (let warning in this.props.studies[study].series[series].warnings) {
-                if (!this.props.studies[study].series[series].warnings[warning].dismissed) {
-                    return false
+        for (let series in this.props.series) {
+            if (Object.keys(this.props.studies[study].series).includes(series)) {
+                for (let warning in this.props.series[series].warnings) {
+                    if (!this.props.series[series].warnings[warning].dismissed) {
+                        studyStatus = 'Incomplete'
+                    }
                 }
-            } 
+            }
         }
-        return true
+        return studyStatus 
     }
 
     render() {

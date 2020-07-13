@@ -17,10 +17,6 @@ import Button from 'react-bootstrap/Button'
 
 export default class ButtonIgnore extends Component {
 
-    state = {
-        ignored: false
-    }
-
     constructor(props) {
         super(props)
         this.onClick = this.onClick.bind(this)
@@ -28,12 +24,11 @@ export default class ButtonIgnore extends Component {
 
     onClick() {
         this.props.onClick()
-        this.setState( (prevState) => ( {ignored: !prevState.ignored}))
     }
 
     render() {
         return (
-            <Button onClick={this.onClick}> { this.state.ignored ? 'Consider' : 'Ignore' } </Button>
+            <Button id={this.idWarning} onClick={this.onClick}> { (this.props.warning != undefined && this.props.warning) ? 'Consider' : 'Ignore' } </Button>
         )
     }
 }

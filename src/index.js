@@ -4,18 +4,19 @@ import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
-import { Provider } from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
-import reducers from './uploader/reducers'
+export default function installUploader(config = {}, containerId = 'root', callback) {
+  const container = document.getElementById(containerId);
 
-const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
-ReactDOM.render(
-  <Provider store={createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
-)
+  if (!container) {
+    throw new Error(
+      "No root element found to install viewer. Please add a <div> with the id 'root', or pass a DOM element into the installViewer function."
+    );
+  }
+
+  return ReactDOM.render(<App config={config} />, container, callback);
+}
+
+installUploader({}, 'root')
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

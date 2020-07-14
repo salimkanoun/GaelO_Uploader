@@ -1,6 +1,7 @@
 {
   "name": "gaelo-uploader",
   "version": "0.1.0",
+  "main": "lib/index.js",
   "proxy": "http://localhost:8080",
   "private": true,
   "dependencies": {
@@ -45,5 +46,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-react": "^7.10.4",
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^8.1.0"
   }
 }

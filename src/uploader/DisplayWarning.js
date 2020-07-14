@@ -74,6 +74,7 @@ class DisplayWarning extends Component {
                     classes="table table-borderless"
                     bodyClasses="du-warnings"
                     headerClasses="du-warnings th"
+                    wrapperClasses="table-responsive"
                     data={this.buildRow()}
                     columns={this.columns}
                 />

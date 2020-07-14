@@ -147,6 +147,7 @@ class StudiesTab extends Component {
                                 data={this.getStudies()}
                                 columns={this.columns}
                                 selectRow={this.selectRow}
+                                wrapperClasses="table-responsive"
                             />
                             <CheckPatient studyUID={this.selectedStudy} validateCheckPatient={this.validateCheckPatient}
                                 show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)}

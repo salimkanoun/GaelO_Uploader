@@ -108,6 +108,7 @@ class DisplaySeries extends Component {
                             bodyClasses="du-series-tbody"
                             headerClasses="du-series th"
                             rowClasses="du-series td"
+                            wrapperClasses="table-responsive"
                             keyField='seriesInstanceUID'
                             data={this.buildRows(this.props.selectedStudy)}
                             columns={this.columns}

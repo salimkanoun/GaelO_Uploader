@@ -13,12 +13,15 @@
  */
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import Modal from 'react-bootstrap/Modal'
 import BootstrapTable from 'react-bootstrap-table-next';
 import ButtonIgnore from './render_component/ButtonIgnore'
-import Button from 'react-bootstrap/Button'
+import Button from 'react-bootstrap/Button' 
 
-export default class CheckPatient extends Component {
+import {validateCheckPatient} from './actions/DisplayTables'
+
+ class CheckPatient extends Component {
 
     state = {
         rows: []
@@ -31,7 +34,6 @@ export default class CheckPatient extends Component {
 
     async componentDidMount() {
         await (this.props.currentStudy.length !== 0)
-        console.log(this.props.currentStudy)
         this.generateRows()
         
     }
@@ -61,12 +63,7 @@ export default class CheckPatient extends Component {
     ]
 
     onClick(id, ignored) {
-        this.setState(state => {
-            state.forEach(row => {
-                if (row.rowName === id) row[id]['valid'] = ignored
-            })
-
-        })
+        
     }
 
     checkRow(expected, current) {
@@ -80,7 +77,6 @@ export default class CheckPatient extends Component {
     }
 
     generateRows() {
-        console.log('Generating rows...')
         let labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
         let keys = ['firstName, lastName', 'birthDate', 'sex', 'acquisitionDate']
         let currentStudy = this.props.currentStudy
@@ -93,8 +89,6 @@ export default class CheckPatient extends Component {
                     ignoreButton: <ButtonIgnore id={labels[i]} onClick={this.onClick} />,
                     valid: this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]]) } ] } )
             }
-        console.log(this.state.rows)
-
     }
 
     render() {
@@ -124,3 +118,16 @@ export default class CheckPatient extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        series: state.Series,
+        studies: state.Studies
+    }
+}
+const mapDispatchToProps = {
+    validateCheckPatient
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CheckPatient)
+//LINK CONFIRM BUTTON TO PATIENT CHECKED

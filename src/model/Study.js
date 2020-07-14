@@ -31,17 +31,17 @@ export default class Study {
         this.acquisitionDate = this.getDate(acquisitionDate);
         this.patientName = patientFirstName + ' ' + patientLastName
         /*
-        this.validSeries = [];     // have passed the checks
-        this.rejectedSeries = [];  // do not have passed the checks
-        this.queuedSeries = [];    // in wait for uplaod
         this.visit = null;
         */
-       this.warnings = {};
+        this.warnings = {};
 
     }
 
     addSeries(seriesObject) {
-        this.series[seriesObject.seriesInstanceUID] = seriesObject
+        if (!this.isExistingSeries(seriesObject.seriesInstanceUID)) {
+            this.series[seriesObject.seriesInstanceUID] = seriesObject
+            return seriesObject
+        } else throw new Error('Existing Series')
     }
 
     isExistingSeries(seriesInstanceUID) {
@@ -54,8 +54,8 @@ export default class Study {
     }
 
     getSeriesArray() {
-        let series= []
-        Object.keys(this.series).forEach(seriesUID =>{
+        let series = []
+        Object.keys(this.series).forEach(seriesUID => {
             series.push(this.series[seriesUID])
         })
         return series
@@ -113,23 +113,10 @@ export default class Study {
         return this.patientID
     }
 
-    toString() {
-        return ("\nStudy Instance UID: " + this.studyUID
-            + "\nStudy date: " + this.studyDate
-            + "\nStudy ID: " + this.studyID
-            + "\nStudy Description: " + this.studyDescription
-            + "\nAccession Number: " + this.accessionNumber
-            + "\nAcquisition date: " + this.acquisitionDate
-            + "\nPatient birth date: " + this.patientBirthDate
-            + "\nPatient ID: " + this.patientID
-            + "\nPatient Name: " + this.patientName
-            + "\nPatient sex: " + this.patientSex);
-    }
-
     checkStudies() {
-		for (let st of this.studies) {
+        for (let st of this.studies) {
 
-			// Check if the study corresponds to the visits in wait for series upload
+            // Check if the study corresponds to the visits in wait for series upload
 			/*let expectedVisit = this.findExpectedVisit(st);
 			if (expectedVisit === undefined) {
 				st.setWarning('notExpectedVisit', 'You should check/select the patient. The imported study informations do not match with the expected ones.', true, false, true);
@@ -150,30 +137,13 @@ export default class Study {
 			// Check inner series
 			this.checkSeries(st);*/
 
-			// Check if study has warnings
-			if (st.hasWarnings()) {
-				if (!st.hasCriticalWarnings() && st.hasValidSeries()) {
-					this.setStatusStudy(st, 'incomplete');
-				} else {
-					this.setStatusStudy(st, 'rejected');
-					this.dequeueStudy(st);
-				}
-			} else {
-					this.setStatusStudy(st, 'valid');
-			}
-
-
-            if (st.hasWarnings()) {
-				st.setStatusSerie(this, 'rejected');
-				st.dequeueSerie(this);
-				st.setWarning('serie' + this.seriesNumber, 'Invalid serie: #' + this.seriesNumber + '.', false, false);
-			} else {
-				st.setStatusSerie(this, 'valid');
-				delete st.warnings['serie' + this.seriesNumber];
-			}
-		}
+        }
     }
-    
+
+    setStatusStudy(key, dismissed) {
+        this.warnings[key]['dismissed'] = dismissed
+    }
+
     getArrayWarnings() {
         return Object.values(this.warnings)
     }

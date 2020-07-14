@@ -11,7 +11,8 @@
  with this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-import DicomFile from './DicomFile'
+
+import { MISSING_TAG_00080060, MISSING_TAG_00080022, MISSING_TAG_00101030, MISSING_TAG_00101031, MISSING_TAG_00181074, MISSING_TAG_00181072, MISSING_TAG_00181075, LESS_THAN_MINIMAL_INSTANCES } from './Warning'
 
 const minNbOfInstances = 30
 
@@ -37,22 +38,31 @@ export default class Series {
 		}
 	}
 
-	addInstance(instanceObject) {
-		this.instances[instanceObject.SOPInstanceUID] = instanceObject
+	addInstance( instanceObject ) {
+		if (! this.isExistingInstance(instanceObject.SOPInstanceUID) ) {
+			this.instances[instanceObject.SOPInstanceUID] = instanceObject
+		} else {
+			throw Error("Existing instance")
+		}
 	}
 
 	isExistingInstance(SOPInstanceUID) {
 		let knownInstancesUID = Object.keys(this.instances)
 		return knownInstancesUID.includes(SOPInstanceUID)
-
 	}
 
 	getInstance(instanceUID) {
 		return this.instances[instanceUID]
 	}
 
-	allInstances() {
-		return this.instances
+	getArrayInstances() {
+		let instances = []
+		Object.keys(this.instances).forEach(
+			instanceID => {
+				instances.push(this.instances[instanceID])
+			}
+		)
+		return instances
 	}
 
 	getNbInstances() {
@@ -62,75 +72,54 @@ export default class Series {
 	hasWarnings() {
 		let nbConsideredWarnings = 0;
 		for (let w in this.warnings) {
-			if (!this.warnings[w].ignore) {
+			if (!this.warnings[w].dismissed) {
 				nbConsideredWarnings++;
 			}
 		}
 		return nbConsideredWarnings > 0;
 	}
 
-	setWarning(name, content, ignorable = false, critical = true, visible = true) {
-		if (this.warnings[name] === undefined) {
-			this.warnings[name] = {
-				content: content,
-				ignore: false,
-				ignorable: ignorable,
-				critical: critical,
-				visible: visible
-			};
+	async checkSeries(dicomFile) {
+		await dicomFile.readDicomFile()
+		console.log("checkingseries")
+		// Check missing tags
+		if ((dicomFile.getModality()) === undefined) {
+			this.warnings[MISSING_TAG_00080060.key] = MISSING_TAG_00080060;
 		} else {
-			this.warnings[name].content = content;
+			if ((dicomFile._getDicomTag('00080021') === undefined) && (dicomFile._getDicomTag('00080022') === undefined)) {
+				this.warnings[MISSING_TAG_00080022.key] = MISSING_TAG_00080022;
+			}
+			if (this.modality === 'PT') {
+				if ((dicomFile._getDicomTag('00101030')) === undefined) {
+					this.warnings[MISSING_TAG_00101030.key] = MISSING_TAG_00101031;
+				}
+				if ((dicomFile._getDicomTag('00080031')) === undefined && (dicomFile._getDicomTag('00080032')) === undefined) {
+					this.warnings[MISSING_TAG_00101031.key] = MISSING_TAG_00101031;
+				}
+				if ((dicomFile.getRadiopharmaceuticalTag('00181074')) === undefined) {
+					this.warnings[MISSING_TAG_00181074.key] = MISSING_TAG_00181074;
+				}
+				if ((dicomFile.getRadiopharmaceuticalTag('00181072')) === undefined && (dicomFile.getRadiopharmaceuticalTag('00181078')) === undefined) {
+					this.warnings[MISSING_TAG_00181072.key] = MISSING_TAG_00181072;
+				}
+				if ((dicomFile.getRadiopharmaceuticalTag('00181075')) === undefined) {
+					this.warnings[MISSING_TAG_00181075.key] = MISSING_TAG_00181075;
+				}
+			}
+		}
+		// Check number of instances
+		if (this.getNbInstances() < minNbOfInstances) {
+			this.warnings[LESS_THAN_MINIMAL_INSTANCES.key] = LESS_THAN_MINIMAL_INSTANCES;
+		} else {
+			delete this.warnings[LESS_THAN_MINIMAL_INSTANCES]
 		}
 	}
 
-	ignoreWarning(name) {
-		this.warnings[name].ignore = true;
+	getArrayWarnings() {
+		return Object.values(this.warnings)
 	}
 
-	considerWarning(name) {
-		this.warnings[name].ignore = false;
-	}
-
-	toString() {
-		return ("\nInstance number: " + this.seriesNumber
-			+ "\nModality: " + this.modality
-			+ "\nSeries instance UID: " + this.seriesInstanceUID
-			+ "\nSeries date: " + this.seriesDate
-			+ "\nSeries description: " + this.seriesDescription);
-	}
-
-	checkSeries(dicomFile) {
-			// Check missing tags
-			if ((dicomFile.getModality()) == undefined) {
-				this.setWarning('missingTag00080060', 'Missing tag: Modality', true);
-			} else {
-				if ((dicomFile._getDicomTag('00080021') == undefined) && (dicomFile._getDicomTag('00080022') == undefined) ) {
-					this.setWarning('missingTag00080022', 'Missing tag: SeriesDate', true);
-				}
-				if (this.modality == 'PT') {
-					if ( (dicomFile._getDicomTag('00101030')) == undefined ) {
-						this.setWarning('missingTag00101030', 'Missing tag: Patient Weight', true);
-					}
-					if ( (dicomFile._getDicomTag('00080031')) == undefined && (dicomFile._getDicomTag('00080032')) == undefined ) {
-						this.setWarning('missingTag00101031', 'Missing tag: Series Time', true);
-					}
-					if ( (dicomFile.getRadiopharmaceuticalTag('00181074')) == undefined) {
-						this.setWarning('missingTag00181074', 'Missing tag: Radionuclide Total Dose', true);
-					}
-					if ((dicomFile.getRadiopharmaceuticalTag('00181072')) == undefined && (dicomFile.getRadiopharmaceuticalTag('00181078')) == undefined) {
-						this.setWarning('missingTag00181072', 'Missing tag: Radiopharmaceutical Start Time', true);
-					}
-					if ( (dicomFile.getRadiopharmaceuticalTag('00181075')) == undefined ) {
-						this.setWarning('missingTag00181075', 'Missing tag: Radionuclide Half Life', true);
-					}
-				}
-			}
-
-			// Check number of instances
-			if(this.getNbInstances() < minNbOfInstances) {
-				this.setWarning(`lessThan${minNbOfInstances}Instances`, `This serie contains less than ${minNbOfInstances} instances`, true, false);
-			} else {
-				delete this.warnings[`lessThan${minNbOfInstances}Instances`];
-			}
+	setWarningStatus(key, dismissed) {
+		this.warnings[key]['dismissed'] = dismissed
 	}
 }

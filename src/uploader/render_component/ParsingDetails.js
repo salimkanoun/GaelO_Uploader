@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import Badge from 'react-bootstrap/Badge'
 
 export default class ParsingDetails extends Component {

@@ -4,7 +4,7 @@ import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
-function installUploader(config = {}, containerId = 'root', callback) {
+function installUploader(config = {}, containerId = 'root') {
   const container = document.getElementById(containerId);
 
   if (!container) {
@@ -13,7 +13,7 @@ function installUploader(config = {}, containerId = 'root', callback) {
     );
   }
 
-  return ReactDOM.render(<App config={config} />, container, callback);
+  return ReactDOM.render(<App config={config} />, container);
 }
 
 export { App, installUploader };

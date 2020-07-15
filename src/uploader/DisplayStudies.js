@@ -99,7 +99,6 @@ class StudiesTab extends Component {
                 studies.push({...tempStudy})
             }
         }
-        console.log(studies)
         return studies
     }
 

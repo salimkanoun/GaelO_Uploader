@@ -81,7 +81,6 @@ export default class Series {
 
 	async checkSeries(dicomFile) {
 		await dicomFile.readDicomFile()
-		console.log("checkingseries")
 		// Check missing tags
 		if ((dicomFile.getModality()) === undefined) {
 			this.warnings[MISSING_TAG_00080060.key] = MISSING_TAG_00080060;

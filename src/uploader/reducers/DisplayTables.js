@@ -4,7 +4,8 @@ import { SELECT_STUDY, SELECT_SERIES, VALIDATE_CHECK_PATIENT, SERIES_READY } fro
 const initialState = {
   selectedStudy: undefined,
   selectedSeries: [],
-  seriesReady: {}
+  seriesReady: {},
+  validatedPatients: []
 }
 
 export default function DisplayTablesReducer(state = initialState, action) {

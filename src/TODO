@@ -2,3 +2,7 @@ Gérer les warnings
 Fixer la délégation (studies & series existing)
 Dissocier l'affichage des studies et series du drag&drop pour réduire la consommation de mémoire et éviter sélection pendant l'upload
 TUS & Uppy
+
+MULTIUPLOADER
+
+npx webpack

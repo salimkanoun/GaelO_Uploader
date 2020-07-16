@@ -1,11 +1,10 @@
 // Gérer les IDs, selected study, warnings
-import { SELECT_STUDY, SELECT_SERIES, VALIDATE_CHECK_PATIENT, SERIES_READY } from '../actions/actions-types'
+import { SELECT_STUDY, SELECT_SERIES, SERIES_READY } from '../actions/actions-types'
 
 const initialState = {
   selectedStudy: undefined,
   selectedSeries: [],
   seriesReady: {},
-  validatedPatients: []
 }
 
 export default function DisplayTablesReducer(state = initialState, action) {
@@ -28,11 +27,6 @@ export default function DisplayTablesReducer(state = initialState, action) {
           ...state,
           selectedSeries: state.selectedSeries.filter(thisRow => thisRow !== action.payload.row.seriesInstanceUID)
         }
-      }
-
-    case VALIDATE_CHECK_PATIENT:
-      return {
-        ...state
       }
 
     case SERIES_READY:

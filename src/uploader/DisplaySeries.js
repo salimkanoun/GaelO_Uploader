@@ -14,6 +14,8 @@
 
 import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
+import cellEditFactory from 'react-bootstrap-table2-editor';
+import { Type } from 'react-bootstrap-table2-editor';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -30,6 +32,14 @@ class DisplaySeries extends Component {
             isDummyField: true,
             hidden: true,
             
+        },
+        {
+            dataField: 'selected',
+            editable: true,
+            editor: {
+                type: Type.CHECKBOX,
+                value: 'Y:N'
+              }
         },
         {
             dataField: 'status',
@@ -58,8 +68,9 @@ class DisplaySeries extends Component {
     ];
 
     selectRow = {
-        mode: 'checkbox',
+        mode: 'radio',
         clickToSelect: true,
+        hideSelectColumn: true, 
         classes: "row-clicked",
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
@@ -68,6 +79,7 @@ class DisplaySeries extends Component {
             if (row.dismissed) {
                 this.props.seriesReady(row, isSelect)
             }
+            //console.log(this.props.selectedSeries)
         }
     }
 
@@ -112,7 +124,8 @@ class DisplaySeries extends Component {
                             keyField='seriesInstanceUID'
                             data={this.buildRows(this.props.selectedStudy)}
                             columns={this.columns}
-                            selectRow={this.selectRow} />
+                            selectRow={this.selectRow}
+                            cellEdit={ cellEdit } />
                     </Col>
                     <Col xs={6} md={4}>
                         <DisplayWarning type='series' selectionID={this.props.selectedSeries[(this.props.selectedSeries.length)-1]} />
@@ -128,6 +141,15 @@ const rowClasses = (row, rowIndex) => {
         return 'du-series row-danger'
     } else return 'du-series td'
 }
+
+const cellEdit = cellEditFactory({
+    mode: 'click',
+    afterSaveCell: (oldValue, newValue, row, column) => { 
+        console.log(oldValue) 
+        console.log(newValue) 
+    }
+  })
+  
 
 const mapStateToProps = state => {
     return {

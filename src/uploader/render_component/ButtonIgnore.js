@@ -23,14 +23,13 @@ export default class ButtonIgnore extends Component {
     }
 
     onClick() {
-        this.props.onClick(this.props.id)
+        this.props.onClick(this.props.rowName)
+        this.forceUpdate()
     }
 
     render() {
-        console.log("render")
-        console.log(this.props.warning)
         return (
-            <Button id={(this.props.id == null) ? null : this.props.id} onClick={this.onClick}> { (this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore' } </Button>
+            <Button onClick={this.onClick}> { (this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore' } </Button>
         )
     }
 }

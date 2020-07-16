@@ -26,13 +26,13 @@ const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patien
 class CheckPatient extends Component {
 
     state = {
-        rows: []
+        rows: [],
+        isDisabled: true
     }
 
     constructor(props) {
         super(props)
         this.onClick = this.onClick.bind(this)
-        this.generateRows()
     }
 
     columns = [
@@ -48,59 +48,60 @@ class CheckPatient extends Component {
             dataField: 'currentStudy',
             text: 'Current',
         },
+        
         {
             dataField: 'ignoreButton',
             text: '',
-            formatter: (cell, row, rowIndex, extraData) => ((!row.ignoredStatus) ? <ButtonIgnore id={row} onClick={this.onClick}
-            warning={this.state[row.ignoredStatus]} /> : null)
+            formatter: (cell, row, rowIndex, extraData) => ((row.ignoredStatus !== null) ? <ButtonIgnore rowName={row.rowName} onClick={this.onClick}
+            warning={row['ignoredStatus']} /> : null)
         },
         {
             dataField: 'ignoredStatus',
-            isDummyField: true,
+            hidden: true
         },
     ]
 
-    componentDidUpdate(prevState) {
-        if (prevState.studyUID !== this.props.studyUID) {
-            let rows = this.generateRows()
-            for (let row in rows) {
-                this.setState( {[rows[row].rowName]: rows[row].ignoredStatus})
+    onClick (rowName) {
+        this.setState( (state) => {  
+            let rows = state.rows.map(row => {
+                if(row.rowName === rowName) 
+                    return {...row, ignoredStatus : !row.ignoredStatus}
+                else
+                    return row
+            })
+
+            return {
+                rows : [...rows],
+                
             }
-        }
+        }, this.updateDisableButton())
     }
 
-    async onClick (row) {
-        //row.ignoredStatus = !row.ignoredStatus
-        let newRow = {}
-        let index
-        for(let i in this.state.rows) {
-            if (this.state.rows[i].rowName === row.rowName) {
-                index = i
-            }
-        }
-        console.log(index)
-        newRow[index] = {...row}
-        newRow[index].ignoredStatus = !row.ignoredStatus
-        console.log(newRow)
-        await this.setState((prevState) => ({ rows: [...prevState.rows, [index]: {...newRow}]}))
-        console.log(this.state)
+    /**
+     * Return if some items still need to be checked
+     */
+    updateDisableButton() {
+        let nonIgnoredList = this.state.rows.filter (row => {
+            return row.ignoredStatus === false
+        })
+
+        this.setState({isDisabled: nonIgnoredList.length === 0})
     }
 
     checkRow(expected, current) {
-        if (expected === '' || expected === undefined) {
-            return true
-        } else if (expected === current) {
+        //Call function checkPatientIdentity instead
+        if (expected === current) {
             return true
         } else {
             return false
         }
     }
 
-    generateRows() {
-        if (this.props.studyUID !== undefined) {
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.props.studyUID !== nextProps.studyUID && nextProps.studyUID !== undefined) {
 
             let rows = []
-            let currentStudy = this.props.studies[this.props.studyUID]
+            let currentStudy = this.props.studies[nextProps.studyUID]
 
             currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
             currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
@@ -109,7 +110,7 @@ class CheckPatient extends Component {
 
             //Fake unmatching fields
             expectedStudy.patientFirstName = 'A'
-            expectedStudy.patientLastName = 'B'
+            expectedStudy.patientSex = 'M'
             expectedStudy.patientBirthDate = '01-01-2000'
 
             for (let i in labels) {
@@ -117,12 +118,13 @@ class CheckPatient extends Component {
                     rowName: labels[i],
                     expectedStudy: expectedStudy[keys[i]],
                     currentStudy: currentStudy[keys[i]],
-                    ignoredStatus: this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])
+                    ignoredStatus: (this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])) ? null : this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])
                 })
             }
 
-            this.setState( {rows: [...rows]})
+            this.setState( {rows: [...rows]}, this.updateDisableButton())
         }
+        return true
     }
 
     render() {
@@ -138,7 +140,7 @@ class CheckPatient extends Component {
                         classes="table table-borderless"
                         bodyClasses="du-studies-tbody"
                         headerClasses="du-studies th"
-                        rowClasses="du-studies td"
+                        rowClasses={ rowClasses }
                         data={this.state.rows}
                         columns={this.columns}
                         selectRow={this.selectRow}
@@ -146,14 +148,21 @@ class CheckPatient extends Component {
                     <p>If you want to force the upload you may have to ignore all the warnings.</p>
                 </Modal.Body>
                 <Modal.Footer class="modal-footer">
-                    <Button id="du-patp-btn-confirm" type="button" onClick={() => console.log("clicked")} class="btn btn-primary" data-dismiss="modal">This is the correct patient</Button>
+                    <Button id="du-patp-btn-confirm" type="button" onClick={() => console.log("clicked")} class="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>This is the correct patient</Button>
                 </Modal.Footer>
             </Modal>
         )
     }
 }
 
-// onClick = {this.props.validateCheckPatient(this.props.studyUID)}
+const rowClasses = (row, rowIndex) => {
+    if (row.ignoredStatus == false) {
+        return 'du-studies row-danger'
+    } else if (row.ignoredStatus == null) {
+        return 'du-studies row-success'
+    }
+    return 'du-studies td'
+}
 
 const mapStateToProps = state => {
     return {
@@ -166,4 +175,3 @@ const mapDispatchToProps = {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckPatient)
-//LINK CONFIRM BUTTON TO PATIENT CHECKED

@@ -167,7 +167,6 @@ const rowClasses = (row, rowIndex) => {
 const mapStateToProps = state => {
     return {
         studies: state.Studies.studies,
-        validatedPatient: state.DisplayTables.validatedPatient
     }
 }
 const mapDispatchToProps = {

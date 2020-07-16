@@ -76,6 +76,7 @@ class DisplayWarning extends Component {
                     classes="table table-borderless"
                     bodyClasses="du-warnings"
                     headerClasses="du-warnings th"
+                    rowClasses={ rowClasses }
                     wrapperClasses="table-responsive"
                     data={this.buildRow()}
                     columns={this.columns}
@@ -85,6 +86,12 @@ class DisplayWarning extends Component {
             return null;
         }
     }
+}
+
+const rowClasses = (row, rowIndex) => {
+    if (row.dismissed)
+        return 'du-warnings row-ignored'
+    else return 'du-warnings td'
 }
 
 const mapStateToProps = state => {

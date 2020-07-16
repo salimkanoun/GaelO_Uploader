@@ -107,7 +107,7 @@ class DisplaySeries extends Component {
                             classes="table table-borderless"
                             bodyClasses="du-series-tbody"
                             headerClasses="du-series th"
-                            rowClasses="du-series td"
+                            rowClasses={ rowClasses }
                             wrapperClasses="table-responsive"
                             keyField='seriesInstanceUID'
                             data={this.buildRows(this.props.selectedStudy)}
@@ -121,6 +121,12 @@ class DisplaySeries extends Component {
             </Container>
         )
     }
+}
+
+const rowClasses = (row, rowIndex) => {
+    if (row.status == 'Rejected') {
+        return 'du-series row-danger'
+    } else return 'du-series td'
 }
 
 const mapStateToProps = state => {

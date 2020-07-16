@@ -104,7 +104,6 @@ class StudiesTab extends Component {
 
     componentDidUpdate(prevState) {
         if (this.props.selectedStudy !== undefined && prevState.series !== this.props.series) {
-            console.log("RERENDERING")
             this.render()
         }
     }
@@ -142,14 +141,14 @@ class StudiesTab extends Component {
                                 classes="table table-borderless"
                                 bodyClasses="du-studies-tbody"
                                 headerClasses="du-studies th"
-                                rowClasses="du-studies td"
+                                rowClasses= { rowClasses }
                                 data={this.getStudies()}
                                 columns={this.columns}
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
                             <CheckPatient studyUID={this.props.selectedStudy} validateCheckPatient={this.validateCheckPatient}
-                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} />
+                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} hidden={this.props.validatedPatient}/>
                         </Col>
                         <Col xs={6} md={4}>
                             <DisplayWarning type='studies' selectionID={this.props.selectedStudy} />
@@ -162,9 +161,17 @@ class StudiesTab extends Component {
     }
 }
 
+const rowClasses = (row, rowIndex) => {
+    if (row.status === 'Rejected') 
+        return 'du studies row-danger'
+    if (row.status === 'Incomplete') 
+        return 'du-studies row-warning'
+    return 'du-studies td'
+}
+
 const mapStateToProps = state => {
     return {
-        selectedStudy: state.DisplayTables.selectedStudy
+        selectedStudy: state.DisplayTables.selectedStudy,
     }
 }
 const mapDispatchToProps = {

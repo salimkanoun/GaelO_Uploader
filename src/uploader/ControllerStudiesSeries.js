@@ -22,14 +22,6 @@ import DisplaySeries from './DisplaySeries.js'
 import { seriesReady } from './actions/DisplayTables'
 class ControllerStudiesSeries extends Component {
 
-    state = {
-        seriesToUpload: {},
-    }
-
-    constructor(props) {
-        super(props)
-    }
-
     componentDidUpdate(prevState) {
         if (prevState.selectedSeries !== this.props.selectedSeries) {
             this.prepareSeriesToUpload()

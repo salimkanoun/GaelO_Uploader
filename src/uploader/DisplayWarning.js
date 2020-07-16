@@ -22,7 +22,7 @@ class DisplayWarning extends Component {
         },
         {
             dataField: 'dismissed',
-            hidden: false
+            hidden: true
         },
         {
             dataField: 'ignoreButton',
@@ -52,6 +52,8 @@ class DisplayWarning extends Component {
                         rows.push({objectID: selID, ...this.props.series[this.props.selectionID].warnings[warning]})
                     }
                     return rows
+                default:
+                    return []
             }
         } else {
             return []

@@ -99,12 +99,11 @@ class StudiesTab extends Component {
                 studies.push({...tempStudy})
             }
         }
-        console.log(studies)
         return studies
     }
 
     componentDidUpdate(prevState) {
-        if (this.props.selectedStudy != undefined && prevState.series != this.props.series) {
+        if (this.props.selectedStudy !== undefined && prevState.series !== this.props.series) {
             console.log("RERENDERING")
             this.render()
         }
@@ -149,9 +148,8 @@ class StudiesTab extends Component {
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient studyUID={this.selectedStudy} validateCheckPatient={this.validateCheckPatient}
-                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)}
-                                expectedStudy={this.props.studies} currentStudy={this.props.studies} />
+                            <CheckPatient studyUID={this.props.selectedStudy} validateCheckPatient={this.validateCheckPatient}
+                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} />
                         </Col>
                         <Col xs={6} md={4}>
                             <DisplayWarning type='studies' selectionID={this.props.selectedStudy} />

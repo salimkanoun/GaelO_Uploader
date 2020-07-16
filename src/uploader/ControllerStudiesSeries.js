@@ -13,77 +13,69 @@
  */
 
 import React, { Component, Fragment } from 'react'
-import DisplayStudies from './DisplayStudies.js'
-import DisplaySeries from './DisplaySeries.js'
+import { connect } from 'react-redux'
+
 import Row from 'react-bootstrap/Row'
 
+import DisplayStudies from './DisplayStudies.js'
+import DisplaySeries from './DisplaySeries.js'
+import { seriesReady } from './actions/DisplayTables'
+class ControllerStudiesSeries extends Component {
 
-export default class ControllerStudiesSeries extends Component {
-
-    state = {
-        selectedStudy: undefined,
-        seriestoUpload: [],
-        selectedSeries: []
-    }
-
-    constructor(props) {
-        super(props)
-        this.updateSelectedSeries = this.updateSelectedSeries.bind(this)
+    componentDidUpdate(prevState) {
+        if (prevState.selectedSeries !== this.props.selectedSeries) {
+            this.prepareSeriesToUpload()
+        }
     }
 
     prepareSeriesToUpload = () => {
-        //console.log(this.state.selectedSeries)
-        let seriesIDs = this.state.selectedSeries
-        let series = []
-            let study = this.props.uploadModel.getStudy(this.state.selectedStudy)['series']
-            seriesIDs.forEach( (serie) => {
-                    console.log(study[serie])
-                    series.push(study[serie])
-                
-                 } )
-    
-        console.log(series)
-        this.setState( { seriesToUpload: [...series] }, () => (console.log(this.state.seriesToUpload)) )
-        
-    }
-
-    updateSelectedSeries = (series) => {
-        console.log(series)
-        this.setState( {selectedSeries: series }, () => (this.prepareSeriesToUpload()))
-    }
-
-    setCurrentStudy = (studyUID) => {
-        this.setState({ selectedStudy: studyUID })
-
-    }
-
-    validateCheckPatient(studyUID) {
-        //console.log(studyUID)
-    }
-
-    ignoreStudyWarning(studyUID) {
-
-    }
-
-    getSeries(studyUID) {
-        if (studyUID !== undefined) {
-            return this.props.uploadModel.getStudy(studyUID).getSeriesArray()
-        }
-        else return []
+        let seriesIDs = this.props.selectedSeries
+        let series = {}
+        //Fetch series in the model
+        let studies = Object.values(this.props.studies)
+        studies.forEach(study => {
+            let studyID = study.studyUID
+            //Check if there is no warning on study level
+            if (this.props.studies[studyID].warnings = {}) {
+                //If there isn't, series are OK to be uploaded
+                Object.values(study.series).forEach(theSeries => {
+                    if (seriesIDs.includes(theSeries.seriesInstanceUID)) {
+                        if (series[studyID] === undefined) {
+                            series[studyID] = []
+                        }
+                        series[studyID].push(theSeries.seriesInstanceUID)
+                    }
+                })
+            }
+        })
+        this.props.seriesValidated(series)
     }
 
     render() {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning}
-                        studies={this.props.uploadModel.getStudiesArray()} onSelectChange={this.setCurrentStudy} />
+                    <DisplayStudies studies={this.props.studies} series={this.props.series} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
                 </Row>
                 <Row>
-                    <DisplaySeries studyUID={this.state.selectedStudy} series={this.getSeries(this.state.selectedStudy)}
-                    selectedSeries={this.updateSelectedSeries} />
+                    <DisplaySeries selectedStudy={this.props.selectedStudy} />
                 </Row>
             </Fragment>
         )
     }
 }
+
+
+const mapStateToProps = state => {
+    return {
+        studies: state.Studies.studies,
+        series: state.Series.series,
+        selectedStudy: state.DisplayTables.selectedStudy
+    }
+}
+
+const mapDispatchToProps = {
+    seriesReady
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

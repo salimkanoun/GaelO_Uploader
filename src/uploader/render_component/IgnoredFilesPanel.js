@@ -46,7 +46,6 @@ export default class IgnoredFilesPanel extends Component {
                 reason: this.props.dataIgnoredFiles[ignoredFileName],
             })            
         })
-        //console.log(rows)
         return rows
     }
 

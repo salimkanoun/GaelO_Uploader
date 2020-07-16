@@ -1,86 +1,82 @@
 import React, { Component } from "react";
 import BootstrapTable from 'react-bootstrap-table-next'
 import ButtonIgnore from './render_component/ButtonIgnore'
-export default class DisplayWarning extends Component {
-
-    state = {
-        rows: {}
-    }
-    constructor(props) {
-        super(props)
-        this.rowsLength = Object.keys(this.state.rows).length
-        this.onClick = this.onClick.bind(this)
-    }
-
-    onClick(id, ignored) {
-        this.setState(state => {
-            state.forEach(row => {
-                if (row.rowName === id) row[id]['valid'] = ignored
-            })
-        })
-        checkSeriesValidation(id)
-    }
+//Redux
+import { connect } from 'react-redux';
+import { updateWarningSeries } from './actions/StudiesSeries'
+class DisplayWarning extends Component {
 
     columns = [
         {
-            dataField: 'id',
+            dataField: 'objectID',
+            hidden: true,
+        },
+        {
+            dataField: 'key',
             isDummyField: true,
             hidden: true,
         },
         {
-            dataField: 'warning',
+            dataField: 'content',
             text: 'Warnings',
+        },
+        {
+            dataField: 'dismissed',
+            hidden: true
         },
         {
             dataField: 'ignoreButton',
             text: '',
+            formatter: (cell, row, rowIndex, extraData) => (
+                <ButtonIgnore warning={this.props.series[row.objectID].warnings[row.key].dismissed} 
+                onClick={async () => {
+                    await this.props.updateWarningSeries(row)
+                }} />
+            ),
         },
     ]
 
     /*Build the tab rows according to the type of object*/
     buildRow() {
-        if (this.props.loaded) {
-            if (this.props.type === 'studies') {
-                let rows = []
-                this.props.object.forEach(
-                    series => { rows.push({ series: series.warnings }) })
-                return rows
-            } else if (this.props.type === 'series') {
-                let series = this.props.object
-                series.forEach((sr) => {
-                    let srIUID = sr['seriesInstanceUID']
-                    sr = (sr['warnings'])
-                    for (let key in sr) {
-                        this.setState( { rows: { [this.rowsLength]:{seriesID: srIUID,
-                            warning: sr[key]['content'],
-                            ignoreButton: <ButtonIgnore id={srIUID} onClick={this.onClick} />,
-                            valid: (this.sr[key]['content'] === undefined) ? true : false } }
-                        } )
-                        this.rowsLength++
-                        //console.log(this.rowsLength)
+        if (this.props.selectionID !== undefined && this.props.selectionID !== null){
+            let rows = []
+            switch(this.props.type) {
+                case 'studies':
+                    for (let warning in this.props.studies[this.props.selectionID].warnings) {
+                        rows.push(this.props.studies[this.props.selectionID].warnings[warning])
                     }
-                    //console.log(this.state.rows)
-                })
-                return []
+                    return rows
+                case 'series':
+                    let selID = this.props.selectionID
+                    for (let warning in this.props.series[this.props.selectionID].warnings) {
+                        rows.push({objectID: selID, ...this.props.series[this.props.selectionID].warnings[warning]})
+                    }
+                    return rows
+                default:
+                    return []
             }
+        } else {
+            return []
         }
+
     }
 
-    checkSeriesValidation(rowID) {
-        this.state.rows[id]( 
-            
+    checkObjectValidation(rowID) {
+        this.state.rows[rowID](
+
         )
         this.setState((state) => { return { rows: !state.rows[rowID] } })
     }
 
     render() {
-        if (this.props.loaded) {
+        if (this.props.object !== null) {
             return (
                 <BootstrapTable
-                    keyField='warning'
+                    keyField='key'
                     classes="table table-borderless"
                     bodyClasses="du-warnings"
                     headerClasses="du-warnings th"
+                    wrapperClasses="table-responsive"
                     data={this.buildRow()}
                     columns={this.columns}
                 />
@@ -90,3 +86,15 @@ export default class DisplayWarning extends Component {
         }
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        studies: state.Studies.studies,
+        series: state.Series.series
+    }
+}
+const mapDispatchToProps = {
+    updateWarningSeries
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DisplayWarning)

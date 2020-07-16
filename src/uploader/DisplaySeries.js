@@ -17,24 +17,19 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-
 import DisplayWarning from './DisplayWarning'
+//Redux
+import { connect } from 'react-redux';
+import { selectSeries, seriesReady } from './actions/DisplayTables'
 
-export default class DisplaySeries extends Component {
-
-    state = {
-        selectedSeries:[]
-    }
-
-    constructor(props) {
-        super(props)
-    }
+class DisplaySeries extends Component {
 
     columns = [
         {
             dataField: 'seriesInstanceUID',
             isDummyField: true,
-            hidden: true
+            hidden: true,
+            
         },
         {
             dataField: 'status',
@@ -60,35 +55,46 @@ export default class DisplaySeries extends Component {
             dataField: 'numberOfInstances',
             text: 'Nb of Instances',
         },
-
     ];
 
     selectRow = {
         mode: 'checkbox',
         clickToSelect: true,
+        classes: "row-clicked",
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
             //ICI FAIRE REMONTER L INFO QUE L UPLAD EST A FAIREs
-            if (isSelect) {
-                this.setState( (prevState) => ( {selectedSeries: [...prevState.selectedSeries, row.seriesInstanceUID] } ),
-                () => (this.props.selectedSeries(this.state.selectedSeries)) )
-            } else {
-                this.setState( (prevState) => ({selectedSeries: prevState.selectedSeries.filter(thisRow => thisRow !== row.seriesInstanceUID)}),
-                () => (this.props.selectedSeries(this.state.selectedSeries)) )
+            this.props.selectSeries(row, isSelect)
+            if (row.dismissed) {
+                this.props.seriesReady(row, isSelect)
             }
-            
         }
     }
 
-    buildRows() {
-        let rows = []
-        this.props.series.forEach(series => {
-            rows.push({
-                ...series,
-                numberOfInstances: Object.keys(series.instances).length
-            })
-        })
-        return rows
+    buildRows(selectedStudy) {
+        if (selectedStudy !== null && selectedStudy !== undefined) {
+            let seriesArray = []
+            let seriesToDisplay = Object.keys(this.props.studies[selectedStudy].series)
+            seriesToDisplay.forEach((series) => {
+                let seriesToPush = this.props.series[series]
+                seriesToPush['status'] = (this.warningsPassed(series)) ? 'Valid' : 'Rejected'
+                seriesArray.push({
+                    ...seriesToPush
+                })
+            }
+            )
+            return seriesArray
+        }
+        else return []
+    }
+
+    warningsPassed(series) {
+        for (let warning in this.props.series[series].warnings) {
+            if (!this.props.series[series].warnings[warning].dismissed) {
+                return false
+            }
+        }
+        return true
     }
 
     render() {
@@ -102,22 +108,31 @@ export default class DisplaySeries extends Component {
                             bodyClasses="du-series-tbody"
                             headerClasses="du-series th"
                             rowClasses="du-series td"
+                            wrapperClasses="table-responsive"
                             keyField='seriesInstanceUID'
-                            data={this.buildRows()}
+                            data={this.buildRows(this.props.selectedStudy)}
                             columns={this.columns}
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-
+                        <DisplayWarning type='series' selectionID={this.props.selectedSeries[(this.props.selectedSeries.length)-1]} />
                     </Col>
                 </Row>
             </Container>
         )
     }
-
 }
 
-/*
-<DisplayWarning type='series' object={(this.props.series.length !== 0) ? this.props.series : null}
-                                loaded={(this.props.series.length !== 0) ? true : false} />
-                                */
+const mapStateToProps = state => {
+    return {
+        series: state.Series.series,
+        studies: state.Studies.studies,
+        selectedSeries: state.DisplayTables.selectedSeries
+    }
+}
+const mapDispatchToProps = {
+    selectSeries,
+    seriesReady
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DisplaySeries)

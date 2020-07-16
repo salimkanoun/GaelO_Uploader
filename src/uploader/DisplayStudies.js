@@ -12,37 +12,164 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
+import BootstrapTable from 'react-bootstrap-table-next';
+import Button from 'react-bootstrap/Button'
+import CheckPatient from './CheckPatient'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
+//Redux
+import { connect } from 'react-redux';
+import { selectStudy } from './actions/DisplayTables'
 
-import StudiesTab from './StudiesTab'
+import { validateCheckPatient } from './actions/StudiesSeries'
 
-export default class DisplayStudies extends Component {
-  render () {
-    /* if (this.props.studies.length !== 0) {
-            console.log(this.props.studies[0]['warnings'])
-        } */
-    return (
-      <>
-        <Container fluid>
-          <span class='title'>Studies</span>
-          <Row>
-            <Col xs={12} md={8}>
-              <StudiesTab
-                studies={this.props.studies} onSelectChange={this.props.onSelectChange}
-                validateCheckPatient={this.props.validateCheckPatient}
-              />
-            </Col>
-            <Col xs={6} md={4} />
-          </Row>
-        </Container>
-      </>
-    )
-  }
+class StudiesTab extends Component {
+
+    state = {
+        isCheck: false,
+    }
+
+    constructor(props) {
+        super(props)
+        this.validateCheckPatient = this.validateCheckPatient.bind(this)
+        this.toggleCheckPatient = this.toggleCheckPatient.bind(this)
+    }
+
+    columns = [
+        {
+            dataField: 'studyUID',
+            isDummyField: true,
+            hidden: false,
+            formatter: (cell, row, rowIndex, extraData) => (
+                <Button onClick={() => { this.toggleCheckPatient(row); }}>
+                    Check Patient
+                </Button>
+            ),
+        },
+        {
+            dataField: 'status',
+            text: 'Status',
+        },
+        {
+            dataField: 'patientName',
+            text: 'Patient name',
+        },
+        {
+            dataField: 'studyDescription',
+            text: 'Description',
+        },
+        {
+            dataField: 'accessionNumber',
+            text: 'Accession #',
+        },
+        {
+            dataField: 'acquisitionDate',
+            text: 'Date',
+        },
+    ]
+
+    selectRow = {
+        mode: 'radio',
+        clickToSelect: true,
+        hideSelectColumn: true,
+        classes: "row-clicked",
+        onSelect: (row) => {
+            this.props.selectStudy(row.studyUID)
+        }
+    };
+
+    validateCheckPatient = (studyUID) => {
+
+    }
+
+    toggleCheckPatient(row) {
+        this.setState((state) => { return { isCheck: !state.isCheck } })
+        return row
+    }
+
+    getStudies() {
+        let studies = []
+        if (Object.keys(this.props.studies).length > 0) {
+            for (let study in this.props.studies) {
+                let tempStudy = this.props.studies[study]
+                tempStudy['status'] = this.warningsPassed(study)
+                studies.push({...tempStudy})
+            }
+        }
+        return studies
+    }
+
+    componentDidUpdate(prevState) {
+        if (this.props.selectedStudy !== undefined && prevState.series !== this.props.series) {
+            console.log("RERENDERING")
+            this.render()
+        }
+    }
+
+    warningsPassed(study) {
+        let studyStatus = 'Valid'
+        //Check for warnings in study
+        for (let warning in this.props.studies[study].warnings) {
+            if (!this.props.studies[study].warnings[warning].dismissed) {
+                studyStatus = 'Rejected'
+            }
+        }
+        //Check for warnings in series
+        for (let series in this.props.series) {
+            if (Object.keys(this.props.studies[study].series).includes(series)) {
+                for (let warning in this.props.series[series].warnings) {
+                    if (!this.props.series[series].warnings[warning].dismissed) {
+                        studyStatus = 'Incomplete'
+                    }
+                }
+            }
+        }
+        return studyStatus 
+    }
+
+    render() {
+        return (
+            <>
+                <Container fluid>
+                    <span class='title'>Studies</span>
+                    <Row>
+                        <Col xs={12} md={8}>
+                            <BootstrapTable
+                                keyField='studyUID'
+                                classes="table table-borderless"
+                                bodyClasses="du-studies-tbody"
+                                headerClasses="du-studies th"
+                                rowClasses="du-studies td"
+                                data={this.getStudies()}
+                                columns={this.columns}
+                                selectRow={this.selectRow}
+                                wrapperClasses="table-responsive"
+                            />
+                            <CheckPatient studyUID={this.props.selectedStudy} validateCheckPatient={this.validateCheckPatient}
+                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} />
+                        </Col>
+                        <Col xs={6} md={4}>
+                            <DisplayWarning type='studies' selectionID={this.props.selectedStudy} />
+                        </Col>
+                    </Row>
+                </Container>
+
+            </>
+        )
+    }
 }
 
-/* <DisplayWarning type='studies' object={(this.props.studies.length !== 0) ? this.props.studies : null}
-                                loaded={(this.props.studies.length !== 0) ? true : false} /> */
+const mapStateToProps = state => {
+    return {
+        selectedStudy: state.DisplayTables.selectedStudy
+    }
+}
+const mapDispatchToProps = {
+    selectStudy,
+    validateCheckPatient
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

@@ -1,44 +1,73 @@
 import React, { Component, Fragment } from 'react'
+import { connect } from 'react-redux'
+
 import Card from 'react-bootstrap/Card'
 import Dropzone from 'react-dropzone'
-import dicomParser from 'dicom-parser'
-import DicomFile from '../model/DicomFile'
+import Uppy from '@uppy/core'
+import Tus from '@uppy/tus'
+
 import Model from '../model/Model'
-import Study from '../model/Study'
-import Series from '../model/Series'
-import Instance from '../model/Instance'
+import DicomFile from '../model/DicomFile'
+import DicomBatchUploader from '../model/DicomBatchUploader'
+
 import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import IgnoredFilesPanel from './render_component/IgnoredFilesPanel'
 import WarningPatient from './render_component/WarningPatient'
+
 import { getAets, logIn, registerStudy } from '../services/api'
 
-export default class Uploader extends Component {
+import { addSeries, addStudy } from './actions/StudiesSeries'
+
+class Uploader extends Component {
 
     state = {
         fileIgnored: 0,
         fileParsed: 0,
         fileLoaded: 0,
+        parseFinished: false,
         showIgnoredFiles: false,
         ignoredFiles: {},
         showWarning: false,
-        zipPercent: 50,
-        uploadPercent: 30,
-        queuedStudies: []
+        zipProgress: 0,
+        uploadProgress: 0,
+        seriesValidated: {}
     }
 
     constructor(props) {
 
         super(props)
-
         this.uploadModel = new Model();
 
-        this.toogleShowIgnoreFile = this.toogleShowIgnoreFile.bind(this)
+        this.toggleShowIgnoreFile = this.toggleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
-        this.uploadStudies = this.uploadStudies.bind(this)
-        this.ignoredFiles = {}
+        this.onUploadDone = this.onUploadDone.bind(this)
+        this.seriesValidated = this.seriesValidated.bind(this)
+
+        this.uppy = Uppy({
+            id: 'uppy',
+            autoProceed: true,
+            allowMultipleUploads: true,
+            debug: true
+        })
+
+        this.uppy.use(Tus, {
+            endpoint: '/tus', // use your tus endpoint here
+            resume: true,
+            autoRetry: true,
+            chunkSize: 2000000,
+            limit: 3,
+            headers: {},
+            retryDelays: [0, 1000, 3000, 5000]
+        })
+
+        this.uppy.on('upload-error', (file, error, response) => {
+            console.log('error with file:', file.id)
+            console.log('error message:', error)
+        })
+
     }
 
     async componentDidMount() {
@@ -49,100 +78,144 @@ export default class Uploader extends Component {
     }
 
     addFile(files) {
-        this.setState((previousState) => { return { fileLoaded: previousState.fileLoaded++ } })
+        this.setState((previousState) => { return { fileLoaded: (previousState.fileLoaded + files.length) } })
         console.log('Added file', files)
-        files.forEach(file => {
-            this.read(file)
+        let readPromises = files.map((file) => {
+            return this.read(file)
+        })
+        Promise.all(readPromises).then(() => {
+            this.checkSeriesAndSendData()
         })
 
-        //console.log(this.uploadModel)
     }
 
     /**
 	 * Read and parse dicom file
 	 */
-    read(file) {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(file);
-        reader.onload = () => {
-            // Retrieve file content as Uint8Array
-            const arrayBuffer = reader.result;
-            const byteArray = new Uint8Array(arrayBuffer);
-            try {
-                // Try to parse as dicom file
-                //Will throw exception if not dicom file (exeption from dicomParser)
-                let dataSet = dicomParser.parseDicom(byteArray)
-                //But read data in a DicomFile Object
-                let dicomFile = new DicomFile(file, dataSet);
-                let study;
-                let series;
+    async read(file) {
+        try {
+            let dicomFile = new DicomFile(file);
+            await dicomFile.readDicomFile()
 
-                //console.log(dicomFile)
-                let dicomStudyID = dicomFile.getStudyInstanceUID()
-                let dicomSeriesID = dicomFile.getSeriesInstanceUID()
-                let dicomInstanceID = dicomFile.getSOPInstanceUID()
+            let studyInstanceUID = dicomFile.getStudyInstanceUID()
+            let seriesInstanceUID = dicomFile.getSeriesInstanceUID()
 
-                if (!this.uploadModel.isExistingStudy(dicomStudyID)) {
-                    study = new Study(dicomStudyID, dicomFile.getStudyID(), dicomFile.getStudyDate(), dicomFile.getStudyDescription(),
-                        dicomFile.getAccessionNumber(), dicomFile.getPatientID(), dicomFile.getPatientFirstName(), dicomFile.getPatientLastName(),
-                        dicomFile.getPatientBirthDate(), dicomFile.getPatientSex(), dicomFile.getAcquisitionDate());
-                    this.uploadModel.addStudy(study);
-                } else {
-                    study = this.uploadModel.getStudy(dicomStudyID)
-                }
+            let study
+            if (!this.uploadModel.isExistingStudy(studyInstanceUID)) {
+                study = this.uploadModel.addStudy(dicomFile.getStudyObject())
+            } else {
+                study = this.uploadModel.getStudy(studyInstanceUID)
+            }
 
-                if (!study.isExistingSeries(dicomSeriesID)) {
-                    series = new Series(dicomSeriesID, dicomFile.getSeriesNumber(), dicomFile.getSeriesDate(),
-                        dicomFile.getSeriesDescription(), dicomFile.getModality());
-                    study.addSeries(series);
-                } else {
-                    series = study.getSeries(dicomSeriesID)
-                }
+            let series
+            if (!study.isExistingSeries(seriesInstanceUID)) {
+                series = study.addSeries(dicomFile.getSeriesObject())
+            } else {
+                series = study.getSeries(seriesInstanceUID)
+            }
 
-                if (!series.isExistingInstance(dicomInstanceID)) {
-                    series.addInstance(new Instance(dicomInstanceID, dicomFile.getInstanceNumber(), dicomFile, file));
-                    this.setState((previousState) => { return { fileParsed: previousState.fileParsed++ } })
-                } else {
-                    //this.setState((previousState) => { return { fileIgnored: previousState.fileIgnored++ } })
-                    throw ("Existing instance")
-                }
-                series.checkSeries(dicomFile)
+            series.addInstance(dicomFile.getInstanceObject())
 
+            this.setState((previousState) => { return { fileParsed: ++previousState.fileParsed } })
 
-            } catch (e) {
-                console.warn(e)
-                this.setState(state => {
-                    //SK ICI BUG IGNORE FILE A UN SEUL ITEM
-                    return {
-                        fileIgnored: state.fileIgnored++,
-                        ignoredFiles: {
-                            ...state.ignoredFiles,
-                            [file.name]: e
-                        }
+        } catch (error) {
+            //Save only message of error
+            let errorMessage = error
+            if (typeof error === 'object') {
+                errorMessage = error.message
+            }
+            this.setState(state => {
+                return {
+                    fileIgnored: ++state.fileIgnored,
+                    ignoredFiles: {
+                        ...state.ignoredFiles,
+                        [file.name]: errorMessage
                     }
-                })
+                }
+            })
+        }
+
+    }
+
+    async checkSeriesAndSendData() {
+        //Check series to send warning
+        //SK ICI A AMELIORER NE TESTER QUE LES NOUVELLE SERIES DEPUIS LE PARSE
+        let studies = this.uploadModel.getStudiesArray()
+        for (let study of studies) {
+            let series = study.getSeriesArray()
+            for (let serieInstance of series) {
+                //SK DICOMFILE et INSTANCE A REVOIR
+                let firstInstance = serieInstance.getArrayInstances()[0]
+                await serieInstance.checkSeries(new DicomFile(firstInstance.getFile()))
+
+            }
+        }
+
+        //ICI A VOIR DIFFEREMENT IL FAUT QUE LE CONTROLEUR INJECTE SEPARAMENT 
+        //LES NOUVELLES STUDIES + WARNING SI PATIENT NE MATCH PAS PATIENT ATTENDU
+        // LES NOUVELLES SERIES + LES WARNING
+        console.log(this.uploadModel.data)
+        this.props.addStudy(this.uploadModel.data)
+        for (let study in this.uploadModel.data) {
+            for (let series in this.uploadModel.data[study].series) {
+                this.props.addSeries(this.uploadModel.data[study].series[series])
             }
         }
     }
 
     /*Trigger ignored files panel if clicked*/
-    toogleShowIgnoreFile() {
+    toggleShowIgnoreFile() {
         this.setState(((state) => { return { showIgnoredFiles: !state.showIgnoredFiles } }))
     }
 
     /*Trigger hide warning if closed*/
     onHideWarning() {
-        console.log(this.state.onHideWarning)
         this.setState((state) => { return { showWarning: !state.showWarning } });
     }
 
-    onUploadClick(e) {
-        console.log('upload clicked')
+    seriesValidated = (series) => {
+        this.setState(() => { return { seriesValidated: { ...series } } })
+    }
+
+    async onUploadClick(e) {
+
+        /*let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
+        let studyIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.304'
+        let seriesIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.610'
+        let seriesID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
+        let series = this.uploadModel.getStudy(studyID).getSeries(seriesID)
+        let instances = series.getArrayInstances()*/
+        let instancesToUpload = []
+
+        //Gather all instances to upload
+        for (let studyID in this.state.seriesValidated) {
+            for (let seriesID in this.state.seriesValidated[studyID]) {
+                    seriesID = this.state.seriesValidated[studyID][seriesID]
+                    let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
+                    instancesToUpload.push(...mySeries.getArrayInstances())
+            }
+        }
+
+        let fileArray = instancesToUpload.map(instance => {
+            return instance.getFile()
+        })
+
+        let uploader = new DicomBatchUploader(this.uppy, fileArray, this.onUploadDone)
+        this.intervalProgress = setInterval(() => {
+            console.log(uploader.getProgress())
+            this.setState({
+                ...uploader.getProgress()
+            })
+        }, 200)
+
+
+        uploader.startUpload()
 
     }
 
-    uploadStudies = (studiesReady) => {
-        return null
+    onUploadDone() {
+        clearInterval(this.intervalProgress)
+        console.log("upload Finished")
     }
 
     render() {
@@ -160,14 +233,28 @@ export default class Uploader extends Component {
                                 </section>
                             )}
                         </Dropzone>
-                        <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toogleShowIgnoreFile} />
-                        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
+                        <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
+                        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries uploadModel={this.uploadModel} studiesReadyToUpload={this.uploadStudies} />
-                        <ProgressUpload onUploadClick={this.onUploadClick} zipPercent={this.state.zipPercent} uploadPercent={this.state.uploadPercent} />
+                        <ControllerStudiesSeries selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
+                        <ProgressUpload multiUpload={false} studyProgress = {3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </Card.Body>
                 </Card>
             </Fragment>
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        studies: state.Studies.studies,
+        series: state.Series.series,
+        selectedSeries: state.DisplayTables.selectedSeries,
+    }
+}
+const mapDispatchToProps = {
+    addStudy,
+    addSeries,
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

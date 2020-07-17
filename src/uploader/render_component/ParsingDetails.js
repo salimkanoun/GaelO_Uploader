@@ -15,13 +15,31 @@
 import React, { Component } from 'react'
 import Badge from 'react-bootstrap/Badge'
 
+import IgnoredFilesPanel from './IgnoredFilesPanel'
+
 export default class ParsingDetails extends Component {
+
+  state ={
+    showIgnoredFiles : false
+  }
+
+  constructor(props){
+    super(props)
+    this.toogleShowIgnoredFile = this.toogleShowIgnoredFile.bind(this)
+  }
+
+  toogleShowIgnoredFile(){
+    this.setState( (state) => {return {showIgnoredFiles : !state.showIgnoredFiles}} )
+
+  }
+
   render () {
     return (
       <>
         <Badge variant='secondary'>{this.props.fileLoaded} File(s) loaded</Badge>
         <Badge variant='success'>{this.props.fileParsed} File(s) parsed</Badge>
-        <Badge variant='warning' className='du-ignored-badge' onClick={this.props.onClick}>{this.props.fileIgnored} File(s) ignored (Click to show)</Badge>
+        <Badge variant='warning' className='du-ignored-badge' onClick={this.toogleShowIgnoredFile}>{Object.keys(this.props.dataIgnoredFiles).length} File(s) ignored (Click to show)</Badge>
+        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toogleShowIgnoredFile} dataIgnoredFiles={this.props.dataIgnoredFiles} />
       </>
     )
   }

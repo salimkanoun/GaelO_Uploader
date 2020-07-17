@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 
-import Card from 'react-bootstrap/Card'
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
 
@@ -14,7 +13,6 @@ import DicomDropZone from './render_component/DicomDropZone'
 import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
-import IgnoredFilesPanel from './render_component/IgnoredFilesPanel'
 import WarningPatient from './render_component/WarningPatient'
 
 import { getAets, logIn, registerStudy } from '../services/api'
@@ -26,13 +24,11 @@ class Uploader extends Component {
 
     state = {
         isFilesLoaded: false,
-        isMultiUploadModeOn: false,
-        fileIgnored: 0,
+        multiUpload: false,
         fileParsed: 0,
         fileLoaded: 0,
         isParsingFiles: false,
         isUploadStarted : false,
-        showIgnoredFiles: false,
         ignoredFiles: {},
         showWarning: false,
         zipProgress: 0,
@@ -45,7 +41,6 @@ class Uploader extends Component {
         super(props)
         this.uploadModel = new Model();
         this.addFile = this.addFile.bind(this)
-        this.toggleShowIgnoreFile = this.toggleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
         this.onUploadDone = this.onUploadDone.bind(this)
@@ -148,7 +143,6 @@ class Uploader extends Component {
             }
             this.setState(state => {
                 return {
-                    fileIgnored: ++state.fileIgnored,
                     ignoredFiles: {
                         ...state.ignoredFiles,
                         [file.name]: errorMessage
@@ -192,14 +186,7 @@ class Uploader extends Component {
      * 
      */
     triggerMultiUpload() {
-        this.setState((state) => ({isMultiUploadModeOn: !state.isMultiUploadModeOn}))
-    }
-
-    /**
-     * Trigger ignored files panel if clicked
-     */
-    toggleShowIgnoreFile() {
-        this.setState(((state) => { return { showIgnoredFiles: !state.showIgnoredFiles } }))
+        this.setState((state) => ({multiUpload: !state.multiUpload}))
     }
 
     /**
@@ -258,23 +245,26 @@ class Uploader extends Component {
         return (
             <Fragment>
                     <div>
-                        <Button className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.isMultiUploadModeOn ? 'Exit Uploader' : 'Multi Uploader'}</Button>
+                        <Button className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.multiUpload ? 'Exit Uploader' : 'Multi Uploader'}</Button>
                         <DicomDropZone 
                             addFile={this.addFile} 
                             isParsingFiles={this.state.isParsingFiles}
                             isUploadStarted = {this.state.isUploadStarted}
                             fileParsed = {this.state.fileParsed}
-                            fileIgnored = {this.state.fileIgnored}
+                            fileIgnored = {Object.keys(this.state.ignoredFiles).length}
                             fileLoaded = {this.state.fileLoaded}
                         />
                     </div>
                     <div className="mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
-                        <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
+                        <ParsingDetails 
+                            fileLoaded={this.state.fileLoaded} 
+                            fileParsed={this.state.fileParsed} 
+                            dataIgnoredFiles = {this.state.ignoredFiles} 
+                        />
                     </div>
                     <div hidden={!this.state.isFilesLoaded}>
-                        <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries multiUploader={this.state.isMultiUploadModeOn} selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
+                        <ControllerStudiesSeries multiUploader={this.state.multiUpload} selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
                         <ProgressUpload multiUpload={false} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </div>
             </Fragment>

@@ -17,19 +17,9 @@ import Button from 'react-bootstrap/Button'
 
 export default class ButtonIgnore extends Component {
 
-    constructor(props) {
-        super(props)
-        this.onClick = this.onClick.bind(this)
-    }
-
-    onClick() {
-        this.props.onClick(this.props.rowName)
-        this.forceUpdate()
-    }
-
     render() {
         return (
-            <Button onClick={this.onClick}> { (this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore' } </Button>
+            <Button onClick={() => this.props.onClick(this.props.rowName)}> { (this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore' } </Button>
         )
     }
 }

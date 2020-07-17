@@ -19,7 +19,6 @@ export default class DicomBatchUploader {
             this.currentBatchUpload = ++this.currentBatchUpload
             let fractionUploaded = ( this.currentBatchUpload * this.batchValue)
             this.uploadProgress = Math.min(fractionUploaded , 100)
-            //SK MODIF POUR PREPARER LE SUIVANT QUAND UN UPLOAD ATTEINT 80% ?
             await this.batchesIterator.next()
         })
 
@@ -87,12 +86,10 @@ export default class DicomBatchUploader {
 
             yield true
 
-
         }
 
         return
 
-        
     }
 
 

@@ -23,18 +23,20 @@ export default function DisplayTablesReducer (state = initialState, action) {
       }
 
     case SERIES_READY:
+      let seriesReady
       if (action.payload.isSelect) {
-        return {
-          ...state,
-          seriesReady: [...state.seriesReady, action.payload.validSeriesID]
-        }
+        //If select add SeriesUID to selectedSeries
+        seriesReady  = [...state.seriesReady, action.payload.validSeriesID]
       } else if (!action.payload.isSelect) {
-        return {
-          ...state,
-          seriesReady: state.seriesReady.filter(thisRowID => thisRowID !== action.payload.validSeriesID)
-        }
+        //If not remove SeriesUID from selected Series Array
+        seriesReady = state.seriesReady.filter(thisRowID => thisRowID !== action.payload.validSeriesID)
+        
       }
-
+      return {
+        ...state,
+        seriesReady: seriesReady
+      }
+    
     default:
       return state
   }

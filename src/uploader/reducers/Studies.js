@@ -7,6 +7,7 @@ const initialState = {
 
 export default function StudiesReducer (state = initialState, action) {
   switch (action.type) {
+    
     case ADD_STUDY:
       const study = action.payload
       return {

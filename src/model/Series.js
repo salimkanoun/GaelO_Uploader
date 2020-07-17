@@ -55,12 +55,7 @@ export default class Series {
 	}
 
 	getArrayInstances() {
-		let instances = []
-		Object.keys(this.instances).forEach(
-			instanceID => {
-				instances.push(this.instances[instanceID])
-			}
-		)
+		let instances = Object.values(this.instances)
 		return instances
 	}
 

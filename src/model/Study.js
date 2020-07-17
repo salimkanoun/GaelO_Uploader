@@ -27,8 +27,8 @@ export default class Study {
         this.patientFirstName = patientFirstName
         this.patientLastName = patientLastName
         this.patientBirthDate = this.getDate(patientBirthDate)
-        this.patientSex = patientSex;
-        this.acquisitionDate = this.getDate(acquisitionDate);
+        this.patientSex = patientSex
+        this.acquisitionDate = this.getDate(acquisitionDate)
         this.patientName = patientFirstName + ' ' + patientLastName
         this.warnings = {}
     }
@@ -50,10 +50,7 @@ export default class Study {
     }
 
     getSeriesArray() {
-        let series = []
-        Object.keys(this.series).forEach(seriesUID => {
-            series.push(this.series[seriesUID])
-        })
+        let series = Object.values(this.series)
         return series
     }
 
@@ -108,35 +105,6 @@ export default class Study {
     getPatientID() {
         return this.patientID
     }
-
-    /*
-    checkStudies() {
-        for (let st of this.studies) {
-
-            // Check if the study corresponds to the visits in wait for series upload
-			/*let expectedVisit = this.findExpectedVisit(st);
-			if (expectedVisit === undefined) {
-				st.setWarning('notExpectedVisit', 'You should check/select the patient. The imported study informations do not match with the expected ones.', true, false, true);
-			} else {
-				delete st.warnings['notExpectedVisit'];
-				if (!this.config.multiImportMode) {
-					st.visit = expectedVisit;
-				}
-			}
-
-			// Check if visit ID is set
-			if (st.visit == null || typeof st.visit.idVisit === undefined) {
-				st.setWarning('visitID', 'You should check/select the patient. Null visit ID.', false, true, false);
-			} else {
-				delete st.warnings['visitID'];
-			}
-
-			// Check inner series
-			this.checkSeries(st);
-
-        }
-    }
-    */
 
     setStatusStudy(key, dismissed) {
         this.warnings[key]['dismissed'] = dismissed

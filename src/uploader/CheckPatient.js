@@ -14,13 +14,14 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+
 import Modal from 'react-bootstrap/Modal'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import ListGroup from 'react-bootstrap/ListGroup'
-import BootstrapTable from 'react-bootstrap-table-next';
-import ButtonIgnore from './render_component/ButtonIgnore'
 import Button from 'react-bootstrap/Button'
+import BootstrapTable from 'react-bootstrap-table-next';
 
+import ButtonIgnore from './render_component/ButtonIgnore'
 import { validateCheckPatient } from './actions/DisplayTables'
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
@@ -35,7 +36,6 @@ class CheckPatient extends Component {
     constructor(props) {
         super(props)
         this.onClick = this.onClick.bind(this)
-        this.buttonElement = React.createRef()
     }
 
     columns = [
@@ -51,7 +51,6 @@ class CheckPatient extends Component {
             dataField: 'currentStudy',
             text: 'Current',
         },
-
         {
             dataField: 'ignoreButton',
             text: '',
@@ -168,9 +167,9 @@ class CheckPatient extends Component {
 }
 
 const rowClasses = (row, rowIndex) => {
-    if (row.ignoredStatus == false) {
+    if (row.ignoredStatus === false) {
         return 'du-studies row-danger'
-    } else if (row.ignoredStatus == null) {
+    } else if (row.ignoredStatus === null) {
         return 'du-studies row-success'
     }
     return 'du-studies td'
@@ -178,9 +177,10 @@ const rowClasses = (row, rowIndex) => {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Studies.studies,
+        studies: state.Studies.studies
     }
 }
+
 const mapDispatchToProps = {
     validateCheckPatient
 }

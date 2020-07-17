@@ -59,7 +59,7 @@ class ControllerStudiesSeries extends Component {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies studies={this.props.studies} series={this.props.series} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
+                    <DisplayStudies multiUploader={this.props.multiUploader} studies={this.props.studies} series={this.props.series} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
                 </Row>
                 <Row>
                     <DisplaySeries selectedStudy={this.props.selectedStudy} />

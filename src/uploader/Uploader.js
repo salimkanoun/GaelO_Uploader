@@ -19,10 +19,13 @@ import WarningPatient from './render_component/WarningPatient'
 import { getAets, logIn, registerStudy } from '../services/api'
 
 import { addSeries, addStudy } from './actions/StudiesSeries'
+import Button from 'react-bootstrap/Button'
 
 class Uploader extends Component {
 
     state = {
+        isFilesNotLoaded: true,
+        isMultiUploadModeOn: false,
         fileIgnored: 0,
         fileParsed: 0,
         fileLoaded: 0,
@@ -44,6 +47,7 @@ class Uploader extends Component {
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
         this.onUploadDone = this.onUploadDone.bind(this)
+        this.triggerMultiUpload = this.triggerMultiUpload.bind(this)
         this.seriesValidated = this.seriesValidated.bind(this)
 
         this.uppy = Uppy({
@@ -86,7 +90,7 @@ class Uploader extends Component {
         Promise.all(readPromises).then(() => {
             this.checkSeriesAndSendData()
         })
-
+        this.setState({ isFilesNotLoaded: false })
     }
 
     /**
@@ -167,6 +171,13 @@ class Uploader extends Component {
     }
 
     /**
+     * 
+     */
+    triggerMultiUpload() {
+        this.setState((state) => ({isMultiUploadModeOn: !state.isMultiUploadModeOn}))
+    }
+
+    /**
      * Trigger ignored files panel if clicked
      */
     toggleShowIgnoreFile() {
@@ -196,9 +207,9 @@ class Uploader extends Component {
         //Gather all instances to upload
         for (let studyID in this.state.seriesValidated) {
             for (let seriesID in this.state.seriesValidated[studyID]) {
-                    seriesID = this.state.seriesValidated[studyID][seriesID]
-                    let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
-                    instancesToUpload.push(...mySeries.getArrayInstances())
+                seriesID = this.state.seriesValidated[studyID][seriesID]
+                let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
+                instancesToUpload.push(...mySeries.getArrayInstances())
             }
         }
 
@@ -228,7 +239,8 @@ class Uploader extends Component {
         return (
             <Fragment>
                 <Card className="col mb-5">
-                    <Card.Body>
+                    <Card.Body id={'dropzone'}>
+                        <Button id="uploadApp" className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.isMultiUploadModeOn ? 'Exit Uploader' : 'Multi Uploader'}</Button>
                         <Dropzone onDrop={acceptedFiles => this.addFile(acceptedFiles)} >
                             {({ getRootProps, getInputProps }) => (
                                 <section>
@@ -239,11 +251,13 @@ class Uploader extends Component {
                                 </section>
                             )}
                         </Dropzone>
+                    </Card.Body>
+                    <Card.Body id={'file-details'} hidden={this.state.isFilesNotLoaded}>
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
-                        <ProgressUpload multiUpload={false} studyProgress = {3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
+                        <ControllerStudiesSeries multiUploader={this.state.isMultiUploadModeOn} selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
+                        <ProgressUpload multiUpload={false} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </Card.Body>
                 </Card>
             </Fragment>

@@ -15,6 +15,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Modal from 'react-bootstrap/Modal'
+import DropdownButton from 'react-bootstrap/DropdownButton'
+import ListGroup from 'react-bootstrap/ListGroup'
 import BootstrapTable from 'react-bootstrap-table-next';
 import ButtonIgnore from './render_component/ButtonIgnore'
 import Button from 'react-bootstrap/Button'
@@ -129,8 +131,20 @@ class CheckPatient extends Component {
         return (
             <Modal show={this.props.show} onHide={this.props.closeListener} updatedData={this.props.studyUID}>
                 <Modal.Header class="modal-header" closeButton>
-                    <Modal.Title class="modal-title" id="du-patientLongTitle">Check Patient</Modal.Title>
+                    <Modal.Title class="modal-title" id="du-patientLongTitle">{this.props.multiUploader ? 'Select Patient' : 'Check Patient'}</Modal.Title>
                 </Modal.Header>
+                <Modal.Body hidden={!this.props.multiUploader} class="modal-body du-patient" id='du-patp-comparison'>
+                    <span class='du-patp-label'>Select Visit Type</span>
+                    <DropdownButton>
+
+                    </DropdownButton>
+                    <span class='du-patp-label'>Select Patient</span>
+                    <ListGroup>
+
+                    </ListGroup>
+                    <span class='du-patp-label'>Comparison</span>
+                    <p>We let you check if the selected patient and the imported patient informations are matching:</p>
+                </Modal.Body>
                 <Modal.Body class="modal-body" id="du-patp-comparison">
                     <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
                     <BootstrapTable

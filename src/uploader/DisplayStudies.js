@@ -45,7 +45,7 @@ class StudiesTab extends Component {
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => (
                 <Button onClick={() => { this.toggleCheckPatient(row); }}>
-                    Check Patient
+                    {(this.props.multiUploader) ? 'Select Patient' : 'Check Patient'}
                 </Button>
             ),
         },
@@ -159,7 +159,7 @@ class StudiesTab extends Component {
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient studyUID={this.props.selectedStudy} validateCheckPatient={this.validateCheckPatient}
+                            <CheckPatient studyUID={this.props.selectedStudy} multiUploader={this.props.multiUploader} validateCheckPatient={this.validateCheckPatient}
                                 show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} hidden={this.props.validatedPatient}/>
                         </Col>
                         <Col xs={6} md={4}>

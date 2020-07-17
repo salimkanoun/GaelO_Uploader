@@ -53,7 +53,8 @@ class DisplaySeries extends Component {
         {
             dataField: 'seriesDescription',
             text: 'Description',
-            editable: false
+            editable: false,
+            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'modality',

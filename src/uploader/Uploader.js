@@ -31,6 +31,7 @@ class Uploader extends Component {
         fileParsed: 0,
         fileLoaded: 0,
         isParsingFiles: false,
+        isUploadStarted : false,
         showIgnoredFiles: false,
         ignoredFiles: {},
         showWarning: false,
@@ -244,6 +245,7 @@ class Uploader extends Component {
 
 
         uploader.startUpload()
+        this.setState({isUploadStarted : true})
 
     }
 
@@ -260,12 +262,13 @@ class Uploader extends Component {
                         <DicomDropZone 
                             addFile={this.addFile} 
                             isParsingFiles={this.state.isParsingFiles}
+                            isUploadStarted = {this.state.isUploadStarted}
                             fileParsed = {this.state.fileParsed}
                             fileIgnored = {this.state.fileIgnored}
                             fileLoaded = {this.state.fileLoaded}
                         />
                     </div>
-                    <div className="text-center mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
+                    <div className="mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
                     </div>
                     <div hidden={!this.state.isFilesLoaded}>

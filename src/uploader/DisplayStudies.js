@@ -56,14 +56,17 @@ class StudiesTab extends Component {
         {
             dataField: 'patientName',
             text: 'Patient name',
+            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'studyDescription',
             text: 'Description',
+            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'accessionNumber',
             text: 'Accession #',
+            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'acquisitionDate',

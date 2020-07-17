@@ -14,8 +14,7 @@
 
 export default class Modele {
 
-    data = {
-    }
+    data = { }
 
     addStudy( studyObject ) {
         if (!this.isExistingStudy(studyObject.studyUID)) {
@@ -34,10 +33,7 @@ export default class Modele {
     }
 
     getStudiesArray() {
-        let studyArray = []
-        for (let studyUID in this.data) {
-            studyArray.push(this.data[studyUID])
-        }
+        let studyArray = Object.values(this.data)
         return studyArray
     }
 

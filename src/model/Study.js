@@ -18,23 +18,19 @@ export default class Study {
 
     constructor(studyUID, studyID, studyDate, studyDescription, accessionNumber, patientID, patientFirstName, patientLastName,
         patientBirthDate, patientSex, acquisitionDate) {
-        this.studyUID = studyUID;
-        this.studyID = studyID;
-        this.studyDate = studyDate;
-        this.studyDescription = studyDescription;
-        this.accessionNumber = accessionNumber;
-        this.patientID = patientID;
-        this.patientFirstName = patientFirstName;
-        this.patientLastName = patientLastName;
-        this.patientBirthDate = this.getDate(patientBirthDate);
-        this.patientSex = patientSex;
-        this.acquisitionDate = this.getDate(acquisitionDate);
+        this.studyUID = studyUID
+        this.studyID = studyID
+        this.studyDate = studyDate
+        this.studyDescription = studyDescription
+        this.accessionNumber = accessionNumber
+        this.patientID = patientID
+        this.patientFirstName = patientFirstName
+        this.patientLastName = patientLastName
+        this.patientBirthDate = this.getDate(patientBirthDate)
+        this.patientSex = patientSex
+        this.acquisitionDate = this.getDate(acquisitionDate)
         this.patientName = patientFirstName + ' ' + patientLastName
-        /*
-        this.visit = null;
-        */
-        this.warnings = {};
-
+        this.warnings = {}
     }
 
     addSeries(seriesObject) {
@@ -54,10 +50,7 @@ export default class Study {
     }
 
     getSeriesArray() {
-        let series = []
-        Object.keys(this.series).forEach(seriesUID => {
-            series.push(this.series[seriesUID])
-        })
+        let series = Object.values(this.series)
         return series
     }
 
@@ -111,33 +104,6 @@ export default class Study {
 
     getPatientID() {
         return this.patientID
-    }
-
-    checkStudies() {
-        for (let st of this.studies) {
-
-            // Check if the study corresponds to the visits in wait for series upload
-			/*let expectedVisit = this.findExpectedVisit(st);
-			if (expectedVisit === undefined) {
-				st.setWarning('notExpectedVisit', 'You should check/select the patient. The imported study informations do not match with the expected ones.', true, false, true);
-			} else {
-				delete st.warnings['notExpectedVisit'];
-				if (!this.config.multiImportMode) {
-					st.visit = expectedVisit;
-				}
-			}
-
-			// Check if visit ID is set
-			if (st.visit == null || typeof st.visit.idVisit === undefined) {
-				st.setWarning('visitID', 'You should check/select the patient. Null visit ID.', false, true, false);
-			} else {
-				delete st.warnings['visitID'];
-			}
-
-			// Check inner series
-			this.checkSeries(st);*/
-
-        }
     }
 
     setStatusStudy(key, dismissed) {

@@ -87,7 +87,7 @@ export default class DicomFile {
       self.dataSet = dicomParser.parseDicom(byteArray)
       self.studyInstanceUID = self.getStudyInstanceUID()
       self.seriesInstanceUID = self.getSeriesInstanceUID()
-    }).catch( (error)=>{
+    }).catch((error) => {
       throw error
     })
 
@@ -99,7 +99,7 @@ export default class DicomFile {
       let id = tag.toLowerCase()
       try {
         const element = this.dataSet.elements[`x${id}`]
-        if(element === undefined) throw Error('Tag Not Found')
+        if (element === undefined) throw Error('Tag Not Found')
 
         if (element.vr === 'SQ') {
           // Treat each item of sequence
@@ -116,9 +116,9 @@ export default class DicomFile {
         }
 
       } catch (e) {
-        if(e.message !== 'Tag Not Found'){
-            console.log('tag '+ id)
-            console.log(e)
+        if (e.message !== 'Tag Not Found') {
+          console.log('tag ' + id)
+          console.log(e)
         }
 
       }
@@ -271,27 +271,6 @@ export default class DicomFile {
     return this.dicomDirSopValues.includes(this.getSOPClassUID())
   }
 
-  // SK A VOIR UTILITE
-  getDate(property) {
-    try {
-      const date = dicomParser.parseDA(this[property])
-
-      function intToString(integer, digits) {
-        while (integer.toString().length < digits) {
-          integer = '0' + integer
-        }
-        return integer
-      }
-
-      date.toString = () => {
-        return date.year + '-' + intToString(date.month, 2) + '-' + intToString(date.day, 2)
-      }
-      return date
-    } catch (e) {
-      return undefined
-    }
-  }
-
   getPatientFirstName() {
     if (this.getPatientName() !== undefined) {
       return this.getPatientName().split('^').pop()
@@ -318,18 +297,18 @@ export default class DicomFile {
     return res;
   }
 
-  getStudyObject(){
+  getStudyObject() {
     return new Study(this.getStudyInstanceUID(), this.getStudyID(), this.getStudyDate(), this.getStudyDescription(),
-              this.getAccessionNumber(), this.getPatientID(), this.getPatientFirstName(), this.getPatientLastName(),
-              this.getPatientBirthDate(), this.getPatientSex(), this.getAcquisitionDate())
+      this.getAccessionNumber(), this.getPatientID(), this.getPatientFirstName(), this.getPatientLastName(),
+      this.getPatientBirthDate(), this.getPatientSex(), this.getAcquisitionDate())
   }
 
-  getSeriesObject(){
+  getSeriesObject() {
     return new Series(this.getSeriesInstanceUID(), this.getSeriesNumber(), this.getSeriesDate(),
-    this.getSeriesDescription(), this.getModality());
+      this.getSeriesDescription(), this.getModality());
   }
 
-  getInstanceObject(){
-    return new Instance( this.fileObject, this.getSOPInstanceUID() )
+  getInstanceObject() {
+    return new Instance(this.fileObject, this.getSOPInstanceUID())
   }
 }

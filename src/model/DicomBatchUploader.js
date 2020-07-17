@@ -1,11 +1,8 @@
 import DicomFile from './DicomFile'
-
-const JSZip = require('jszip')
-
+import JSZip from 'jszip'
 
 export default class DicomBatchUploader {
 
-    zip = {}
     uploadProgress=0
     zipProgress=0
 
@@ -19,7 +16,6 @@ export default class DicomBatchUploader {
             this.currentBatchUpload = ++this.currentBatchUpload
             let fractionUploaded = ( this.currentBatchUpload * this.batchValue)
             this.uploadProgress = Math.min(fractionUploaded , 100)
-            //SK MODIF POUR PREPARER LE SUIVANT QUAND UN UPLOAD ATTEINT 80% ?
             await this.batchesIterator.next()
         })
 
@@ -34,8 +30,6 @@ export default class DicomBatchUploader {
     }
 
     async startUpload(){
-        //SK Arrive pas a preload car event sucess peut survenir avant fin du zip
-        //Si pas de préload on peut restaurer plus de progressivite dans le progress
         await this.batchesIterator.next()
         await this.batchesIterator.next()
     }
@@ -87,12 +81,10 @@ export default class DicomBatchUploader {
 
             yield true
 
-
         }
 
         return
 
-        
     }
 
 

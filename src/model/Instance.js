@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import DicomFile from "./DicomFile"
+import DicomFile from './DicomFile'
 
 export default class Instance {
   constructor (fileObject, SOPInstanceUID) {

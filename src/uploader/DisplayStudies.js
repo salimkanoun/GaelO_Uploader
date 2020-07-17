@@ -85,11 +85,17 @@ class StudiesTab extends Component {
 
     }
 
+    /**
+     * Toggle modal 'CheckPatient' of given row 
+     */
     toggleCheckPatient(row) {
         this.setState((state) => { return { isCheck: !state.isCheck } })
         return row
     }
 
+    /**
+     * Fetch studies from Redux State to display in table
+     */
     getStudies() {
         let studies = []
         if (Object.keys(this.props.studies).length > 0) {
@@ -102,12 +108,18 @@ class StudiesTab extends Component {
         return studies
     }
 
+    /**
+     * Rerender component if a different study has been selected 
+     */
     componentDidUpdate(prevState) {
         if (this.props.selectedStudy !== undefined && prevState.series !== this.props.series) {
             this.render()
         }
     }
 
+    /**
+     * Check the study status according to its warnings and its series' warnings 
+     */
     warningsPassed(study) {
         let studyStatus = 'Valid'
         //Check for warnings in study

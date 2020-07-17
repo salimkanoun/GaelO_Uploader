@@ -90,12 +90,7 @@ class DisplaySeries extends Component {
         classes: "row-clicked",
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
-            //ICI FAIRE REMONTER L INFO QUE L UPLAD EST A FAIREs
             this.props.selectSeries(row, isSelect)
-
-            /*
-            */
-            //console.log(this.props.selectedSeries)
         }
     }
 
@@ -103,8 +98,6 @@ class DisplaySeries extends Component {
         mode: 'click',
         blurToSave: true,
         afterSaveCell: (oldValue, newValue, row, column) => {
-            console.log(oldValue)
-            console.log(newValue)
             if (row.status) {
                 let isSelect = (newValue === 'No') ? false : true
                 this.props.selectSeriesReady(row.seriesInstanceUID, isSelect)
@@ -113,6 +106,10 @@ class DisplaySeries extends Component {
         }
     })
 
+    /**
+     * Add status and selection state to previous information from the selected study's series 
+     * in order to build table
+     */
     buildRows(selectedStudy) {
         if (selectedStudy !== null && selectedStudy !== undefined) {
             let seriesArray = []
@@ -135,6 +132,9 @@ class DisplaySeries extends Component {
         else return []
     }
 
+    /**
+     * Check if the series warnings have been all passed
+     */
     warningsPassed(series) {
         for (let warning in this.props.series[series].warnings) {
             if (!this.props.series[series].warnings[warning].dismissed) {

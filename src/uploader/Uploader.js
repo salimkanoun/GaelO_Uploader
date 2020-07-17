@@ -137,6 +137,9 @@ class Uploader extends Component {
 
     }
 
+    /**
+     * Check series to add warnings
+     */
     async checkSeriesAndSendData() {
         //Check series to send warning
         //SK ICI A AMELIORER NE TESTER QUE LES NOUVELLE SERIES DEPUIS LE PARSE
@@ -163,28 +166,31 @@ class Uploader extends Component {
         }
     }
 
-    /*Trigger ignored files panel if clicked*/
+    /**
+     * Trigger ignored files panel if clicked
+     */
     toggleShowIgnoreFile() {
         this.setState(((state) => { return { showIgnoredFiles: !state.showIgnoredFiles } }))
     }
 
-    /*Trigger hide warning if closed*/
+    /**
+     * Trigger hide warning if closed
+     */
     onHideWarning() {
         this.setState((state) => { return { showWarning: !state.showWarning } });
     }
 
+    /**
+     * Update component state so that it can rerender
+     */
     seriesValidated = (series) => {
         this.setState(() => { return { seriesValidated: { ...series } } })
     }
 
+    /**
+     * Upload selected and validated series on click
+     */
     async onUploadClick(e) {
-
-        /*let studyID = '1.2.276.0.7230010.3.1.2.2831156016.1.1587396216.293569'
-        let studyIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.304'
-        let seriesIDSalim = '1.2.840.113619.2.55.3.2831168002.786.1486404132.610'
-        let seriesID = '1.2.276.0.7230010.3.1.3.2831156016.1.1587396221.293907'
-        let series = this.uploadModel.getStudy(studyID).getSeries(seriesID)
-        let instances = series.getArrayInstances()*/
         let instancesToUpload = []
 
         //Gather all instances to upload

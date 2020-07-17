@@ -36,7 +36,9 @@ class DisplayWarning extends Component {
         },
     ]
 
-    /*Build the tab rows according to the type of object*/
+    /**
+     * Build the tab rows according to the type of object
+     */
     buildRow() {
         if (this.props.selectionID !== undefined && this.props.selectionID !== null){
             let rows = []
@@ -59,13 +61,6 @@ class DisplayWarning extends Component {
             return []
         }
 
-    }
-
-    checkObjectValidation(rowID) {
-        this.state.rows[rowID](
-
-        )
-        this.setState((state) => { return { rows: !state.rows[rowID] } })
     }
 
     render() {

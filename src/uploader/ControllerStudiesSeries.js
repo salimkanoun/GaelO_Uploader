@@ -28,6 +28,10 @@ class ControllerStudiesSeries extends Component {
         }
     }
 
+    /**
+     * Prepare series ready to upload 
+     * to send to master controller
+     */
     prepareSeriesToUpload = () => {
         let seriesIDs = this.props.seriesReady
         let series = {}

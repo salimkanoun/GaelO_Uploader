@@ -33,6 +33,7 @@ class CheckPatient extends Component {
     constructor(props) {
         super(props)
         this.onClick = this.onClick.bind(this)
+        this.buttonElement = React.createRef()
     }
 
     columns = [
@@ -48,12 +49,12 @@ class CheckPatient extends Component {
             dataField: 'currentStudy',
             text: 'Current',
         },
-        
+
         {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => ((row.ignoredStatus !== null) ? <ButtonIgnore rowName={row.rowName} onClick={this.onClick}
-            warning={row['ignoredStatus']} /> : null)
+                warning={row['ignoredStatus']} /> : null)
         },
         {
             dataField: 'ignoredStatus',
@@ -61,33 +62,29 @@ class CheckPatient extends Component {
         },
     ]
 
-    onClick (rowName) {
-        this.setState( (state) => {  
+    onClick(rowName) {
+        this.setState((state) => {
             let rows = state.rows.map(row => {
-                if(row.rowName === rowName) 
-                    return {...row, ignoredStatus : !row.ignoredStatus}
+                if (row.rowName === rowName)
+                    return { ...row, ignoredStatus: !row.ignoredStatus }
                 else
                     return row
             })
 
             return {
-                rows : [...rows],
-                
+                rows: [...rows],
             }
-        }, this.updateDisableButton())
+
+        }, () => {
+            let nonIgnoredList = this.state.rows.filter(row => (row.ignoredStatus === false))
+            this.setState({ isDisabled: (nonIgnoredList.length !== 0) })
+        })
+
     }
 
     /**
-     * Return if some items still need to be checked
+     * Check correspondance between expected and given data
      */
-    updateDisableButton() {
-        let nonIgnoredList = this.state.rows.filter (row => {
-            return row.ignoredStatus === false
-        })
-
-        this.setState({isDisabled: nonIgnoredList.length === 0})
-    }
-
     checkRow(expected, current) {
         //Call function checkPatientIdentity instead
         if (expected === current) {
@@ -97,9 +94,11 @@ class CheckPatient extends Component {
         }
     }
 
+    /**
+     * Build table rows when study datacomments have been downloaded
+     */
     shouldComponentUpdate(nextProps, nextState) {
         if (this.props.studyUID !== nextProps.studyUID && nextProps.studyUID !== undefined) {
-
             let rows = []
             let currentStudy = this.props.studies[nextProps.studyUID]
 
@@ -121,8 +120,7 @@ class CheckPatient extends Component {
                     ignoredStatus: (this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])) ? null : this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])
                 })
             }
-
-            this.setState( {rows: [...rows]}, this.updateDisableButton())
+            this.setState({ rows: [...rows] })
         }
         return true
     }
@@ -140,7 +138,7 @@ class CheckPatient extends Component {
                         classes="table table-borderless"
                         bodyClasses="du-studies-tbody"
                         headerClasses="du-studies th"
-                        rowClasses={ rowClasses }
+                        rowClasses={rowClasses}
                         data={this.state.rows}
                         columns={this.columns}
                         selectRow={this.selectRow}
@@ -148,7 +146,7 @@ class CheckPatient extends Component {
                     <p>If you want to force the upload you may have to ignore all the warnings.</p>
                 </Modal.Body>
                 <Modal.Footer class="modal-footer">
-                    <Button id="du-patp-btn-confirm" type="button" onClick={() => console.log("clicked")} class="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>This is the correct patient</Button>
+                    <Button id="du-patp-btn-confirm" type="button" onClick={this.props.closeListener} class="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>This is the correct patient</Button>
                 </Modal.Footer>
             </Modal>
         )

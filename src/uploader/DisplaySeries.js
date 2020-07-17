@@ -22,7 +22,7 @@ import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
 //Redux
 import { connect } from 'react-redux';
-import { selectSeries, seriesReady } from './actions/DisplayTables'
+import { selectSeries, selectSeriesReady } from './actions/DisplayTables'
 
 class DisplaySeries extends Component {
 
@@ -31,57 +31,87 @@ class DisplaySeries extends Component {
             dataField: 'seriesInstanceUID',
             isDummyField: true,
             hidden: true,
-            
+
         },
         {
-            dataField: 'selected',
+            dataField: 'selectedSeries',
+            text: 'Select',
             editable: true,
             editor: {
                 type: Type.CHECKBOX,
-                value: 'Y:N'
-              }
+                value: 'Yes:No'
+            },
+            validator: (newValue, row, column) => {
+                if (row.status === 'Rejected') {
+                    return {
+                        valid: false,
+                        message: 'Series not valid'
+                    }
+                }
+            }
         },
         {
             dataField: 'status',
             text: 'Status',
+            editable: false
         },
         {
             dataField: 'seriesDescription',
             text: 'Description',
+            editable: false
         },
         {
             dataField: 'modality',
             text: 'Modality',
+            editable: false
         },
         {
             dataField: 'seriesNumber',
             text: 'Number #',
+            editable: false
         },
         {
             dataField: 'seriesDate',
             text: 'Date',
+            editable: false
         },
         {
             dataField: 'numberOfInstances',
             text: 'Nb of Instances',
+            editable: false
         },
     ];
 
     selectRow = {
         mode: 'radio',
         clickToSelect: true,
-        hideSelectColumn: true, 
+        clickToEdit: true,
+        hideSelectColumn: true,
         classes: "row-clicked",
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
             //ICI FAIRE REMONTER L INFO QUE L UPLAD EST A FAIREs
             this.props.selectSeries(row, isSelect)
-            if (row.dismissed) {
-                this.props.seriesReady(row, isSelect)
-            }
+
+            /*
+            */
             //console.log(this.props.selectedSeries)
         }
     }
+
+    cellEdit = cellEditFactory({
+        mode: 'click',
+        blurToSave: true,
+        afterSaveCell: (oldValue, newValue, row, column) => {
+            console.log(oldValue)
+            console.log(newValue)
+            if (row.status) {
+                let isSelect = (newValue === 'No') ? false : true
+                this.props.selectSeriesReady(row.seriesInstanceUID, isSelect)
+            }
+            
+        }
+    })
 
     buildRows(selectedStudy) {
         if (selectedStudy !== null && selectedStudy !== undefined) {
@@ -90,6 +120,11 @@ class DisplaySeries extends Component {
             seriesToDisplay.forEach((series) => {
                 let seriesToPush = this.props.series[series]
                 seriesToPush['status'] = (this.warningsPassed(series)) ? 'Valid' : 'Rejected'
+                seriesToPush['selectedSeries'] = 'No'
+                console.log(this.props.seriesReady)
+                if (this.props.seriesReady.includes(seriesToPush.seriesInstanceUID)){
+                    seriesToPush['selectedSeries'] = 'Yes'
+                } 
                 seriesArray.push({
                     ...seriesToPush
                 })
@@ -119,16 +154,16 @@ class DisplaySeries extends Component {
                             classes="table table-borderless"
                             bodyClasses="du-series-tbody"
                             headerClasses="du-series th"
-                            rowClasses={ rowClasses }
+                            rowClasses={rowClasses}
                             wrapperClasses="table-responsive"
                             keyField='seriesInstanceUID'
                             data={this.buildRows(this.props.selectedStudy)}
                             columns={this.columns}
                             selectRow={this.selectRow}
-                            cellEdit={ cellEdit } />
+                            cellEdit={this.cellEdit} />
                     </Col>
                     <Col xs={6} md={4}>
-                        <DisplayWarning type='series' selectionID={this.props.selectedSeries[(this.props.selectedSeries.length)-1]} />
+                        <DisplayWarning type='series' selectionID={this.props.selectedSeries} />
                     </Col>
                 </Row>
             </Container>
@@ -139,28 +174,23 @@ class DisplaySeries extends Component {
 const rowClasses = (row, rowIndex) => {
     if (row.status == 'Rejected') {
         return 'du-series row-danger'
+    } else if (row.status == 'Valid' && row.selectedSeries == 'Yes') {
+        return 'du-series row-success'
     } else return 'du-series td'
 }
 
-const cellEdit = cellEditFactory({
-    mode: 'click',
-    afterSaveCell: (oldValue, newValue, row, column) => { 
-        console.log(oldValue) 
-        console.log(newValue) 
-    }
-  })
-  
 
 const mapStateToProps = state => {
     return {
         series: state.Series.series,
         studies: state.Studies.studies,
-        selectedSeries: state.DisplayTables.selectedSeries
+        selectedSeries: state.DisplayTables.selectedSeries,
+        seriesReady: state.DisplayTables.seriesReady
     }
 }
 const mapDispatchToProps = {
     selectSeries,
-    seriesReady
+    selectSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplaySeries)

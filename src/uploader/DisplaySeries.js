@@ -36,19 +36,14 @@ class DisplaySeries extends Component {
         {
             dataField: 'selectedSeries',
             text: 'Select',
-            editable: true,
+            
+            editable: (cell, row, rowIndex, colIndex) => {
+                return (row.status !== 'Rejected')
+              },
             editor: {
                 type: Type.CHECKBOX,
                 value: 'Yes:No'
             },
-            validator: (newValue, row, column) => {
-                if (row.status === 'Rejected') {
-                    return {
-                        valid: false,
-                        message: 'Series not valid'
-                    }
-                }
-            }
         },
         {
             dataField: 'status',
@@ -118,7 +113,6 @@ class DisplaySeries extends Component {
                 let seriesToPush = this.props.series[series]
                 seriesToPush['status'] = (this.warningsPassed(series)) ? 'Valid' : 'Rejected'
                 seriesToPush['selectedSeries'] = 'No'
-                console.log(this.props.seriesReady)
                 if (this.props.seriesReady.includes(seriesToPush.seriesInstanceUID)){
                     seriesToPush['selectedSeries'] = 'Yes'
                 } 

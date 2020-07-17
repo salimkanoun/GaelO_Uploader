@@ -3,8 +3,8 @@ import { SELECT_STUDY, SELECT_SERIES, SERIES_READY } from '../actions/actions-ty
 
 const initialState = {
   selectedStudy: undefined,
-  selectedSeries: [],
-  seriesReady: {},
+  selectedSeries: undefined,
+  seriesReady: []
 }
 
 export default function DisplayTablesReducer(state = initialState, action) {
@@ -17,28 +17,21 @@ export default function DisplayTablesReducer(state = initialState, action) {
       }
 
     case SELECT_SERIES:
-      if (action.payload !== undefined && action.payload.isSelect) {
         return {
           ...state,
-          selectedSeries: [...state.selectedSeries, action.payload.row.seriesInstanceUID]
+          selectedSeries: action.payload.row.seriesInstanceUID
         }
-      } else if (action.payload !== undefined && !action.payload.isSelect) {
-        return {
-          ...state,
-          selectedSeries: state.selectedSeries.filter(thisRow => thisRow !== action.payload.row.seriesInstanceUID)
-        }
-      }
-
+        
     case SERIES_READY:
-      if (action.payload !== undefined && action.payload.isSelect) {
+      if (action.payload.isSelect) {
         return {
           ...state,
-          seriesReady: [...state.seriesReady, action.payload.validSeries.seriesInstanceUID]
+          seriesReady: [...state.seriesReady, action.payload.validSeriesID]
         }
-      } else if (action.payload !== undefined && !action.payload.isSelect) {
+      } else if (!action.payload.isSelect) {
         return {
           ...state,
-          seriesReady: state.seriesReady.filter(thisRow => thisRow !== action.payload.validSeries.seriesInstanceUID)
+          seriesReady: state.seriesReady.filter(thisRowID => thisRowID !== action.payload.validSeriesID)
         }
       }
 

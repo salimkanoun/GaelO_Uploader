@@ -2,13 +2,14 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import Card from 'react-bootstrap/Card'
-import Dropzone from 'react-dropzone'
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
 
 import Model from '../model/Model'
 import DicomFile from '../model/DicomFile'
 import DicomBatchUploader from '../model/DicomBatchUploader'
+
+import DicomDropZone from './render_component/DicomDropZone'
 
 import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
@@ -24,12 +25,12 @@ import Button from 'react-bootstrap/Button'
 class Uploader extends Component {
 
     state = {
-        isFilesNotLoaded: true,
+        isFilesLoaded: false,
         isMultiUploadModeOn: false,
         fileIgnored: 0,
         fileParsed: 0,
         fileLoaded: 0,
-        parseFinished: false,
+        isParsingFiles: false,
         showIgnoredFiles: false,
         ignoredFiles: {},
         showWarning: false,
@@ -42,7 +43,7 @@ class Uploader extends Component {
 
         super(props)
         this.uploadModel = new Model();
-
+        this.addFile = this.addFile.bind(this)
         this.toggleShowIgnoreFile = this.toggleShowIgnoreFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
@@ -82,15 +83,23 @@ class Uploader extends Component {
     }
 
     addFile(files) {
-        this.setState((previousState) => { return { fileLoaded: (previousState.fileLoaded + files.length) } })
-        console.log('Added file', files)
+
+        this.setState((previousState) => { 
+            return { 
+                fileLoaded: (previousState.fileLoaded + files.length), 
+                isParsingFiles : true 
+            }
+        })
+
         let readPromises = files.map((file) => {
             return this.read(file)
         })
+
         Promise.all(readPromises).then(() => {
+            this.setState({ isFilesLoaded : true, isParsingFiles : false })
             this.checkSeriesAndSendData()
         })
-        this.setState({ isFilesNotLoaded: false })
+        
     }
 
     /**
@@ -246,21 +255,18 @@ class Uploader extends Component {
     render() {
         return (
             <Fragment>
-                <Card className="col mb-5">
-                    <Card.Body id={'dropzone'}>
-                        <Button id="uploadApp" className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.isMultiUploadModeOn ? 'Exit Uploader' : 'Multi Uploader'}</Button>
-                        <Dropzone onDrop={acceptedFiles => this.addFile(acceptedFiles)} >
-                            {({ getRootProps, getInputProps }) => (
-                                <section>
-                                    <div className="dropzone" {...getRootProps()}>
-                                        <input directory="" webkitdirectory="" {...getInputProps()} />
-                                        <p>Drag 'n' drop some files here, or click to select files</p>
-                                    </div>
-                                </section>
-                            )}
-                        </Dropzone>
+                <Card>
+                    <Card.Body>
+                        <Button className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.isMultiUploadModeOn ? 'Exit Uploader' : 'Multi Uploader'}</Button>
+                        <DicomDropZone 
+                            addFile={this.addFile} 
+                            isParsingFiles={this.state.isParsingFiles}
+                            fileParsed = {this.state.fileParsed}
+                            fileIgnored = {this.state.fileIgnored}
+                            fileLoaded = {this.state.fileLoaded}
+                        />
                     </Card.Body>
-                    <Card.Body id={'file-details'} hidden={this.state.isFilesNotLoaded}>
+                    <Card.Body hidden={!this.state.isFilesLoaded}>
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />

@@ -87,11 +87,17 @@ class CheckPatient extends Component {
      * Check correspondance between expected and given data
      */
     checkRow(expected, current) {
-        //Call function checkPatientIdentity instead
-        if (expected === current) {
+        if(expected === undefined || expected === ''){
+            //if exected is empty check is true
             return true
-        } else {
-            return false
+        }else{
+             //Call function checkPatientIdentity instead
+             // SK ?
+            if (expected === current) {
+                return true
+            } else {
+                return false
+            }
         }
     }
 
@@ -102,7 +108,9 @@ class CheckPatient extends Component {
         if (this.props.studyUID !== nextProps.studyUID && nextProps.studyUID !== undefined) {
             let rows = []
             let currentStudy = this.props.studies[nextProps.studyUID]
-
+            //SK ICI patientName peut etre undefined (donc crash ici)
+            //Peut etre plutot a gerer quand on construit l'entree study mettre les
+            //caractères recherchés pour le match
             currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
             currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
 

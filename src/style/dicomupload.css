@@ -380,7 +380,7 @@ input:disabled {
 	font-style: italic;
 }
 
-.du-patient .du-patp-label {
+.du-patp-label {
 	font-weight: bold;
 	color: rgb(165, 23, 56);
 }

@@ -21,9 +21,9 @@ export function validateCheckPatient(id){
   }
 }
 
-export function seriesReady(validSeries, isSelect) {
+export function selectSeriesReady(validSeriesID, isSelect) {
   return {
     type: SERIES_READY,
-    payload: { validSeries, isSelect }
+    payload: { validSeriesID, isSelect }
   }
 }

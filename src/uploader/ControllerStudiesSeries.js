@@ -19,17 +19,17 @@ import Row from 'react-bootstrap/Row'
 
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
-import { seriesReady } from './actions/DisplayTables'
+import { selectSeriesReady } from './actions/DisplayTables'
 class ControllerStudiesSeries extends Component {
 
     componentDidUpdate(prevState) {
-        if (prevState.selectedSeries !== this.props.selectedSeries) {
+        if (prevState.seriesReady !== this.props.seriesReady) {
             this.prepareSeriesToUpload()
         }
     }
 
     prepareSeriesToUpload = () => {
-        let seriesIDs = this.props.selectedSeries
+        let seriesIDs = this.props.seriesReady
         let series = {}
         //Fetch series in the model
         let studies = Object.values(this.props.studies)
@@ -70,12 +70,13 @@ const mapStateToProps = state => {
     return {
         studies: state.Studies.studies,
         series: state.Series.series,
-        selectedStudy: state.DisplayTables.selectedStudy
+        selectedStudy: state.DisplayTables.selectedStudy,
+        seriesReady: state.DisplayTables.seriesReady
     }
 }
 
 const mapDispatchToProps = {
-    seriesReady
+    selectSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

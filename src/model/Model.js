@@ -14,8 +14,7 @@
 
 export default class Modele {
 
-    data = {
-    }
+    data = { }
 
     addStudy( studyObject ) {
         if (!this.isExistingStudy(studyObject.studyUID)) {

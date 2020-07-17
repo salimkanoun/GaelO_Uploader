@@ -16,10 +16,9 @@ import React, { Component } from 'react'
 import Button from 'react-bootstrap/Button'
 
 export default class ButtonIgnore extends Component {
-
-    render() {
-        return (
-            <Button onClick={() => this.props.onClick(this.props.rowName)}> { (this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore' } </Button>
-        )
-    }
+  render () {
+    return (
+      <Button onClick={() => this.props.onClick(this.props.rowName)}> {(this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore'} </Button>
+    )
+  }
 }

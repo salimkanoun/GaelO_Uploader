@@ -98,8 +98,16 @@ class Uploader extends Component {
 	 */
     async read(file) {
         try {
-            let dicomFile = new DicomFile(file);
+            let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
+
+            //if Secondary capture or DicomDir do no register file
+            if( dicomFile.isDicomDir() ){
+                throw Error('Dicomdir file')
+            }
+            if( dicomFile.isSecondaryCaptureImg() ){
+                throw Error('Secondary Capture Image')
+            }
 
             let studyInstanceUID = dicomFile.getStudyInstanceUID()
             let seriesInstanceUID = dicomFile.getSeriesInstanceUID()

@@ -20,7 +20,6 @@ export default class Series {
 
 	instances = {}
 
-
 	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality) {
 		this.seriesInstanceUID = seriesInstanceUID;
 		this.seriesNumber = seriesNumber;
@@ -38,8 +37,8 @@ export default class Series {
 		}
 	}
 
-	addInstance( instanceObject ) {
-		if (! this.isExistingInstance(instanceObject.SOPInstanceUID) ) {
+	addInstance(instanceObject) {
+		if (!this.isExistingInstance(instanceObject.SOPInstanceUID)) {
 			this.instances[instanceObject.SOPInstanceUID] = instanceObject
 		} else {
 			throw Error("Existing instance")

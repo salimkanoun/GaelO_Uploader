@@ -14,14 +14,14 @@ export function selectSeries (row, isSelect) {
   }
 }
 
-export function validateCheckPatient(id){
+export function validateCheckPatient (id) {
   return {
-    type : SELECT_SERIES,
-    payload : id
+    type: SELECT_SERIES,
+    payload: id
   }
 }
 
-export function selectSeriesReady(validSeriesID, isSelect) {
+export function selectSeriesReady (validSeriesID, isSelect) {
   return {
     type: SERIES_READY,
     payload: { validSeriesID, isSelect }

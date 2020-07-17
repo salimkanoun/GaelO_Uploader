@@ -1,1 +1,1 @@
-//export function checkPatientIdentity(study) 
+// export function checkPatientIdentity(study)

@@ -18,23 +18,19 @@ export default class Study {
 
     constructor(studyUID, studyID, studyDate, studyDescription, accessionNumber, patientID, patientFirstName, patientLastName,
         patientBirthDate, patientSex, acquisitionDate) {
-        this.studyUID = studyUID;
-        this.studyID = studyID;
-        this.studyDate = studyDate;
-        this.studyDescription = studyDescription;
-        this.accessionNumber = accessionNumber;
-        this.patientID = patientID;
-        this.patientFirstName = patientFirstName;
-        this.patientLastName = patientLastName;
-        this.patientBirthDate = this.getDate(patientBirthDate);
+        this.studyUID = studyUID
+        this.studyID = studyID
+        this.studyDate = studyDate
+        this.studyDescription = studyDescription
+        this.accessionNumber = accessionNumber
+        this.patientID = patientID
+        this.patientFirstName = patientFirstName
+        this.patientLastName = patientLastName
+        this.patientBirthDate = this.getDate(patientBirthDate)
         this.patientSex = patientSex;
         this.acquisitionDate = this.getDate(acquisitionDate);
         this.patientName = patientFirstName + ' ' + patientLastName
-        /*
-        this.visit = null;
-        */
-        this.warnings = {};
-
+        this.warnings = {}
     }
 
     addSeries(seriesObject) {
@@ -113,6 +109,7 @@ export default class Study {
         return this.patientID
     }
 
+    /*
     checkStudies() {
         for (let st of this.studies) {
 
@@ -135,10 +132,11 @@ export default class Study {
 			}
 
 			// Check inner series
-			this.checkSeries(st);*/
+			this.checkSeries(st);
 
         }
     }
+    */
 
     setStatusStudy(key, dismissed) {
         this.warnings[key]['dismissed'] = dismissed

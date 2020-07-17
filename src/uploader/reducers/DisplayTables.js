@@ -7,21 +7,21 @@ const initialState = {
   seriesReady: []
 }
 
-export default function DisplayTablesReducer(state = initialState, action) {
+export default function DisplayTablesReducer (state = initialState, action) {
   switch (action.type) {
     case SELECT_STUDY:
-      //SK ICI PREVOIR LE MEME TYPE DE FONCTION QUE SERIES POUR LE MULTIUPLOADER 
+      // SK ICI PREVOIR LE MEME TYPE DE FONCTION QUE SERIES POUR LE MULTIUPLOADER
       return {
         ...state,
         selectedStudy: action.payload
       }
 
     case SELECT_SERIES:
-        return {
-          ...state,
-          selectedSeries: action.payload.row.seriesInstanceUID
-        }
-        
+      return {
+        ...state,
+        selectedSeries: action.payload.row.seriesInstanceUID
+      }
+
     case SERIES_READY:
       if (action.payload.isSelect) {
         return {

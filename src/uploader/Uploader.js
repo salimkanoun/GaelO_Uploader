@@ -255,8 +255,7 @@ class Uploader extends Component {
     render() {
         return (
             <Fragment>
-                <Card>
-                    <Card.Body>
+                    <div>
                         <Button className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.isMultiUploadModeOn ? 'Exit Uploader' : 'Multi Uploader'}</Button>
                         <DicomDropZone 
                             addFile={this.addFile} 
@@ -265,15 +264,16 @@ class Uploader extends Component {
                             fileIgnored = {this.state.fileIgnored}
                             fileLoaded = {this.state.fileLoaded}
                         />
-                    </Card.Body>
-                    <Card.Body hidden={!this.state.isFilesLoaded}>
+                    </div>
+                    <div className="text-center mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
                         <ParsingDetails fileLoaded={this.state.fileLoaded} fileParsed={this.state.fileParsed} fileIgnored={this.state.fileIgnored} onClick={this.toggleShowIgnoreFile} />
+                    </div>
+                    <div hidden={!this.state.isFilesLoaded}>
                         <IgnoredFilesPanel display={this.state.showIgnoredFiles} closeListener={this.toggleShowIgnoreFile} dataIgnoredFiles={this.state.ignoredFiles} />
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
                         <ControllerStudiesSeries multiUploader={this.state.isMultiUploadModeOn} selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
                         <ProgressUpload multiUpload={false} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
-                    </Card.Body>
-                </Card>
+                    </div>
             </Fragment>
         )
     }

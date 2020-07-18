@@ -23,16 +23,16 @@ import Button from 'react-bootstrap/Button'
 class Uploader extends Component {
 
     state = {
-        isFilesLoaded: false,
         multiUpload: false,
-        fileParsed: 0,
-        fileLoaded: 0,
+        isFilesLoaded: false,
         isParsingFiles: false,
         isUploadStarted : false,
-        ignoredFiles: {},
-        showWarning: false,
+        fileParsed: 0,
+        fileLoaded: 0,
         zipProgress: 0,
         uploadProgress: 0,
+        ignoredFiles: {},
+        showWarning: false,
         seriesValidated: {}
     }
 
@@ -78,8 +78,13 @@ class Uploader extends Component {
         console.log(answer)
     }
 
+    /**
+     * Read droped files (listen to DropZone event)
+     * @param {Array} files 
+     */
     addFile(files) {
 
+        //Add number of files to be parsed to the previous number (incremental parsing)
         this.setState((previousState) => { 
             return { 
                 fileLoaded: (previousState.fileLoaded + files.length), 
@@ -87,19 +92,21 @@ class Uploader extends Component {
             }
         })
 
+        //Build promise array for all files reading
         let readPromises = files.map((file) => {
             return this.read(file)
         })
 
+        //Once all promised resolved update state and refresh redux with parsing results
         Promise.all(readPromises).then(() => {
             this.setState({ isFilesLoaded : true, isParsingFiles : false })
-            this.checkSeriesAndSendData()
+            this.checkSeriesAndUpdateRedux()
         })
         
     }
 
     /**
-	 * Read and parse dicom file
+	 * Read and parse a single dicom file
 	 */
     async read(file) {
         try {
@@ -114,6 +121,7 @@ class Uploader extends Component {
                 throw Error('Secondary Capture Image')
             }
 
+            //Register Study, Series, Instance if new in model
             let studyInstanceUID = dicomFile.getStudyInstanceUID()
             let seriesInstanceUID = dicomFile.getSeriesInstanceUID()
 
@@ -131,11 +139,15 @@ class Uploader extends Component {
                 series = study.getSeries(seriesInstanceUID)
             }
 
-            series.addInstance(dicomFile.getInstanceObject())
+            series.addInstance( dicomFile.getInstanceObject() )
 
-            this.setState((previousState) => { return { fileParsed: ++previousState.fileParsed } })
+            this.setState( (previousState) => { 
+                return { fileParsed: ++previousState.fileParsed } 
+            })
 
         } catch (error) {
+            //If exception register file in ignored file list
+
             //Save only message of error
             let errorMessage = error
             if (typeof error === 'object') {
@@ -156,14 +168,17 @@ class Uploader extends Component {
     /**
      * Check series to add warnings
      */
-    async checkSeriesAndSendData() {
+    //SK ici c'est un peu le bordel
+    //Au final peut etre rafraichir tout le redux quitte a perdre les actions faites
+    //si on ajoute de nouveaux fichiers
+    async checkSeriesAndUpdateRedux() {
         //Check series to send warning
         //SK ICI A AMELIORER NE TESTER QUE LES NOUVELLE SERIES DEPUIS LE PARSE
         let studies = this.uploadModel.getStudiesArray()
         for (let study of studies) {
             let series = study.getSeriesArray()
             for (let serieInstance of series) {
-                //SK DICOMFILE et INSTANCE A REVOIR
+                //SK Cette methode check peut peut etre s'encapsuler dans series
                 let firstInstance = serieInstance.getArrayInstances()[0]
                 await serieInstance.checkSeries(new DicomFile(firstInstance.getFile()))
 
@@ -196,9 +211,7 @@ class Uploader extends Component {
         this.setState((state) => { return { showWarning: !state.showWarning } });
     }
 
-    /**
-     * Update component state so that it can rerender
-     */
+    //SK ICI devrait etre envoyé directement depuis le controlleur studies/series vers le redux
     seriesValidated = (series) => {
         this.setState(() => { return { seriesValidated: { ...series } } })
     }

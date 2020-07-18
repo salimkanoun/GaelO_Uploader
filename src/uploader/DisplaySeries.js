@@ -14,8 +14,6 @@
 
 import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
-import cellEditFactory from 'react-bootstrap-table2-editor';
-import { Type } from 'react-bootstrap-table2-editor';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -36,14 +34,13 @@ class DisplaySeries extends Component {
         {
             dataField: 'selectedSeries',
             text: 'Select',
-            
-            editable: (cell, row, rowIndex, colIndex) => {
-                return (row.status !== 'Rejected')
-              },
-            editor: {
-                type: Type.CHECKBOX,
-                value: 'Yes:No'
-            },
+            formatExtraData : this,
+            formatter : (cell, row, rowIndex, formatExtraData) => {
+                let checked  = row.selectedSeries
+                return (
+                    <input disabled ={row.status === 'Rejected'} checked = {checked} type = "checkbox" onChange={() => {formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked)}} />
+                )
+            }
         },
         {
             dataField: 'status',
@@ -90,18 +87,6 @@ class DisplaySeries extends Component {
         }
     }
 
-    cellEdit = cellEditFactory({
-        mode: 'click',
-        blurToSave: true,
-        afterSaveCell: (oldValue, newValue, row, column) => {
-            if (row.status) {
-                let isSelect = (newValue === 'No') ? false : true
-                this.props.selectSeriesReady(row.seriesInstanceUID, isSelect)
-            }
-            
-        }
-    })
-
     /**
      * Add status and selection state to previous information from the selected study's series 
      * in order to build table
@@ -113,9 +98,9 @@ class DisplaySeries extends Component {
             seriesToDisplay.forEach((series) => {
                 let seriesToPush = this.props.series[series]
                 seriesToPush['status'] = (this.warningsPassed(series)) ? 'Valid' : 'Rejected'
-                seriesToPush['selectedSeries'] = 'No'
+                seriesToPush['selectedSeries'] = false
                 if (this.props.seriesReady.includes(seriesToPush.seriesInstanceUID)){
-                    seriesToPush['selectedSeries'] = 'Yes'
+                    seriesToPush['selectedSeries'] = true
                 } 
                 seriesArray.push({
                     ...seriesToPush
@@ -154,11 +139,13 @@ class DisplaySeries extends Component {
                             keyField='seriesInstanceUID'
                             data={this.buildRows(this.props.selectedStudy)}
                             columns={this.columns}
-                            selectRow={this.selectRow}
-                            cellEdit={this.cellEdit} />
+                            selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                        <DisplayWarning type='series' selectionID={this.props.selectedSeries} />
+                        <DisplayWarning 
+                            type='series' 
+                            selectionID={this.props.selectedSeries} 
+                        />
                     </Col>
                 </Row>
             </Container>
@@ -167,9 +154,9 @@ class DisplaySeries extends Component {
 }
 
 const rowClasses = (row, rowIndex) => {
-    if (row.status == 'Rejected') {
+    if (row.status === 'Rejected') {
         return 'du-series row-danger'
-    } else if (row.status == 'Valid' && row.selectedSeries == 'Yes') {
+    } else if (row.status === 'Valid' && row.selectedSeries === true) {
         return 'du-series row-success'
     } else return 'du-series td'
 }

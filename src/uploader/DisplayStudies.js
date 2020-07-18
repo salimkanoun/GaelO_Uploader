@@ -166,7 +166,10 @@ class StudiesTab extends Component {
                                 show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} hidden={this.props.validatedPatient}/>
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='studies' selectionID={this.props.selectedStudy} />
+                            <DisplayWarning 
+                                type='studies' 
+                                selectionID={this.props.selectedStudy} 
+                            />
                         </Col>
                     </Row>
                 </Container>

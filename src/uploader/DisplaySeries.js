@@ -158,7 +158,10 @@ class DisplaySeries extends Component {
                             cellEdit={this.cellEdit} />
                     </Col>
                     <Col xs={6} md={4}>
-                        <DisplayWarning type='series' selectionID={this.props.selectedSeries} />
+                        <DisplayWarning 
+                            type='series' 
+                            selectionID={this.props.selectedSeries} 
+                        />
                     </Col>
                 </Row>
             </Container>

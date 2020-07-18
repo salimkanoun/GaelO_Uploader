@@ -23,17 +23,17 @@ export default function SeriesReducer(state = initialState, action) {
     case UPDATE_WARNING_SERIES:
       // Ignore warning at series level
       const seriesWarning = action.payload.key
-      const seriesID = action.payload.objectID
+      const seriesInstanceUID = action.payload.seriesInstanceUID
       //SK : ici structure compliquée, ne serait ce pas mieux dans un reducer de warning?
       return {
         ...state,
         series: {
           ...state.series,
-          [seriesID]: {
-            ...state.series[seriesID],
+          [seriesInstanceUID]: {
+            ...state.series[seriesInstanceUID],
             warnings: {
-              ...state.series[seriesID].warnings,
-              [seriesWarning]: { ...state.series[seriesID].warnings[seriesWarning], dismissed: !state.series[seriesID].warnings[seriesWarning].dismissed }
+              ...state.series[seriesInstanceUID].warnings,
+              [seriesWarning]: { ...state.series[seriesInstanceUID].warnings[seriesWarning], dismissed: !state.series[seriesInstanceUID].warnings[seriesWarning].dismissed }
             }
           }
         }

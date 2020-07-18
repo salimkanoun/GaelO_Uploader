@@ -45,7 +45,7 @@ class StudiesTab extends Component {
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => (
                 <Button onClick={() => { this.toggleCheckPatient(row); }}>
-                    Check Patient
+                    {(this.props.multiUploader) ? 'Select Patient' : 'Check Patient'}
                 </Button>
             ),
         },
@@ -56,14 +56,17 @@ class StudiesTab extends Component {
         {
             dataField: 'patientName',
             text: 'Patient name',
+            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'studyDescription',
             text: 'Description',
+            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'accessionNumber',
             text: 'Accession #',
+            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'acquisitionDate',
@@ -85,11 +88,17 @@ class StudiesTab extends Component {
 
     }
 
+    /**
+     * Toggle modal 'CheckPatient' of given row 
+     */
     toggleCheckPatient(row) {
         this.setState((state) => { return { isCheck: !state.isCheck } })
         return row
     }
 
+    /**
+     * Fetch studies from Redux State to display in table
+     */
     getStudies() {
         let studies = []
         if (Object.keys(this.props.studies).length > 0) {
@@ -102,13 +111,18 @@ class StudiesTab extends Component {
         return studies
     }
 
+    /**
+     * Rerender component if a different study has been selected 
+     */
     componentDidUpdate(prevState) {
         if (this.props.selectedStudy !== undefined && prevState.series !== this.props.series) {
-            console.log("RERENDERING")
             this.render()
         }
     }
 
+    /**
+     * Check the study status according to its warnings and its series' warnings 
+     */
     warningsPassed(study) {
         let studyStatus = 'Valid'
         //Check for warnings in study
@@ -142,17 +156,20 @@ class StudiesTab extends Component {
                                 classes="table table-borderless"
                                 bodyClasses="du-studies-tbody"
                                 headerClasses="du-studies th"
-                                rowClasses="du-studies td"
+                                rowClasses= { rowClasses }
                                 data={this.getStudies()}
                                 columns={this.columns}
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient studyUID={this.props.selectedStudy} validateCheckPatient={this.validateCheckPatient}
-                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} />
+                            <CheckPatient studyUID={this.props.selectedStudy} multiUploader={this.props.multiUploader} validateCheckPatient={this.validateCheckPatient}
+                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} hidden={this.props.validatedPatient}/>
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='studies' selectionID={this.props.selectedStudy} />
+                            <DisplayWarning 
+                                type='studies' 
+                                selectionID={this.props.selectedStudy} 
+                            />
                         </Col>
                     </Row>
                 </Container>
@@ -162,9 +179,17 @@ class StudiesTab extends Component {
     }
 }
 
+const rowClasses = (row, rowIndex) => {
+    if (row.status === 'Rejected') 
+        return 'du studies row-danger'
+    if (row.status === 'Incomplete') 
+        return 'du-studies row-warning'
+    return 'du-studies td'
+}
+
 const mapStateToProps = state => {
     return {
-        selectedStudy: state.DisplayTables.selectedStudy
+        selectedStudy: state.DisplayTables.selectedStudy,
     }
 }
 const mapDispatchToProps = {

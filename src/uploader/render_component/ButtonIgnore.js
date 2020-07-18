@@ -16,21 +16,9 @@ import React, { Component } from 'react'
 import Button from 'react-bootstrap/Button'
 
 export default class ButtonIgnore extends Component {
-
-    constructor(props) {
-        super(props)
-        this.onClick = this.onClick.bind(this)
-    }
-
-    onClick() {
-        this.props.onClick(this.props.id)
-    }
-
-    render() {
-        console.log("render")
-        console.log(this.props.warning)
-        return (
-            <Button id={(this.props.id == null) ? null : this.props.id} onClick={this.onClick}> { (this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore' } </Button>
-        )
-    }
+  render () {
+    return (
+      <Button onClick={() => this.props.onClick(this.props.rowName)}> {(this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore'} </Button>
+    )
+  }
 }

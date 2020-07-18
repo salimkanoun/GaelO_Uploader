@@ -19,17 +19,21 @@ import Row from 'react-bootstrap/Row'
 
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
-import { seriesReady } from './actions/DisplayTables'
+import { selectSeriesReady } from './actions/DisplayTables'
 class ControllerStudiesSeries extends Component {
 
     componentDidUpdate(prevState) {
-        if (prevState.selectedSeries !== this.props.selectedSeries) {
+        if (prevState.seriesReady !== this.props.seriesReady) {
             this.prepareSeriesToUpload()
         }
     }
 
+    /**
+     * Prepare series ready to upload 
+     * to send to master controller
+     */
     prepareSeriesToUpload = () => {
-        let seriesIDs = this.props.selectedSeries
+        let seriesIDs = this.props.seriesReady
         let series = {}
         //Fetch series in the model
         let studies = Object.values(this.props.studies)
@@ -55,7 +59,7 @@ class ControllerStudiesSeries extends Component {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies studies={this.props.studies} series={this.props.series} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
+                    <DisplayStudies multiUploader={this.props.multiUploader} studies={this.props.studies} series={this.props.series} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
                 </Row>
                 <Row>
                     <DisplaySeries selectedStudy={this.props.selectedStudy} />
@@ -70,12 +74,13 @@ const mapStateToProps = state => {
     return {
         studies: state.Studies.studies,
         series: state.Series.series,
-        selectedStudy: state.DisplayTables.selectedStudy
+        selectedStudy: state.DisplayTables.selectedStudy,
+        seriesReady: state.DisplayTables.seriesReady
     }
 }
 
 const mapDispatchToProps = {
-    seriesReady
+    selectSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

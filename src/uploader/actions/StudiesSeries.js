@@ -21,23 +21,23 @@ export function updateWarningSeries (warningToUpdate) {
   }
 }
 
-export function addStudy(studyObject){
+export function addStudy (studyObject) {
   return {
     type: ADD_STUDY,
     payload: studyObject
   }
 }
 
-export function updateWarningStudy(warningObject){
+export function updateWarningStudy (warningObject) {
   return {
-    type : UPDATE_WARNING_STUDY,
-    payload : warningObject
+    type: UPDATE_WARNING_STUDY,
+    payload: warningObject
   }
 }
 
-export function validateCheckPatient(patientID){
+export function validateCheckPatient (patientID) {
   return {
-    type : VALIDATE_CHECK_PATIENT,
-    payload : patientID
+    type: VALIDATE_CHECK_PATIENT,
+    payload: patientID
   }
 }

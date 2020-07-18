@@ -27,7 +27,7 @@
 	cursor: pointer;
 }
 
-#du-drop-zone.du-deactivated {
+.dropzone.dz-deactivated {
 	animation: drop-zone-deactivate 1s ease-out forwards;
 	pointer-events: none;
 	cursor: no-drop;
@@ -54,13 +54,13 @@
 	}
 }
 
-#du-drop-zone.dz-drag-hover {
+.dropzone.dz-hover {
 	transition: 0.1s ease-in-out;
 	box-shadow: inset 0 0 35px rgba(255, 10, 67, 0.2);
 	border: 5px solid rgba(175, 54, 82, 0.8);
 }
 
-#du-drop-zone.dz-parsing {
+.dropzone.dz-parsing {
 	transition: 0.1s ease-in-out;
 	box-shadow: inset 0 0 35px rgba(255, 10, 67, 0.2);
 	border: 5px solid rgba(175, 54, 82, 0.8);
@@ -200,26 +200,25 @@
 	font-weight: bold;
 }
 
-.du-studies .row-success,
-.du-series .row-success {
+.row-success,
+.row-success {
 	color: #09810f;
 	background-color: #e2ffe1;
 }
 
-.du-studies .row-danger,
-.du-series .row-danger {
+.row-danger,
+.row-danger {
 	color: #c40404;
 	background-color: #fff3f3;
 }
 
-.du-studies :not(.ignored).row-warning,
-.du-series :not(.ignored).row-warning {
+.row-warning,
+.row-warning {
 	color: #8f510a;
 	background-color: #ffeacb;
 }
 
-.du-studies .ignored,
-.du-series .ignored {
+.du-warnings .row-ignored {
 	font-style: italic;
 	color: #a4a4a4;
 	background-color: #f7f7f7;
@@ -381,7 +380,7 @@ input:disabled {
 	font-style: italic;
 }
 
-.du-patient .du-patp-label {
+.du-patp-label {
 	font-weight: bold;
 	color: rgb(165, 23, 56);
 }

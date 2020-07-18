@@ -8,7 +8,7 @@ class DisplayWarning extends Component {
 
     columns = [
         {
-            dataField: 'objectID',
+            dataField: 'seriesInstanceUID',
             hidden: true,
         },
         {
@@ -28,15 +28,17 @@ class DisplayWarning extends Component {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => (
-                <ButtonIgnore warning={this.props.series[row.objectID].warnings[row.key].dismissed} 
-                onClick={async () => {
-                    await this.props.updateWarningSeries(row)
-                }} />
+                <ButtonIgnore 
+                    warning={ this.props.series[row.seriesInstanceUID].warnings[row.key].dismissed } 
+                    onClick={ () => this.props.updateWarningSeries(row) }
+                />
             ),
         },
     ]
 
-    /*Build the tab rows according to the type of object*/
+    /**
+     * Build the tab rows according to the type of object
+     */
     buildRow() {
         if (this.props.selectionID !== undefined && this.props.selectionID !== null){
             let rows = []
@@ -47,9 +49,8 @@ class DisplayWarning extends Component {
                     }
                     return rows
                 case 'series':
-                    let selID = this.props.selectionID
                     for (let warning in this.props.series[this.props.selectionID].warnings) {
-                        rows.push({objectID: selID, ...this.props.series[this.props.selectionID].warnings[warning]})
+                        rows.push({seriesInstanceUID: this.props.selectionID, ...this.props.series[this.props.selectionID].warnings[warning]})
                     }
                     return rows
                 default:
@@ -61,30 +62,25 @@ class DisplayWarning extends Component {
 
     }
 
-    checkObjectValidation(rowID) {
-        this.state.rows[rowID](
-
-        )
-        this.setState((state) => { return { rows: !state.rows[rowID] } })
-    }
-
     render() {
-        if (this.props.object !== null) {
             return (
                 <BootstrapTable
                     keyField='key'
                     classes="table table-borderless"
                     bodyClasses="du-warnings"
                     headerClasses="du-warnings th"
+                    rowClasses={ rowClasses }
                     wrapperClasses="table-responsive"
                     data={this.buildRow()}
                     columns={this.columns}
                 />
             )
-        } else {
-            return null;
-        }
     }
+}
+
+const rowClasses = (row, rowIndex) => {
+    if (row.dismissed) return 'du-warnings row-ignored'
+    else return 'du-warnings td'
 }
 
 const mapStateToProps = state => {

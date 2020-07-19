@@ -6,9 +6,11 @@ export default class DicomBatchUploader {
     uploadProgress=0
     zipProgress=0
 
-    constructor (uppy, files, onUploadDone) {
+    constructor (uppy, idVisit, files, onUploadDone) {
         this.uppy = uppy
         this.files = files
+        this.idVisit = idVisit
+        this.timeStamp = Date.now()
         this.onUploadDone = onUploadDone
         this.buildBatches()
         
@@ -70,8 +72,17 @@ export default class DicomBatchUploader {
             let zipBlob = await this.zipFiles(batch)
             this.uppy.addFile(
                 {
-                    name: 'uploadBatch'+index+'.zip', // file name
+                    name: this.timeStamp+'_'+this.idVisit+'_'+index+'_'+this.batches.length+'.zip', // file name
                     type: 'application/zip', // file type
+                    meta: {
+                        //add metadata
+                        idVisit : this.idVisit,
+                        timeStamp : this.timeStamp,
+                        zipNumber : index,
+                        numberOfZips : this.batches.length,
+                        dicomFiles : batch.length,
+                        totalDicomFiles :  this.files.length
+                    },
                     data: zipBlob // file blob
                 }
             )

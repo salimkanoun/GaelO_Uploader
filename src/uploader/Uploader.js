@@ -235,7 +235,7 @@ class Uploader extends Component {
             return instance.getFile()
         })
 
-        let uploader = new DicomBatchUploader(this.uppy, fileArray, this.onUploadDone)
+        let uploader = new DicomBatchUploader(this.uppy, 42 /*DOIT ETRE UN VARIABLE */, fileArray, this.onUploadDone)
         this.intervalProgress = setInterval(() => {
             console.log(uploader.getProgress())
             this.setState({

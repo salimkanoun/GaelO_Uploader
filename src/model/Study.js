@@ -12,6 +12,8 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+ import SHA1 from 'crypto-js/sha1'
+
 export default class Study {
 
     series = {}
@@ -108,6 +110,12 @@ export default class Study {
 
     setStatusStudy(key, dismissed) {
         this.warnings[key]['dismissed'] = dismissed
+    }
+
+    //SK Pour envoyer au back pour savoir si etude connue ou pas et au moment du post processing
+    getOrthancStudyID(){
+		let hash = SHA1(this.patientID + '|' + this.studyUID).toString()
+		return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`
     }
 
     getArrayWarnings() {

@@ -15,7 +15,7 @@ import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
 
-import { getAets, logIn, registerStudy } from '../services/api'
+import { getAets, logIn, registerStudy, validateUpload } from '../services/api'
 
 import { addSeries, addStudy } from './actions/StudiesSeries'
 import Button from 'react-bootstrap/Button'
@@ -43,7 +43,6 @@ class Uploader extends Component {
         this.addFile = this.addFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
-        this.onUploadDone = this.onUploadDone.bind(this)
         this.triggerMultiUpload = this.triggerMultiUpload.bind(this)
         this.seriesValidated = this.seriesValidated.bind(this)
 
@@ -223,19 +222,26 @@ class Uploader extends Component {
         let instancesToUpload = []
 
         //Gather all instances to upload
-        for (let studyID in this.state.seriesValidated) {
-            for (let seriesID in this.state.seriesValidated[studyID]) {
-                seriesID = this.state.seriesValidated[studyID][seriesID]
-                let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
-                instancesToUpload.push(...mySeries.getArrayInstances())
-            }
+        let studiesUIDToUpload = Object.keys(this.state.seriesValidated)
+        let studyInstanceUID = studiesUIDToUpload[0]
+        let studyOrthancID = this.uploadModel.getStudy(studiesUIDToUpload[0]).getOrthancStudyID()
+        
+        for (let seriesID in this.state.seriesValidated[studyInstanceUID]) {
+            seriesID = this.state.seriesValidated[studyInstanceUID][seriesID]
+            let mySeries = this.uploadModel.getStudy(studyInstanceUID).getSeries(seriesID)
+            instancesToUpload.push(...mySeries.getArrayInstances())
         }
+        
 
         let fileArray = instancesToUpload.map(instance => {
             return instance.getFile()
         })
 
-        let uploader = new DicomBatchUploader(this.uppy, 42 /*DOIT ETRE UN VARIABLE */, fileArray, this.onUploadDone)
+        let uploader = new DicomBatchUploader(this.uppy, 282 /*DOIT ETRE UN VARIABLE */, fileArray,  () => {
+            clearInterval(this.intervalProgress)
+            validateUpload(282, uploader.timeStamp, uploader.totalDicomFiles,studyOrthancID)
+        })
+
         this.intervalProgress = setInterval(() => {
             console.log(uploader.getProgress())
             this.setState({
@@ -247,11 +253,6 @@ class Uploader extends Component {
         uploader.startUpload()
         this.setState({isUploadStarted : true})
 
-    }
-
-    onUploadDone() {
-        clearInterval(this.intervalProgress)
-        console.log("upload Finished")
     }
 
     render() {

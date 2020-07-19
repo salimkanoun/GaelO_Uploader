@@ -11,6 +11,7 @@ export default class DicomBatchUploader {
         this.files = files
         this.idVisit = idVisit
         this.timeStamp = Date.now()
+        //SK ICI ENOYE 2 Fois
         this.onUploadDone = onUploadDone
         this.buildBatches()
         
@@ -63,7 +64,7 @@ export default class DicomBatchUploader {
         return index
 
     }
-
+    //SK Triggerd multiple tame du to async dowload
     buildNextZip = async function*(){
 
         let index = 0

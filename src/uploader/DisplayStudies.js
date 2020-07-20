@@ -141,7 +141,7 @@ class StudiesTab extends Component {
         return (
             <>
                 <Container fluid>
-                    <span class='title'>Studies</span>
+                    <span className='title'>Studies</span>
                     <Row>
                         <Col xs={12} md={8}>
                             <BootstrapTable

@@ -33,7 +33,6 @@ class Uploader extends Component {
         uploadProgress: 0,
         ignoredFiles: {},
         showWarning: false,
-        seriesValidated: {}
     }
 
     constructor(props) {
@@ -45,7 +44,6 @@ class Uploader extends Component {
         this.onUploadClick = this.onUploadClick.bind(this)
         this.onUploadDone = this.onUploadDone.bind(this)
         this.triggerMultiUpload = this.triggerMultiUpload.bind(this)
-        this.seriesValidated = this.seriesValidated.bind(this)
 
         this.uppy = Uppy({
             id: 'uppy',
@@ -211,23 +209,18 @@ class Uploader extends Component {
         this.setState((state) => { return { showWarning: !state.showWarning } });
     }
 
-    //SK ICI devrait etre envoyé directement depuis le controlleur studies/series vers le redux
-    seriesValidated = (series) => {
-        this.setState(() => { return { seriesValidated: { ...series } } })
-    }
-
     /**
      * Upload selected and validated series on click
      */
     async onUploadClick(e) {
         let instancesToUpload = []
-
         //Gather all instances to upload
-        for (let studyInstanceUID in this.state.seriesValidated) {
-            for (let seriesInstanceUID in this.state.seriesValidated[studyInstanceUID]) {
-                seriesInstanceUID = this.state.seriesValidated[studyInstanceUID][seriesInstanceUID]
-                let mySeries = this.uploadModel.getStudy(studyInstanceUID).getSeries(seriesInstanceUID)
-                instancesToUpload.push(...mySeries.getArrayInstances())
+        for (let studyInstanceUID in this.props.studies) {
+            for (let i in this.props.seriesReady) {
+                if (this.uploadModel.getStudy(studyInstanceUID).getSeries(this.props.seriesReady[i]) !== undefined) {
+                    let mySeries = this.uploadModel.getStudy(studyInstanceUID).getSeries(this.props.seriesReady[i])
+                    instancesToUpload.push(...mySeries.getArrayInstances())
+                }
             }
         }
 
@@ -277,7 +270,7 @@ class Uploader extends Component {
                     </div>
                     <div hidden={!this.state.isFilesLoaded}>
                         <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries multiUploader={this.state.multiUpload} selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
+                        <ControllerStudiesSeries multiUploader={this.state.multiUpload} selectedSeries={this.props.selectedSeries} />
                         <ProgressUpload multiUpload={false} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                     </div>
             </Fragment>
@@ -290,6 +283,7 @@ const mapStateToProps = state => {
         studies: state.Studies.studies,
         series: state.Series.series,
         selectedSeries: state.DisplayTables.selectedSeries,
+        seriesReady: state.DisplayTables.seriesReady
     }
 }
 const mapDispatchToProps = {

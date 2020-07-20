@@ -22,7 +22,7 @@ import Button from 'react-bootstrap/Button'
 import BootstrapTable from 'react-bootstrap-table-next';
 
 import ButtonIgnore from './render_component/ButtonIgnore'
-import { validateCheckPatient } from './actions/DisplayTables'
+import { validateCheckPatient } from './actions/Warnings'
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
 const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']

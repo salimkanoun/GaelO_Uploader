@@ -20,16 +20,19 @@ import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
 //Redux
 import { connect } from 'react-redux';
-import { selectSeries, selectSeriesReady } from './actions/DisplayTables'
+import { selectSeriesReady } from './actions/DisplayTables'
 
 class DisplaySeries extends Component {
+
+    state = {
+        selectedSeries: null
+    }
 
     columns = [
         {
             dataField: 'seriesInstanceUID',
             isDummyField: true,
             hidden: true,
-
         },
         {
             dataField: 'selectedSeries',
@@ -83,7 +86,7 @@ class DisplaySeries extends Component {
         classes: "row-clicked",
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
-            this.props.selectSeries(row, isSelect)
+            this.setState({selectedSeries: row.seriesInstanceUID})
         }
     }
 
@@ -97,7 +100,7 @@ class DisplaySeries extends Component {
             let seriesToDisplay = Object.keys(this.props.studies[selectedStudy].series)
             seriesToDisplay.forEach((series) => {
                 let seriesToPush = this.props.series[series]
-                seriesToPush['status'] = (this.warningsPassed(series)) ? 'Valid' : 'Rejected'
+                seriesToPush['status'] = this.warningsPassed(series) ? 'Valid' : 'Rejected'
                 seriesToPush['selectedSeries'] = false
                 if (this.props.seriesReady.includes(seriesToPush.seriesInstanceUID)){
                     seriesToPush['selectedSeries'] = true
@@ -116,8 +119,8 @@ class DisplaySeries extends Component {
      * Check if the series warnings have been all passed
      */
     warningsPassed(series) {
-        for (let warning in this.props.series[series].warnings) {
-            if (!this.props.series[series].warnings[warning].dismissed) {
+        for (let warning in this.props.warningsSeries[series]) {
+            if (!this.props.warningsSeries[series][warning].dismissed) {
                 return false
             }
         }
@@ -144,7 +147,7 @@ class DisplaySeries extends Component {
                     <Col xs={6} md={4}>
                         <DisplayWarning 
                             type='series' 
-                            selectionID={this.props.selectedSeries} 
+                            selectionID={this.state.selectedSeries} 
                         />
                     </Col>
                 </Row>
@@ -166,12 +169,11 @@ const mapStateToProps = state => {
     return {
         series: state.Series.series,
         studies: state.Studies.studies,
-        selectedSeries: state.DisplayTables.selectedSeries,
-        seriesReady: state.DisplayTables.seriesReady
+        seriesReady: state.DisplayTables.seriesReady,
+        warningsSeries: state.Warnings.warningsSeries
     }
 }
 const mapDispatchToProps = {
-    selectSeries,
     selectSeriesReady
 }
 

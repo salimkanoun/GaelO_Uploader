@@ -52,7 +52,6 @@ class ControllerStudiesSeries extends Component {
                 })
             }
         })
-        this.props.seriesValidated(series)
     }
 
     render() {

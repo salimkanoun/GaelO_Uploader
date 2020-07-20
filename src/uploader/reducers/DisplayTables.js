@@ -1,9 +1,8 @@
 // Gérer les IDs, selected study, warnings
-import { SELECT_STUDY, SELECT_SERIES, SERIES_READY } from '../actions/actions-types'
+import { SELECT_STUDY, SERIES_READY } from '../actions/actions-types'
 
 const initialState = {
   selectedStudy: undefined,
-  selectedSeries: undefined,
   seriesReady: []
 }
 
@@ -14,12 +13,6 @@ export default function DisplayTablesReducer (state = initialState, action) {
       return {
         ...state,
         selectedStudy: action.payload
-      }
-
-    case SELECT_SERIES:
-      return {
-        ...state,
-        selectedSeries: action.payload.row.seriesInstanceUID
       }
 
     case SERIES_READY:

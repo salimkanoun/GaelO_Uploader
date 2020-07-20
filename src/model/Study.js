@@ -12,7 +12,8 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
- import SHA1 from 'crypto-js/sha1'
+import SHA1 from 'crypto-js/sha1'
+import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from './Warning'
 
 export default class Study {
 
@@ -33,6 +34,7 @@ export default class Study {
         this.acquisitionDate = this.getDate(acquisitionDate)
         this.patientName = patientFirstName + ' ' + patientLastName
         this.warnings = {}
+        this.visit = null
     }
 
     addSeries(seriesObject) {
@@ -113,12 +115,25 @@ export default class Study {
     }
 
     //SK Pour envoyer au back pour savoir si etude connue ou pas et au moment du post processing
-    getOrthancStudyID(){
-		let hash = SHA1(this.patientID + '|' + this.studyInstanceUID).toString()
-		return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`
+    getOrthancStudyID() {
+        let hash = SHA1(this.patientID + '|' + this.studyInstanceUID).toString()
+        return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`
     }
 
-    getArrayWarnings() {
-        return Object.values(this.warnings)
+    getWarnings() {
+        return this.warnings
+    }
+
+    checkStudies() {
+        let expectedVisit
+        // Check if the study corresponds to the visits in wait for series upload
+        if (expectedVisit === undefined) {
+            this.warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
+        }
+
+        // Check if visit ID is set
+        if (this.visit == null || typeof this.visit.idVisit === undefined) {
+            this.warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        }
     }
 }

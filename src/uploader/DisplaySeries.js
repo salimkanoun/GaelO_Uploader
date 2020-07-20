@@ -20,13 +20,9 @@ import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
 //Redux
 import { connect } from 'react-redux';
-import { selectSeriesReady } from './actions/DisplayTables'
+import { selectSeriesReady, selectSeries } from './actions/DisplayTables'
 
 class DisplaySeries extends Component {
-
-    state = {
-        selectedSeries: null
-    }
 
     columns = [
         {
@@ -86,7 +82,7 @@ class DisplaySeries extends Component {
         classes: "row-clicked",
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
-            this.setState({selectedSeries: row.seriesInstanceUID})
+            this.props.selectSeries(row.seriesInstanceUID)
         }
     }
 
@@ -134,8 +130,8 @@ class DisplaySeries extends Component {
                 <Row>
                     <Col xs={12} md={8}>
                         <BootstrapTable
-                            classes="table table-borderless"
                             bodyClasses="du-series-tbody"
+                            classes="table table-borderless"
                             headerClasses="du-series th"
                             rowClasses={rowClasses}
                             wrapperClasses="table-responsive"
@@ -147,7 +143,7 @@ class DisplaySeries extends Component {
                     <Col xs={6} md={4}>
                         <DisplayWarning 
                             type='series' 
-                            selectionID={this.state.selectedSeries} 
+                            selectionID={this.props.selectedSeries} 
                         />
                     </Col>
                 </Row>
@@ -170,11 +166,13 @@ const mapStateToProps = state => {
         series: state.Series.series,
         studies: state.Studies.studies,
         seriesReady: state.DisplayTables.seriesReady,
+        selectedSeries: state.DisplayTables.selectedSeries,
         warningsSeries: state.Warnings.warningsSeries
     }
 }
 const mapDispatchToProps = {
-    selectSeriesReady
+    selectSeriesReady,
+    selectSeries
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplaySeries)

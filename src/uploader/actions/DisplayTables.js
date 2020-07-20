@@ -1,9 +1,16 @@
-import { SELECT_STUDY, SERIES_READY } from './actions-types'
+import { SELECT_STUDY, SERIES_READY , SELECT_SERIES } from './actions-types'
 
 export function selectStudy (studyInstanceUID) {
   return {
     type: SELECT_STUDY,
     payload: studyInstanceUID
+  }
+}
+
+export function selectSeries (seriesInstanceUID) {
+  return {
+    type: SELECT_SERIES,
+    payload: seriesInstanceUID
   }
 }
 

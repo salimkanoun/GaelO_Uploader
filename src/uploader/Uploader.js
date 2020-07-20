@@ -16,17 +16,23 @@ import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
 
 import { getAets, logIn, registerStudy } from '../services/api'
+import { fetchExpectedVisits } from '../services/tools'
 
 import { addSeries, addStudy } from './actions/StudiesSeries'
+import { addWarningsSeries, addWarningsStudy } from './actions/Warnings'
+
 import Button from 'react-bootstrap/Button'
+
+//CheckPatient table labels and keys
+const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
+const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
 
 class Uploader extends Component {
 
     state = {
-        multiUpload: false,
         isFilesLoaded: false,
         isParsingFiles: false,
-        isUploadStarted : false,
+        isUploadStarted: false,
         fileParsed: 0,
         fileLoaded: 0,
         zipProgress: 0,
@@ -36,8 +42,30 @@ class Uploader extends Component {
     }
 
     constructor(props) {
-
         super(props)
+
+        // Declare default config
+		this.config = {
+            multiUpload: false,
+			expectedVisitsURL: '../../scripts/get_possible_import.php',
+			validationScriptURL: '../../scripts/validate_dicom_upload.php',
+			dicomsReceiptsScriptURL: '../../scripts/dicoms_receipts.php',
+			isNewStudyURL: '../../scripts/is_new_study.php',
+			alertMessageWhenNoVisitAwatingUpload: 'No visit is awaiting series upload. Please create a new visit by clicking on the patient in the <a id="redirect-to-investigator" href="#">patient tree</a>.',
+			minNbOfInstances: 30,
+			idVisit: null,
+			refreshRateProgBar: 200,
+			callbackOnComplete: null,
+			/*callbackOnBeforeUnload: function (event) {
+				event.preventDefault();
+				event.returnValue = ''; // Needed for Chrome
+			},
+			callbackOnAbort: function(){
+				refreshInvestigatorDiv()
+			}*/
+			
+		}
+
         this.uploadModel = new Model();
         this.addFile = this.addFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
@@ -83,10 +111,10 @@ class Uploader extends Component {
     addFile(files) {
 
         //Add number of files to be parsed to the previous number (incremental parsing)
-        this.setState((previousState) => { 
-            return { 
-                fileLoaded: (previousState.fileLoaded + files.length), 
-                isParsingFiles : true 
+        this.setState((previousState) => {
+            return {
+                fileLoaded: (previousState.fileLoaded + files.length),
+                isParsingFiles: true
             }
         })
 
@@ -97,10 +125,10 @@ class Uploader extends Component {
 
         //Once all promised resolved update state and refresh redux with parsing results
         Promise.all(readPromises).then(() => {
-            this.setState({ isFilesLoaded : true, isParsingFiles : false })
+            this.setState({ isFilesLoaded: true, isParsingFiles: false })
             this.checkSeriesAndUpdateRedux()
         })
-        
+
     }
 
     /**
@@ -108,14 +136,16 @@ class Uploader extends Component {
 	 */
     async read(file) {
         try {
+            this.uploadModel = new Model()
+    
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
 
             //if Secondary capture or DicomDir do no register file
-            if( dicomFile.isDicomDir() ){
+            if (dicomFile.isDicomDir()) {
                 throw Error('Dicomdir file')
             }
-            if( dicomFile.isSecondaryCaptureImg() ){
+            if (dicomFile.isSecondaryCaptureImg()) {
                 throw Error('Secondary Capture Image')
             }
 
@@ -137,10 +167,10 @@ class Uploader extends Component {
                 series = study.getSeries(seriesInstanceUID)
             }
 
-            series.addInstance( dicomFile.getInstanceObject() )
+            series.addInstance(dicomFile.getInstanceObject())
 
-            this.setState( (previousState) => { 
-                return { fileParsed: ++previousState.fileParsed } 
+            this.setState((previousState) => {
+                return { fileParsed: ++previousState.fileParsed }
             })
 
         } catch (error) {
@@ -186,11 +216,69 @@ class Uploader extends Component {
         //ICI A VOIR DIFFEREMENT IL FAUT QUE LE CONTROLEUR INJECTE SEPARAMENT 
         //LES NOUVELLES STUDIES + WARNING SI PATIENT NE MATCH PAS PATIENT ATTENDU
         // LES NOUVELLES SERIES + LES WARNING
-        console.log(this.uploadModel.data)
+        //console.log(this.uploadModel.data)
+        for (let studyInstanceUID in this.uploadModel.data) {
+            //console.log(studyInstanceUID)
+            if (!this.state.multiUploader) {
+                this.uploadModel.data[studyInstanceUID].checkStudies()
+                this.props.addWarningsStudy(studyInstanceUID, this.uploadModel.data[studyInstanceUID].getWarnings())
+                if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
+                    this.setState({showWarning: true})
+                }
+            }
+            for (let seriesInstanceUID in this.uploadModel.data[studyInstanceUID].series) {
+                this.props.addSeries(this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID])
+                this.props.addWarningsSeries(seriesInstanceUID, this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID].getWarnings())
+            }
+        }
         this.props.addStudy(this.uploadModel.data)
-        for (let study in this.uploadModel.data) {
-            for (let series in this.uploadModel.data[study].series) {
-                this.props.addSeries(this.uploadModel.data[study].series[series])
+    }
+
+
+    /**
+     * Check matching of patient information
+     */
+    prepareDataCheckPatient(study) {
+        let rows = []
+        let currentStudy = this.props.studies[study]
+        //SK ICI patientName peut etre undefined (donc crash ici)
+        //Peut etre plutot a gerer quand on construit l'entree study mettre les
+        //caractères recherchés pour le match
+        currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
+        currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
+
+        let expectedStudy = [currentStudy]
+
+        //Fake unmatching fields
+        expectedStudy.patientFirstName = 'A'
+        expectedStudy.patientSex = 'M'
+        expectedStudy.patientBirthDate = '01-01-2000'
+
+        for (let i in labels) {
+            rows.push({
+                rowName: labels[i],
+                expectedStudy: expectedStudy[keys[i]],
+                currentStudy: currentStudy[keys[i]],
+                ignoredStatus: (this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])) ? null : this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])
+            })
+        }
+        this.props.addWarningStudy(rows)
+    }
+
+    /**
+     * Check correspondance between expected and given data
+     */
+    checkRow(expected, current) {
+        if (expected === undefined || expected === '') {
+            //if exected is empty check is true
+            return true
+        } else {
+            //Call function checkPatientIdentity instead
+            // SK ?
+            if (expected === current) {
+                return true
+            } else {
+                return false
             }
         }
     }
@@ -199,7 +287,7 @@ class Uploader extends Component {
      * 
      */
     triggerMultiUpload() {
-        this.setState((state) => ({multiUpload: !state.multiUpload}))
+        this.setState((state) => ({ multiUpload: !state.multiUpload }))
     }
 
     /**
@@ -238,7 +326,7 @@ class Uploader extends Component {
 
 
         uploader.startUpload()
-        this.setState({isUploadStarted : true})
+        this.setState({ isUploadStarted: true })
 
     }
 
@@ -250,29 +338,29 @@ class Uploader extends Component {
     render() {
         return (
             <Fragment>
-                    <div>
-                        <Button className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.multiUpload ? 'Exit Uploader' : 'Multi Uploader'}</Button>
-                        <DicomDropZone 
-                            addFile={this.addFile} 
-                            isParsingFiles={this.state.isParsingFiles}
-                            isUploadStarted = {this.state.isUploadStarted}
-                            fileParsed = {this.state.fileParsed}
-                            fileIgnored = {Object.keys(this.state.ignoredFiles).length}
-                            fileLoaded = {this.state.fileLoaded}
-                        />
-                    </div>
-                    <div className="mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
-                        <ParsingDetails 
-                            fileLoaded={this.state.fileLoaded} 
-                            fileParsed={this.state.fileParsed} 
-                            dataIgnoredFiles = {this.state.ignoredFiles} 
-                        />
-                    </div>
-                    <div hidden={!this.state.isFilesLoaded}>
-                        <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries multiUploader={this.state.multiUpload} selectedSeries={this.props.selectedSeries} />
-                        <ProgressUpload multiUpload={false} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
-                    </div>
+                <div>
+                    <Button className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.multiUpload ? 'Exit Uploader' : 'Multi Uploader'}</Button>
+                    <DicomDropZone
+                        addFile={this.addFile}
+                        isParsingFiles={this.state.isParsingFiles}
+                        isUploadStarted={this.state.isUploadStarted}
+                        fileParsed={this.state.fileParsed}
+                        fileIgnored={Object.keys(this.state.ignoredFiles).length}
+                        fileLoaded={this.state.fileLoaded}
+                    />
+                </div>
+                <div className="mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
+                    <ParsingDetails
+                        fileLoaded={this.state.fileLoaded}
+                        fileParsed={this.state.fileParsed}
+                        dataIgnoredFiles={this.state.ignoredFiles}
+                    />
+                </div>
+                <div hidden={!this.state.isFilesLoaded}>
+                    <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
+                    <ControllerStudiesSeries multiUploader={this.state.multiUpload} selectedSeries={this.props.selectedSeries} />
+                    <ProgressUpload multiUpload={false} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
+                </div>
             </Fragment>
         )
     }
@@ -283,12 +371,16 @@ const mapStateToProps = state => {
         studies: state.Studies.studies,
         series: state.Series.series,
         selectedSeries: state.DisplayTables.selectedSeries,
-        seriesReady: state.DisplayTables.seriesReady
+        seriesReady: state.DisplayTables.seriesReady,
+        warningsStudies: state.Warnings.warningsStudies,
+        warningsSeries: state.Warnings.warningsSeries,
     }
 }
 const mapDispatchToProps = {
     addStudy,
     addSeries,
+    addWarningsStudy: addWarningsStudy,
+    addWarningsSeries: addWarningsSeries
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

@@ -105,9 +105,9 @@ class CheckPatient extends Component {
      * Build table rows when study datacomments have been downloaded
      */
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.studyUID !== nextProps.studyUID && nextProps.studyUID !== undefined) {
+        if (this.props.studyInstanceUID !== nextProps.studyInstanceUID && nextProps.studyInstanceUID !== undefined) {
             let rows = []
-            let currentStudy = this.props.studies[nextProps.studyUID]
+            let currentStudy = this.props.studies[nextProps.studyInstanceUID]
             //SK ICI patientName peut etre undefined (donc crash ici)
             //Peut etre plutot a gerer quand on construit l'entree study mettre les
             //caractères recherchés pour le match
@@ -136,7 +136,7 @@ class CheckPatient extends Component {
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.props.closeListener} updatedData={this.props.studyUID}>
+            <Modal show={this.props.show} onHide={this.props.closeListener} updatedData={this.props.studyInstanceUID}>
                 <Modal.Header class="modal-header" closeButton>
                     <Modal.Title class="modal-title" id="du-patientLongTitle">{this.props.multiUploader ? 'Select Patient' : 'Check Patient'}</Modal.Title>
                 </Modal.Header>

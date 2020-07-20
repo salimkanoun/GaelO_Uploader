@@ -40,7 +40,7 @@ class StudiesTab extends Component {
 
     columns = [
         {
-            dataField: 'studyUID',
+            dataField: 'studyInstanceUID',
             isDummyField: true,
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => (
@@ -80,11 +80,11 @@ class StudiesTab extends Component {
         hideSelectColumn: true,
         classes: "row-clicked",
         onSelect: (row) => {
-            this.props.selectStudy(row.studyUID)
+            this.props.selectStudy(row.studyInstanceUID)
         }
     };
 
-    validateCheckPatient = (studyUID) => {
+    validateCheckPatient = (studyInstanceUID) => {
 
     }
 
@@ -152,7 +152,7 @@ class StudiesTab extends Component {
                     <Row>
                         <Col xs={12} md={8}>
                             <BootstrapTable
-                                keyField='studyUID'
+                                keyField='studyInstanceUID'
                                 classes="table table-borderless"
                                 bodyClasses="du-studies-tbody"
                                 headerClasses="du-studies th"
@@ -162,7 +162,7 @@ class StudiesTab extends Component {
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient studyUID={this.props.selectedStudy} multiUploader={this.props.multiUploader} validateCheckPatient={this.validateCheckPatient}
+                            <CheckPatient studyInstanceUID={this.props.selectedStudy} multiUploader={this.props.multiUploader} validateCheckPatient={this.validateCheckPatient}
                                 show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} hidden={this.props.validatedPatient}/>
                         </Col>
                         <Col xs={6} md={4}>

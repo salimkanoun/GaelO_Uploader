@@ -18,9 +18,9 @@ export default class Study {
 
     series = {}
 
-    constructor(studyUID, studyID, studyDate, studyDescription, accessionNumber, patientID, patientFirstName, patientLastName,
+    constructor(studyInstanceUID, studyID, studyDate, studyDescription, accessionNumber, patientID, patientFirstName, patientLastName,
         patientBirthDate, patientSex, acquisitionDate) {
-        this.studyUID = studyUID
+        this.studyInstanceUID = studyInstanceUID
         this.studyID = studyID
         this.studyDate = studyDate
         this.studyDescription = studyDescription
@@ -43,8 +43,8 @@ export default class Study {
     }
 
     isExistingSeries(seriesInstanceUID) {
-        let existingSeriesUID = Object.keys(this.series)
-        return existingSeriesUID.includes(seriesInstanceUID)
+        let existingSeriesInstanceUID = Object.keys(this.series)
+        return existingSeriesInstanceUID.includes(seriesInstanceUID)
     }
 
     getSeries(seriesInstanceUID) {
@@ -68,8 +68,8 @@ export default class Study {
         return this.patientLastName
     }
 
-    getStudyUID() {
-        return this.studyUID
+    getStudyInstanceUID() {
+        return this.studyInstanceUID
     }
 
     getStudyID() {
@@ -114,7 +114,7 @@ export default class Study {
 
     //SK Pour envoyer au back pour savoir si etude connue ou pas et au moment du post processing
     getOrthancStudyID(){
-		let hash = SHA1(this.patientID + '|' + this.studyUID).toString()
+		let hash = SHA1(this.patientID + '|' + this.studyInstanceUID).toString()
 		return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`
     }
 

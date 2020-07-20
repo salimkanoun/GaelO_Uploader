@@ -223,10 +223,10 @@ class Uploader extends Component {
         let instancesToUpload = []
 
         //Gather all instances to upload
-        for (let studyID in this.state.seriesValidated) {
-            for (let seriesID in this.state.seriesValidated[studyID]) {
-                seriesID = this.state.seriesValidated[studyID][seriesID]
-                let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
+        for (let studyInstanceUID in this.state.seriesValidated) {
+            for (let seriesInstanceUID in this.state.seriesValidated[studyInstanceUID]) {
+                seriesInstanceUID = this.state.seriesValidated[studyInstanceUID][seriesInstanceUID]
+                let mySeries = this.uploadModel.getStudy(studyInstanceUID).getSeries(seriesInstanceUID)
                 instancesToUpload.push(...mySeries.getArrayInstances())
             }
         }

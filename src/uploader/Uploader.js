@@ -299,38 +299,60 @@ class Uploader extends Component {
      * Upload selected and validated series on click
      */
     async onUploadClick(e) {
-        let instancesToUpload = []
-        //Gather all instances to upload
-        let studiesUIDToUpload = Object.keys(this.state.seriesValidated)
-        let studyInstanceUID = studiesUIDToUpload[0]
-        let studyOrthancID = this.uploadModel.getStudy(studiesUIDToUpload[0]).getOrthancStudyID()
-        
-        for (let seriesID in this.state.seriesValidated[studyInstanceUID]) {
-            seriesID = this.state.seriesValidated[studyInstanceUID][seriesID]
-            let mySeries = this.uploadModel.getStudy(studyInstanceUID).getSeries(seriesID)
-            instancesToUpload.push(...mySeries.getArrayInstances())
+
+        //build array of series object to be uploaded
+        console.log(this.props.seriesReady)
+        let seriesObjectArrays = this.props.seriesReady.map((seriesUID)=>{
+            return this.props.series[seriesUID]
+        })
+
+        //get unique StudyUID in series arrays
+        let studyUIDArray= seriesObjectArrays.map((seriesObject)=>{
+            return seriesObject.studyInstanceUID
+        })
+        studyUIDArray = Array.from(new Set(studyUIDArray))
+
+        //group series by studyUID
+        for(let studyInstanceUID of studyUIDArray){
+
+            let seriesInstanceUID = seriesObjectArrays.filter((seriesObject) => {
+                return (seriesObject.studyInstanceUID === studyInstanceUID)
+            })
+            let studyOrthancID = this.uploadModel.getStudy(studyInstanceUID).getOrthancStudyID()
+
+            let filesToUpload = []
+
+            seriesInstanceUID.forEach(seriesObject => {
+                console.log(studyInstanceUID)
+                console.log(seriesObject.seriesInstanceUID)
+                let getSeriesObject = this.uploadModel.getStudy(studyInstanceUID).getSeries(seriesObject.seriesInstanceUID)
+                let fileArray = getSeriesObject.getArrayInstances().map(instance => {
+                    return instance.getFile()
+                })
+                filesToUpload.push(...fileArray)
+            })
+
+            let uploader = new DicomBatchUploader(this.uppy, 282 /*DOIT ETRE UN VARIABLE */, filesToUpload)
+            uploader.on('batch-progress', (zipProgress, uploadProgress)=> {
+                this.setState({
+                    uploadProgress : uploadProgress,
+                    zipProgress : zipProgress
+                })
+                console.log(zipProgress)
+                console.log(uploadProgress)
+
+            })
+            uploader.on('batch-upload-done', () => {
+                console.log('Batch Finished')
+                //validateUpload(282, uploader.timeStamp, uploader.totalDicomFiles,studyOrthancID)
+            })
+
+            uploader.startUpload()
+            this.setState({ isUploadStarted: true })
+
+
         }
         
-
-        let fileArray = instancesToUpload.map(instance => {
-            return instance.getFile()
-        })
-
-        let uploader = new DicomBatchUploader(this.uppy, 282 /*DOIT ETRE UN VARIABLE */, fileArray,  () => {
-            clearInterval(this.intervalProgress)
-            validateUpload(282, uploader.timeStamp, uploader.totalDicomFiles,studyOrthancID)
-        })
-
-        this.intervalProgress = setInterval(() => {
-            console.log(uploader.getProgress())
-            this.setState({
-                ...uploader.getProgress()
-            })
-        }, 200)
-
-
-        uploader.startUpload()
-        this.setState({ isUploadStarted: true })
 
     }
 

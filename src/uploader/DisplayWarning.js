@@ -32,9 +32,9 @@ class DisplayWarning extends Component {
                 <ButtonIgnore
                     warning={this.getWarningStatus(row)}
                     onClick={() => {
-                        if (this.props.type == 'series')
+                        if (this.props.type === 'series')
                             this.props.updateWarningSeries(row, row.seriesInstanceUID)
-                        else if (this.props.type == 'study')
+                        else if (this.props.type === 'study')
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
                     }}
                 />
@@ -47,9 +47,9 @@ class DisplayWarning extends Component {
      */
     getWarningStatus(row) {
         console.log(row)
-        if (this.props.type == 'study')
+        if (this.props.type === 'study')
             return this.props.warningsStudies[row.studyInstanceUID][row.key].dismissed
-        else if (this.props.type == 'series')
+        else if (this.props.type === 'series')
             return this.props.warningsSeries[row.seriesInstanceUID][row.key].dismissed
     }
 

@@ -58,6 +58,10 @@ export default class Study {
         return series
     }
 
+    getChildSeriesInstanceUIDs(){
+        return Object.keys(this.series)
+    }
+
     getPatientName() {
         return (this.patientFirstName + this.patientLastName)
     }

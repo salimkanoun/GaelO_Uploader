@@ -305,7 +305,7 @@ export default class DicomFile {
 
   getSeriesObject() {
     return new Series(this.getSeriesInstanceUID(), this.getSeriesNumber(), this.getSeriesDate(),
-      this.getSeriesDescription(), this.getModality());
+      this.getSeriesDescription(), this.getModality(), this.getStudyInstanceUID());
   }
 
   getInstanceObject() {

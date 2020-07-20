@@ -20,12 +20,13 @@ export default class Series {
 
 	instances = {}
 
-	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality) {
-		this.seriesInstanceUID = seriesInstanceUID;
-		this.seriesNumber = seriesNumber;
-		this.seriesDate = this.getDate(seriesDate);
-		this.seriesDescription = seriesDescription;
-		this.modality = modality;
+	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality, studyInstanceUID) {
+		this.seriesInstanceUID = seriesInstanceUID
+		this.seriesNumber = seriesNumber
+		this.seriesDate = this.getDate(seriesDate)
+		this.seriesDescription = seriesDescription
+		this.modality = modality
+		this.studyInstanceUID = studyInstanceUID
 		this.warnings = {};
 	}
 

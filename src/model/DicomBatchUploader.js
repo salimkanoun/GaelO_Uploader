@@ -1,40 +1,41 @@
 import DicomFile from './DicomFile'
 import JSZip from 'jszip'
+const EventEmitter = require('events').EventEmitter;
 
-export default class DicomBatchUploader {
+export default class DicomBatchUploader extends EventEmitter {
 
     uploadProgress=0
     zipProgress=0
 
-    constructor (uppy, idVisit, files, onUploadDone) {
+    constructor (uppy, idVisit, files) {
+        super()
         this.uppy = uppy
         this.files = files
         this.idVisit = idVisit
         this.timeStamp = Date.now()
-        //SK ICI ENOYE 2 Fois
-        this.onUploadDone = onUploadDone
         this.buildBatches()
-        
+        let self = this
+
         this.uppy.on('upload-success', async (file, response) => {
             this.currentBatchUpload = ++this.currentBatchUpload
             let fractionUploaded = ( this.currentBatchUpload * this.batchValue)
             this.uploadProgress = Math.min(fractionUploaded , 100)
+            if(this.zipProgress>=100 && this.uploadProgress >= 100) {
+                clearTimeout(this.refreshInterval)
+                self.emit('batch-upload-done')
+                return
+            }
             await this.batchesIterator.next()
         })
 
     }
 
-    getProgress(){
-        if(this.zipProgress>=100 && this.uploadProgress >= 100) this.onUploadDone()
-        return{
-            uploadProgress : Math.round(this.uploadProgress),
-            zipProgress : Math.round(this.zipProgress)
-        }
-    }
-
     async startUpload(){
         await this.batchesIterator.next()
         await this.batchesIterator.next()
+        this.refreshInterval = setInterval(() => {
+            this.emit('batch-progress', Math.round(this.zipProgress), Math.round(this.uploadProgress) )
+        }, 100);
     }
 
     buildBatches(){
@@ -64,7 +65,10 @@ export default class DicomBatchUploader {
         return index
 
     }
-    //SK Triggerd multiple tame du to async dowload
+
+    /**
+     * Generator generating subzips of the bactch
+     */
     buildNextZip = async function*(){
 
         let index = 0

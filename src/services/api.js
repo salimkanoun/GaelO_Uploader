@@ -13,7 +13,7 @@ export function getAets () {
 export function logIn () {
   const formData = new FormData()
   formData.append('username', 'administrator')
-  formData.append('mdp', '')
+  formData.append('mdp', 'Salim1985')
   formData.append('formSent', '1')
 
   return fetch('/index.php', {

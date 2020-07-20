@@ -24,8 +24,6 @@ import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
 import { selectStudy } from './actions/DisplayTables'
 
-import { validateCheckPatient } from './actions/StudiesSeries'
-
 class StudiesTab extends Component {
 
     state = {
@@ -34,13 +32,12 @@ class StudiesTab extends Component {
 
     constructor(props) {
         super(props)
-        this.validateCheckPatient = this.validateCheckPatient.bind(this)
         this.toggleCheckPatient = this.toggleCheckPatient.bind(this)
     }
 
     columns = [
         {
-            dataField: 'studyUID',
+            dataField: 'studyInstanceUID',
             isDummyField: true,
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => (
@@ -80,13 +77,9 @@ class StudiesTab extends Component {
         hideSelectColumn: true,
         classes: "row-clicked",
         onSelect: (row) => {
-            this.props.selectStudy(row.studyUID)
+            this.props.selectStudy(row.studyInstanceUID)
         }
     };
-
-    validateCheckPatient = (studyUID) => {
-
-    }
 
     /**
      * Toggle modal 'CheckPatient' of given row 
@@ -126,16 +119,16 @@ class StudiesTab extends Component {
     warningsPassed(study) {
         let studyStatus = 'Valid'
         //Check for warnings in study
-        for (let warning in this.props.studies[study].warnings) {
-            if (!this.props.studies[study].warnings[warning].dismissed) {
+        for (let warning in this.props.warningsStudies[study]) {
+            if (!this.props.warningsStudies[study][warning].dismissed) {
                 studyStatus = 'Rejected'
             }
         }
         //Check for warnings in series
         for (let series in this.props.series) {
             if (Object.keys(this.props.studies[study].series).includes(series)) {
-                for (let warning in this.props.series[series].warnings) {
-                    if (!this.props.series[series].warnings[warning].dismissed) {
+                for (let warning in this.props.warningsSeries[series]) {
+                    if (!this.props.warningsSeries[series][warning].dismissed) {
                         studyStatus = 'Incomplete'
                     }
                 }
@@ -152,7 +145,7 @@ class StudiesTab extends Component {
                     <Row>
                         <Col xs={12} md={8}>
                             <BootstrapTable
-                                keyField='studyUID'
+                                keyField='studyInstanceUID'
                                 classes="table table-borderless"
                                 bodyClasses="du-studies-tbody"
                                 headerClasses="du-studies th"
@@ -162,12 +155,11 @@ class StudiesTab extends Component {
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient studyUID={this.props.selectedStudy} multiUploader={this.props.multiUploader} validateCheckPatient={this.validateCheckPatient}
-                                show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} hidden={this.props.validatedPatient}/>
+                            <CheckPatient multiUploader={this.props.multiUploader} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} hidden={this.props.validatedPatient}/>
                         </Col>
                         <Col xs={6} md={4}>
                             <DisplayWarning 
-                                type='studies' 
+                                type='study' 
                                 selectionID={this.props.selectedStudy} 
                             />
                         </Col>
@@ -190,11 +182,12 @@ const rowClasses = (row, rowIndex) => {
 const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
+        warningsSeries: state.Warnings.warningsSeries,
+        warningsStudies: state.Warnings.warningsStudies
     }
 }
 const mapDispatchToProps = {
     selectStudy,
-    validateCheckPatient
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

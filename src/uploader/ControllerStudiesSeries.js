@@ -33,26 +33,25 @@ class ControllerStudiesSeries extends Component {
      * to send to master controller
      */
     prepareSeriesToUpload = () => {
-        let seriesIDs = this.props.seriesReady
+        let seriesInstanceUIDs = this.props.seriesReady
         let series = {}
         //Fetch series in the model
         let studies = Object.values(this.props.studies)
         studies.forEach(study => {
-            let studyID = study.studyUID
+            let studyInstanceUID = study.studyInstanceUID
             //Check if there is no warning on study level
-            if (this.props.studies[studyID].warnings = {}) {
+            if (this.props.studies[studyInstanceUID].warnings = {}) {
                 //If there isn't, series are OK to be uploaded
                 Object.values(study.series).forEach(theSeries => {
-                    if (seriesIDs.includes(theSeries.seriesInstanceUID)) {
-                        if (series[studyID] === undefined) {
-                            series[studyID] = []
+                    if (seriesInstanceUIDs.includes(theSeries.seriesInstanceUID)) {
+                        if (series[studyInstanceUID] === undefined) {
+                            series[studyInstanceUID] = []
                         }
-                        series[studyID].push(theSeries.seriesInstanceUID)
+                        series[studyInstanceUID].push(theSeries.seriesInstanceUID)
                     }
                 })
             }
         })
-        this.props.seriesValidated(series)
     }
 
     render() {

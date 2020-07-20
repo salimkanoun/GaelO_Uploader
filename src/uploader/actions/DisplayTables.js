@@ -1,29 +1,22 @@
-import { SELECT_STUDY, SELECT_SERIES, SERIES_READY } from './actions-types'
+import { SELECT_STUDY, SERIES_READY , SELECT_SERIES } from './actions-types'
 
-export function selectStudy (studyID) {
+export function selectStudy (studyInstanceUID) {
   return {
     type: SELECT_STUDY,
-    payload: studyID
+    payload: studyInstanceUID
   }
 }
 
-export function selectSeries (row, isSelect) {
+export function selectSeries (seriesInstanceUID) {
   return {
     type: SELECT_SERIES,
-    payload: { row, isSelect }
+    payload: seriesInstanceUID
   }
 }
 
-export function validateCheckPatient (id) {
-  return {
-    type: SELECT_SERIES,
-    payload: id
-  }
-}
-
-export function selectSeriesReady (validSeriesID, isSelect) {
+export function selectSeriesReady (validSeriesInstanceUID, isSelect) {
   return {
     type: SERIES_READY,
-    payload: { validSeriesID, isSelect }
+    payload: { validSeriesInstanceUID: validSeriesInstanceUID, isSelect: isSelect }
   }
 }

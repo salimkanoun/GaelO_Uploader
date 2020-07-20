@@ -108,8 +108,8 @@ export default class Series {
 		}
 	}
 
-	getArrayWarnings() {
-		return Object.values(this.warnings)
+	getWarnings() {
+		return this.warnings
 	}
 
 	setWarningStatus(key, dismissed) {

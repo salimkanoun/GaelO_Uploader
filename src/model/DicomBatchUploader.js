@@ -19,21 +19,23 @@ export default class DicomBatchUploader extends EventEmitter {
             this.currentBatchUpload = ++this.currentBatchUpload
             let fractionUploaded = ( this.currentBatchUpload * this.batchValue)
             this.uploadProgress = Math.min(fractionUploaded , 100)
+            this.emitProgress()
             await this.batchesIterator.next()
         })
+
+    }
+
+    emitProgress(){
+        this.emit('batch-progress', Math.round(this.zipProgress), Math.round(this.uploadProgress) )
+        if(this.zipProgress>=100 && this.uploadProgress >= 100) {
+            this.emit('batch-upload-done', this.timeStamp, this.files.length)
+        }
 
     }
 
     async startUpload(){
         await this.batchesIterator.next()
         await this.batchesIterator.next()
-        this.refreshInterval = setInterval(() => {
-            this.emit('batch-progress', Math.round(this.zipProgress), Math.round(this.uploadProgress) )
-            if(this.zipProgress>=100 && this.uploadProgress >= 100) {
-                clearTimeout(this.refreshInterval)
-                this.emit('batch-upload-done')
-            }
-        }, 100);
     }
 
     buildBatches(){
@@ -92,6 +94,7 @@ export default class DicomBatchUploader extends EventEmitter {
 
             let fractionZipped = index * this.batchValue
             this.zipProgress = Math.min( fractionZipped , 100)
+            this.emitProgress()
 
             yield true
 

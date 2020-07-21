@@ -6,7 +6,6 @@ import Tus from '@uppy/tus'
 
 import Model from '../model/Model'
 import DicomFile from '../model/DicomFile'
-import DicomBatchUploader from '../model/DicomBatchUploader'
 
 import DicomDropZone from './render_component/DicomDropZone'
 
@@ -19,8 +18,7 @@ import { getAets, logIn, registerStudy, validateUpload } from '../services/api'
 
 import { addSeries, addStudy } from './actions/StudiesSeries'
 import { addWarningsSeries, addWarningsStudy, checkPatientData } from './actions/Warnings'
-
-import Button from 'react-bootstrap/Button'
+import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 
 class Uploader extends Component {
 
@@ -254,9 +252,10 @@ class Uploader extends Component {
                 })
                 filesToUpload.push(...fileArray)
             })
-
-            let uploader = new DicomBatchUploader(this.uppy, 282 /*DOIT ETRE UN VARIABLE */, filesToUpload)
-            uploader.on('batch-progress', (zipProgress, uploadProgress) => {
+            console.log(filesToUpload)
+            let uploader = new DicomMultiStudyUploader(this.uppy)
+            uploader.addStudyToUpload(282, filesToUpload)
+            uploader.on('upload-progress', (studyNumber, zipProgress, uploadProgress) => {
                 this.setState({
                     uploadProgress: uploadProgress,
                     zipProgress: zipProgress
@@ -265,9 +264,9 @@ class Uploader extends Component {
                 console.log(uploadProgress)
 
             })
-            uploader.on('batch-upload-done', () => {
+            uploader.on('upload-finished', (visitID, timeStamp, numberOfFiles) => {
                 console.log('Batch Finished')
-                //validateUpload(282, uploader.timeStamp, uploader.totalDicomFiles,studyOrthancID)
+                validateUpload(visitID, timeStamp, numberOfFiles , studyOrthancID)
             })
 
             uploader.startUpload()

@@ -58,7 +58,7 @@ export default class Study {
         return series
     }
 
-    getChildSeriesInstanceUIDs(){
+    getChildSeriesInstanceUIDs() {
         return Object.keys(this.series)
     }
 
@@ -129,8 +129,8 @@ export default class Study {
     }
 
     checkStudies() {
-        let expectedVisit
         // Check if the study corresponds to the visits in wait for series upload
+        let expectedVisit = this.findExpectedVisit(this);
         if (expectedVisit === undefined) {
             this.warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         }
@@ -138,6 +138,24 @@ export default class Study {
         // Check if visit ID is set
         if (this.visit == null || typeof this.visit.idVisit === undefined) {
             this.warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        }
+    }
+
+    findExpectedVisit(st) {
+        let thisP = st.getPatientName();
+
+        if (thisP.givenName === undefined) {
+            return undefined;
+        }
+        if (thisP.familyName === undefined) {
+            return undefined;
+        }
+
+        thisP.birthDate = st.getPatientBirthDate();
+        thisP.sex = st.patientSex;
+
+        if (thisP.birthDate === undefined || thisP.sex === undefined) {
+            return undefined;
         }
     }
 }

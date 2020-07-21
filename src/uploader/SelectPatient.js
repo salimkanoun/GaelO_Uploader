@@ -13,12 +13,25 @@
  */
 
 import React, { Component } from 'react'
-import Button from 'react-bootstrap/Button'
 
-export default class ButtonIgnore extends Component {
-  render () {
-    return (
-      <Button onClick={() => this.props.onClick(this.props.rowIndex)}> {(this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore'} </Button>
-    )
-  }
+import ListGroup from 'react-bootstrap/ListGroup'
+import Select from 'react-select'
+
+export default class SelectPatient extends Component {
+    render() {
+        return (
+            <>
+                <span className='du-patp-label'>Select Visit Type</span>
+                <Select>
+
+                </Select>
+                <span className='du-patp-label'>Select Patient</span>
+                <ListGroup>
+
+                </ListGroup>
+                <span className='du-patp-label'>Comparison</span>
+                <p>We let you check if the selected patient and the imported patient informations are matching:</p>
+            </>
+        )
+    }
 }

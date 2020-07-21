@@ -23,7 +23,9 @@ import DisplayWarning from './DisplayWarning'
 //Redux
 import { connect } from 'react-redux';
 import { selectStudy } from './actions/DisplayTables'
-
+import { checkPatientData } from './actions/Warnings'
+const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
+const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
 class StudiesTab extends Component {
 
     state = {
@@ -33,6 +35,7 @@ class StudiesTab extends Component {
     constructor(props) {
         super(props)
         this.toggleCheckPatient = this.toggleCheckPatient.bind(this)
+        this.myRef = React.createRef()
     }
 
     columns = [
@@ -76,17 +79,18 @@ class StudiesTab extends Component {
         clickToSelect: true,
         hideSelectColumn: true,
         classes: "row-clicked",
-        onSelect: (row) => {
-            this.props.selectStudy(row.studyInstanceUID)
+        onSelect: async (row) => {
+            await this.props.selectStudy(row.studyInstanceUID)
+            if (!this.props.studies[row.studyInstanceUID].warnings['NOT_EXPECTED_VISIT'].dismissed)
+                this.prepareDataCheckPatient()
         }
     };
 
     /**
      * Toggle modal 'CheckPatient' of given row 
      */
-    toggleCheckPatient(row) {
+    toggleCheckPatient() {
         this.setState((state) => { return { isCheck: !state.isCheck } })
-        return row
     }
 
     /**
@@ -104,15 +108,36 @@ class StudiesTab extends Component {
         return studies
     }
 
-    /**
-     * Rerender component if a different study has been selected 
-     */
-    componentDidUpdate(prevState) {
-        if (this.props.selectedStudy !== undefined && prevState.series !== this.props.series) {
-            this.render()
-        }
-    }
 
+    /**
+     * Check matching of patient information
+     */
+    prepareDataCheckPatient() {
+        let rows = []
+        let currentStudy = this.props.studies[this.props.selectedStudy]
+        //SK ICI patientName peut etre undefined (donc crash ici)
+        //Peut etre plutot a gerer quand on construit l'entree study mettre les
+        //caractères recherchés pour le match
+        currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
+        currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
+
+        let expectedStudy = [currentStudy]
+
+        //Fake unmatching fields
+        expectedStudy.patientFirstName = 'A'
+        expectedStudy.patientSex = 'M'
+        expectedStudy.patientBirthDate = '2000-01-01'
+
+        for (let i in labels) {
+            rows.push({
+                rowName: labels[i],
+                expectedStudy: expectedStudy[keys[i]],
+                currentStudy: currentStudy[keys[i]],
+            })
+        }
+        this.props.checkPatientData(rows)
+    }
+    
     /**
      * Check the study status according to its warnings and its series' warnings 
      */
@@ -122,6 +147,7 @@ class StudiesTab extends Component {
         for (let warning in this.props.warningsStudies[study]) {
             if (!this.props.warningsStudies[study][warning].dismissed) {
                 studyStatus = 'Rejected'
+                return studyStatus
             }
         }
         //Check for warnings in series
@@ -155,13 +181,10 @@ class StudiesTab extends Component {
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient multiUploader={this.props.multiUploader} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient(this.selectedStudy)} hidden={this.props.validatedPatient}/>
+                            <CheckPatient multiUploader={this.props.multiUploader} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} buildRows={this.props.buildRows} hidden={this.props.validatedPatient}/>
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning 
-                                type='study' 
-                                selectionID={this.props.selectedStudy} 
-                            />
+                            <DisplayWarning type='study' selectionID={this.props.selectedStudy}/>
                         </Col>
                     </Row>
                 </Container>
@@ -183,11 +206,13 @@ const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
         warningsSeries: state.Warnings.warningsSeries,
-        warningsStudies: state.Warnings.warningsStudies
+        warningsStudies: state.Warnings.warningsStudies,
+        checkPatientDataTable: state.Warnings.checkPatientDataTable
     }
 }
 const mapDispatchToProps = {
     selectStudy,
+    checkPatientData
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

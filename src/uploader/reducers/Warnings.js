@@ -1,11 +1,12 @@
-import { UPDATE_WARNING_SERIES, VALIDATE_CHECK_PATIENT, UPDATE_WARNING_STUDY, ADD_WARNINGS_SERIES, ADD_WARNINGS_STUDY } from '../actions/actions-types'
+import { UPDATE_WARNING_SERIES, VALIDATE_CHECK_PATIENT, UPDATE_WARNING_STUDY, ADD_WARNINGS_SERIES, ADD_WARNINGS_STUDY, CHECK_PATIENT_DATA } from '../actions/actions-types'
 
 const initialState = {
     warningsSeries: {},
-    warningsStudies: {}
+    warningsStudies: {},
+    checkPatientDataTable: []
 }
 
-export default function DisplayTablesReducer(state = initialState, action) {
+export default function WarningsReducer(state = initialState, action) {
     let warnings = {}
     switch (action.type) {
         case ADD_WARNINGS_SERIES:
@@ -55,10 +56,22 @@ export default function DisplayTablesReducer(state = initialState, action) {
                     }
             }
 
-        case VALIDATE_CHECK_PATIENT: {
-            const patientID = action.payload
+        case CHECK_PATIENT_DATA: {
+            let dataToDisplay = action.payload
             return {
-                ...state
+                ...state,
+                checkPatientDataTable: [ ...dataToDisplay ]
+            }
+        }
+
+        case VALIDATE_CHECK_PATIENT: {
+            let studyInstanceUID = action.payload
+            let newWarningsStudies = state.warningsStudies
+            console.log(studyInstanceUID)
+            newWarningsStudies[studyInstanceUID]['NOT_EXPECTED_VISIT'].dismissed = true
+            return {
+                ...state,
+                warningsStudies: { ...newWarningsStudies },
             }
         }
 

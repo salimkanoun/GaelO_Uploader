@@ -46,7 +46,6 @@ class DisplayWarning extends Component {
      * Get warning status of selected row 
      */
     getWarningStatus(row) {
-        console.log(row)
         if (this.props.type === 'study')
             return this.props.warningsStudies[row.studyInstanceUID][row.key].dismissed
         else if (this.props.type === 'series')

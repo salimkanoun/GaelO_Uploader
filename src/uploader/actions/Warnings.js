@@ -1,4 +1,4 @@
-import { UPDATE_WARNING_SERIES, VALIDATE_CHECK_PATIENT, UPDATE_WARNING_STUDY, ADD_WARNINGS_SERIES, ADD_WARNINGS_STUDY } from './actions-types'
+import { UPDATE_WARNING_SERIES, VALIDATE_CHECK_PATIENT, UPDATE_WARNING_STUDY, ADD_WARNINGS_SERIES, ADD_WARNINGS_STUDY, CHECK_PATIENT_DATA } from './actions-types'
 
 export function addWarningsSeries(seriesInstanceUID, warnings) {
     return {
@@ -25,6 +25,13 @@ export function updateWarningStudy(warningToUpdate, studyInstanceUID) {
     return {
         type: UPDATE_WARNING_STUDY,
         payload: {warningToUpdate: warningToUpdate, studyInstanceUID}
+    }
+}
+
+export function checkPatientData(dataToDisplay) {
+    return {
+        type: CHECK_PATIENT_DATA,
+        payload: dataToDisplay
     }
 }
 

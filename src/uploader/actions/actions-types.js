@@ -1,6 +1,7 @@
 // Studies Actions
 export const ADD_STUDY = 'ADD_STUDY'
 export const VALIDATE_CHECK_PATIENT = 'VALIDATE_CHECK_PATIENT'
+export const CHECK_PATIENT_DATA = 'CHECK_PATIENT_DATA'
 // Series Actions
 export const ADD_SERIES = 'ADD_SERIES'
 // Warning Action

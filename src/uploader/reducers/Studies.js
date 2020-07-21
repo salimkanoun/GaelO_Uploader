@@ -9,11 +9,11 @@ export default function StudiesReducer (state = initialState, action) {
   switch (action.type) {
     
     case ADD_STUDY:
-      const study = action.payload
+      let studyObject = action.payload
       return {
         studies: {
           ...state.studies,
-          ...study
+          [studyObject.studyInstanceUID]: {...studyObject}
         }
       }
 

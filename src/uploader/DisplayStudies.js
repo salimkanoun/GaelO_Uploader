@@ -24,8 +24,7 @@ import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
 import { selectStudy } from './actions/DisplayTables'
 import { checkPatientData } from './actions/Warnings'
-const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
-const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
+
 class StudiesTab extends Component {
 
     state = {
@@ -35,12 +34,12 @@ class StudiesTab extends Component {
     constructor(props) {
         super(props)
         this.toggleCheckPatient = this.toggleCheckPatient.bind(this)
-        this.myRef = React.createRef()
     }
 
     columns = [
         {
             dataField: 'studyInstanceUID',
+            text: '',
             isDummyField: true,
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => (
@@ -79,10 +78,8 @@ class StudiesTab extends Component {
         clickToSelect: true,
         hideSelectColumn: true,
         classes: "row-clicked",
-        onSelect: async (row) => {
-            await this.props.selectStudy(row.studyInstanceUID)
-            if (!this.props.studies[row.studyInstanceUID].warnings['NOT_EXPECTED_VISIT'].dismissed)
-                this.prepareDataCheckPatient()
+        onSelect: (row) => {
+            this.props.selectStudy(row.studyInstanceUID)
         }
     };
 
@@ -91,76 +88,6 @@ class StudiesTab extends Component {
      */
     toggleCheckPatient() {
         this.setState((state) => { return { isCheck: !state.isCheck } })
-    }
-
-    /**
-     * Fetch studies from Redux State to display in table
-     */
-    getStudies() {
-        let studies = []
-        if (Object.keys(this.props.studies).length > 0) {
-            for (let study in this.props.studies) {
-                let tempStudy = this.props.studies[study]
-                tempStudy['status'] = this.warningsPassed(study)
-                studies.push({...tempStudy})
-            }
-        }
-        return studies
-    }
-
-
-    /**
-     * Check matching of patient information
-     */
-    prepareDataCheckPatient() {
-        let rows = []
-        let currentStudy = this.props.studies[this.props.selectedStudy]
-        //SK ICI patientName peut etre undefined (donc crash ici)
-        //Peut etre plutot a gerer quand on construit l'entree study mettre les
-        //caractères recherchés pour le match
-        currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
-        currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
-
-        let expectedStudy = [currentStudy]
-
-        //Fake unmatching fields
-        expectedStudy.patientFirstName = 'A'
-        expectedStudy.patientSex = 'M'
-        expectedStudy.patientBirthDate = '2000-01-01'
-
-        for (let i in labels) {
-            rows.push({
-                rowName: labels[i],
-                expectedStudy: expectedStudy[keys[i]],
-                currentStudy: currentStudy[keys[i]],
-            })
-        }
-        this.props.checkPatientData(rows)
-    }
-    
-    /**
-     * Check the study status according to its warnings and its series' warnings 
-     */
-    warningsPassed(study) {
-        let studyStatus = 'Valid'
-        //Check for warnings in study
-        for (let warning in this.props.warningsStudies[study]) {
-            if (!this.props.warningsStudies[study][warning].dismissed) {
-                studyStatus = 'Rejected'
-                return studyStatus
-            }
-        }
-        //Check for warnings in series
-        for (let series in this.props.series) {
-            if (Object.keys(this.props.studies[study].series).includes(series)) {
-                for (let warning in this.props.warningsSeries[series]) {
-                    if (!this.props.warningsSeries[series][warning].dismissed) {
-                        studyStatus = 'Incomplete'
-                    }
-                }
-            }
-        }
-        return studyStatus 
     }
 
     render() {
@@ -175,16 +102,16 @@ class StudiesTab extends Component {
                                 classes="table table-borderless"
                                 bodyClasses="du-studies-tbody"
                                 headerClasses="du-studies th"
-                                rowClasses= { rowClasses }
-                                data={this.getStudies()}
+                                rowClasses={rowClasses}
+                                data={this.props.studiesRows}
                                 columns={this.columns}
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient multiUploader={this.props.multiUploader} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} buildRows={this.props.buildRows} hidden={this.props.validatedPatient}/>
+                            <CheckPatient multiUploader={this.props.multiUploader} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} hidden={this.props.validatedPatient} />
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='study' selectionID={this.props.selectedStudy}/>
+                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} />
                         </Col>
                     </Row>
                 </Container>
@@ -195,9 +122,9 @@ class StudiesTab extends Component {
 }
 
 const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected') 
+    if (row.status === 'Rejected')
         return 'du studies row-danger'
-    if (row.status === 'Incomplete') 
+    if (row.status === 'Incomplete')
         return 'du-studies row-warning'
     return 'du-studies td'
 }
@@ -205,14 +132,10 @@ const rowClasses = (row, rowIndex) => {
 const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
-        warningsSeries: state.Warnings.warningsSeries,
-        warningsStudies: state.Warnings.warningsStudies,
-        checkPatientDataTable: state.Warnings.checkPatientDataTable
     }
 }
 const mapDispatchToProps = {
     selectStudy,
-    checkPatientData
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

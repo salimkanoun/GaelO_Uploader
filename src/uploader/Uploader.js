@@ -17,11 +17,9 @@ import WarningPatient from './render_component/WarningPatient'
 
 import { getAets, logIn, registerStudy, validateUpload } from '../services/api'
 
-import { addSeries, addStudy } from './actions/StudiesSeries'
-import { addWarningsSeries, addWarningsStudy, checkPatientData } from './actions/Warnings'
-
-import Button from 'react-bootstrap/Button'
-
+import { addSeries, addStudy, addWarningsStudy } from './actions/StudiesSeries'
+import { addWarningsSeries, checkPatientData } from './actions/Warnings'
+import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from '../model/Warning'
 class Uploader extends Component {
 
     state = {
@@ -70,6 +68,10 @@ class Uploader extends Component {
 
     async componentDidMount() {
         await logIn()
+        //EO Check multi/unique upload => (not) force visitID
+        //Redux visit candidates
+        //Unique//multi upload as key object
+        //IDvisit PK
         await registerStudy()
         let answer = await getAets()
         console.log(answer)
@@ -190,11 +192,11 @@ class Uploader extends Component {
             //If not in multiupload mode
             if (!this.state.multiUploader) {
                 //Check studies warnings
-                this.uploadModel.data[studyInstanceUID].checkStudies()
+                let studyWarnings = this.checkStudy(this.uploadModel.data[studyInstanceUID])
                 //Add study to Redux
                 this.props.addStudy(this.uploadModel.data[studyInstanceUID])
                 //Add study warnings to Redux
-                this.props.addWarningsStudy(studyInstanceUID, this.uploadModel.data[studyInstanceUID].getWarnings())
+                this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
                 //If study has warnings, trigger a warning message
                 if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
                     this.setState({ showWarning: true })
@@ -208,7 +210,39 @@ class Uploader extends Component {
                 this.props.addWarningsSeries(seriesInstanceUID, this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID].getWarnings())
             }
         }
+    }
 
+    checkStudy(study) {
+        let warnings = {}
+        // Check if the study corresponds to the visits in wait for series upload
+        let expectedVisit = this.findExpectedVisit(study);
+        if (expectedVisit === undefined) {
+            warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
+        }
+
+        // Check if visit ID is set
+        if (this.config.idVisit == null || typeof this.config.idVisit === undefined) {
+            warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        }
+        return warnings
+    }
+
+    findExpectedVisit(st) {
+        let thisP = st.getPatientName();
+
+        if (thisP.givenName === undefined) {
+            return undefined;
+        }
+        if (thisP.familyName === undefined) {
+            return undefined;
+        }
+
+        thisP.birthDate = st.getPatientBirthDate();
+        thisP.sex = st.patientSex;
+
+        if (thisP.birthDate === undefined || thisP.sex === undefined) {
+            return undefined;
+        }
     }
 
     /**
@@ -301,7 +335,7 @@ class Uploader extends Component {
                 </div>
                 <div hidden={!this.state.isFilesLoaded}>
                     <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                    <ControllerStudiesSeries multiUploader={this.config.multiUpload} selectedSeries={this.props.selectedSeries} />
+                    <ControllerStudiesSeries multiUploader={this.config.multiUpload} selectedSeries={this.props.selectedSeries} selectedStudy={this.props.selectedStudy}/>
                     <ProgressUpload multiUpload={this.config.multiUpload} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                 </div>
             </Fragment>
@@ -313,9 +347,9 @@ const mapStateToProps = state => {
     return {
         studies: state.Studies.studies,
         series: state.Series.series,
+        selectedStudy: state.DisplayTables.selectedStudy,
         selectedSeries: state.DisplayTables.selectedSeries,
         seriesReady: state.DisplayTables.seriesReady,
-        warningsStudies: state.Warnings.warningsStudies,
         warningsSeries: state.Warnings.warningsSeries,
     }
 }

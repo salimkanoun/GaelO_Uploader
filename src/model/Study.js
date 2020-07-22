@@ -13,7 +13,6 @@
  */
 
 import SHA1 from 'crypto-js/sha1'
-import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from './Warning'
 
 export default class Study {
 
@@ -33,8 +32,6 @@ export default class Study {
         this.patientSex = patientSex
         this.acquisitionDate = this.getDate(acquisitionDate)
         this.patientName = patientFirstName + ' ' + patientLastName
-        this.warnings = {}
-        this.visit = null
     }
 
     addSeries(seriesObject) {
@@ -114,10 +111,6 @@ export default class Study {
         return this.patientID
     }
 
-    setStatusStudy(key, dismissed) {
-        this.warnings[key]['dismissed'] = dismissed
-    }
-
     //SK Pour envoyer au back pour savoir si etude connue ou pas et au moment du post processing
     getOrthancStudyID() {
         let hash = SHA1(this.patientID + '|' + this.studyInstanceUID).toString()
@@ -126,36 +119,5 @@ export default class Study {
 
     getWarnings() {
         return this.warnings
-    }
-
-    checkStudies() {
-        // Check if the study corresponds to the visits in wait for series upload
-        let expectedVisit = this.findExpectedVisit(this);
-        if (expectedVisit === undefined) {
-            this.warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
-        }
-
-        // Check if visit ID is set
-        if (this.visit == null || typeof this.visit.idVisit === undefined) {
-            this.warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
-        }
-    }
-
-    findExpectedVisit(st) {
-        let thisP = st.getPatientName();
-
-        if (thisP.givenName === undefined) {
-            return undefined;
-        }
-        if (thisP.familyName === undefined) {
-            return undefined;
-        }
-
-        thisP.birthDate = st.getPatientBirthDate();
-        thisP.sex = st.patientSex;
-
-        if (thisP.birthDate === undefined || thisP.sex === undefined) {
-            return undefined;
-        }
     }
 }

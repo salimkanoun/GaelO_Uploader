@@ -18,7 +18,7 @@ import WarningPatient from './render_component/WarningPatient'
 import { getAets, logIn, registerStudy, validateUpload } from '../services/api'
 
 import { addSeries, addStudy, addWarningsStudy } from './actions/StudiesSeries'
-import { addWarningsSeries, checkPatientData } from './actions/Warnings'
+import { addWarningsSeries } from './actions/Warnings'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from '../model/Warning'
 class Uploader extends Component {
 
@@ -358,7 +358,6 @@ const mapDispatchToProps = {
     addSeries,
     addWarningsStudy,
     addWarningsSeries,
-    checkPatientData
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

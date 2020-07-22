@@ -21,9 +21,9 @@ import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 import { selectSeriesReady } from './actions/DisplayTables'
 
-const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
-const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
 class ControllerStudiesSeries extends Component {
+
+    /* STUDIES TABLE CONTROLLER */
 
     /**
      * Fetch studies from Redux State to display in table
@@ -46,8 +46,8 @@ class ControllerStudiesSeries extends Component {
     studyWarningsPassed(study) {
         let studyStatus = 'Valid'
         //Check for warnings in study
-        for (let warning in this.props.warningsStudies[study]) {
-            if (!this.props.warningsStudies[study][warning].dismissed) {
+        for (let warning in this.props.studies[study].warnings) {
+            if (!this.props.studies[study].warnings[warning].dismissed) {
                 studyStatus = 'Rejected'
                 return studyStatus
             }
@@ -65,12 +65,13 @@ class ControllerStudiesSeries extends Component {
         return studyStatus
     }
 
+    /* SERIES TABLE CONTROLLER */
+
     /**
      * Add status and selection state to previous information from the selected study's series 
      * in order to build table
      */
     buildSeriesRows() {
-        console.log('called')
         if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
             let seriesArray = []
             let seriesToDisplay = Object.keys(this.props.studies[this.props.selectedStudy].series)
@@ -86,7 +87,6 @@ class ControllerStudiesSeries extends Component {
                 })
             }
             )
-            console.log(seriesArray)
             return seriesArray
         }
         else return []
@@ -104,40 +104,11 @@ class ControllerStudiesSeries extends Component {
         return true
     }
 
-    /**
-     * Check matching of patient information
-     */
-    prepareDataCheckPatient() {
-        let rows = []
-        let rowStatus = []
-        let currentStudy = this.props.studies[this.props.selectedStudy]
-        //SK ICI patientName peut etre undefined (donc crash ici)
-        //Peut etre plutot a gerer quand on construit l'entree study mettre les
-        //caractères recherchés pour le match
-        currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
-        currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
-
-        let expectedStudy = [currentStudy]
-
-        //Fake unmatching fields
-        expectedStudy.patientFirstName = 'A'
-        expectedStudy.patientSex = 'M'
-        expectedStudy.patientBirthDate = '2000-01-01'
-
-        for (let i in labels) {
-            rows.push({
-                rowName: labels[i],
-                expectedStudy: expectedStudy[keys[i]],
-                currentStudy: currentStudy[keys[i]],
-            })
-        }
-    }
-
     render() {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies multiUploader={this.props.multiUploader} studiesRows={this.buildStudiesRows()} checkPatientRows={null} />
+                    <DisplayStudies multiUploader={this.props.multiUploader} studiesRows={this.buildStudiesRows()} />
                 </Row>
                 <Row>
                     <DisplaySeries seriesRows={this.buildSeriesRows()} />
@@ -156,7 +127,6 @@ const mapStateToProps = state => {
         selectedStudy: state.DisplayTables.selectedStudy,
         selectedSeries: state.DisplayTables.selectedSeries,
         warningsSeries: state.Warnings.warningsSeries,
-        warningsStudies: state.Warnings.warningsStudies,
     }
 }
 

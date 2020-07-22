@@ -20,8 +20,10 @@ import Button from 'react-bootstrap/Button'
 import BootstrapTable from 'react-bootstrap-table-next';
 import SelectPatient from './SelectPatient'
 import ButtonIgnore from './render_component/ButtonIgnore'
-import { validateCheckPatient, checkPatientData } from './actions/Warnings'
+import { updateWarningStudy } from './actions/StudiesSeries'
 
+const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
+const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
 
 class CheckPatient extends Component {
 
@@ -53,24 +55,28 @@ class CheckPatient extends Component {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => ((row.ignoredStatus !== null) ?
-                <ButtonIgnore rowIndex={rowIndex} onClick={this.onClick}
-                    warning={this.state.rows[rowIndex].ignoredStatus} /> : null)
+                <ButtonIgnore row={row} onClick={this.onClick}
+                    warning={row.ignoredStatus} /> : null)
         },
         {
             dataField: 'ignoredStatus',
-            hidden: false
+            text: 'Status'
         },
     ]
 
-    onClick(rowIndex) {
-        let newRows = this.state.rows
-        newRows[rowIndex].ignoredStatus = !newRows[rowIndex].ignoredStatus
-        this.setState({ rows: newRows }, () => {
+    onClick(thisRow) {
+        let newRows = this.state.rows.map((row) => {
+            let row2 = { ...row }
+            if (row2.rowName === thisRow.rowName) row2.ignoredStatus = !row.ignoredStatus
+            return row2
+        })
+
+        this.setState(() => ({ rows: newRows }), () => {
             let isDisabled = false
             for (let row in this.state.rows) {
                 if (this.state.rows[row].ignoredStatus === false) isDisabled = true
             }
-            this.setState({ isDisabled: isDisabled })
+            this.setState(() => ({ isDisabled: isDisabled }))
         })
     }
 
@@ -79,19 +85,36 @@ class CheckPatient extends Component {
         this.props.closeListener()
     }
 
-    componentDidUpdate(prevState) {
-        if(prevState.checkPatientDataTable !== this.props.checkPatientDataTable) {
-            this.buildRows()
-        }
-    }
+    /**
+     * Check matching of patient information
+     */
     buildRows() {
-        console.log("rows built")
-        let rows = []
-        this.props.checkPatientDataTable.forEach(row => {
-            let rowStatus = this.setRowStatus(row.currentStudy, row.expectedStudy)
-            rows.push({...row, ignoredStatus: rowStatus })
-        })
-        this.setState({rows: rows})
+        if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
+            let rows = []
+            let currentStudy = this.props.studies[this.props.selectedStudy]
+            //SK ICI patientName peut etre undefined (donc crash ici)
+            //Peut etre plutot a gerer quand on construit l'entree study mettre les
+            //caractères recherchés pour le match
+            currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
+            currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
+
+            let expectedStudy = [currentStudy]
+
+            //Fake unmatching fields
+            expectedStudy.patientFirstName = 'A'
+            expectedStudy.patientSex = 'M'
+            expectedStudy.patientBirthDate = '2000-01-01'
+
+            for (let i in labels) {
+                rows.push({
+                    rowName: labels[i],
+                    expectedStudy: expectedStudy[keys[i]],
+                    currentStudy: currentStudy[keys[i]],
+                    ignoredStatus: this.setRowStatus(expectedStudy[keys[i]], currentStudy[keys[i]])
+                })
+            }
+            return rows
+        } else return []
     }
 
     /**
@@ -107,7 +130,7 @@ class CheckPatient extends Component {
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.props.closeListener} updatedData={this.props.studyInstanceUID}>
+            <Modal show={this.props.show} onHide={this.props.closeListener}>
                 <Modal.Header className="modal-header" closeButton>
                     <Modal.Title className="modal-title" id="du-patientLongTitle">{this.props.multiUploader ? 'Select Patient' : 'Check Patient'}</Modal.Title>
                 </Modal.Header>
@@ -122,7 +145,7 @@ class CheckPatient extends Component {
                         bodyClasses="du-studies-tbody"
                         headerClasses="du-studies th"
                         rowClasses={rowClasses}
-                        data={this.state.rows}
+                        data={this.buildRows()}
                         columns={this.columns}
                         selectRow={this.selectRow}
                     />
@@ -142,6 +165,7 @@ const rowClasses = (row, rowIndex) => {
     } else if (row.ignoredStatus === null) {
         return 'du-studies row-success'
     }
+    console.log(row)
     return 'du-studies td'
 }
 
@@ -149,13 +173,11 @@ const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
         studies: state.Studies.studies,
-        checkPatientDataTable: state.Warnings.checkPatientDataTable,
     }
 }
 
 const mapDispatchToProps = {
-    validateCheckPatient,
-    checkPatientData
+    updateWarningStudy
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckPatient)

@@ -3,7 +3,8 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import ButtonIgnore from './render_component/ButtonIgnore'
 //Redux
 import { connect } from 'react-redux';
-import { updateWarningSeries, updateWarningStudy } from './actions/Warnings'
+import { updateWarningSeries } from './actions/Warnings'
+import { updateWarningStudy } from './actions/StudiesSeries'
 class DisplayWarning extends Component {
 
     columns = [
@@ -47,7 +48,7 @@ class DisplayWarning extends Component {
      */
     getWarningStatus(row) {
         if (this.props.type === 'study')
-            return this.props.warningsStudies[row.studyInstanceUID][row.key].dismissed
+            return this.props.studies[row.studyInstanceUID].warnings[row.key].dismissed
         else if (this.props.type === 'series')
             return this.props.warningsSeries[row.seriesInstanceUID][row.key].dismissed
     }
@@ -60,8 +61,8 @@ class DisplayWarning extends Component {
             let rows = []
             switch (this.props.type) {
                 case 'study':
-                    for (let i in this.props.warningsStudies[this.props.selectionID]) {
-                        rows.push({ studyInstanceUID: this.props.selectionID, ...this.props.warningsStudies[this.props.selectionID][i] })
+                    for (let i in this.props.studies[this.props.selectionID].warnings) {
+                        rows.push({ studyInstanceUID: this.props.selectionID, ...this.props.studies[this.props.selectionID].warnings[i] })
                     }
                     return rows
                 case 'series':
@@ -101,7 +102,7 @@ const rowClasses = (row, rowIndex) => {
 
 const mapStateToProps = state => {
     return {
-        warningsStudies: state.Warnings.warningsStudies,
+        studies: state.Studies.studies,
         warningsSeries: state.Warnings.warningsSeries
     }
 }

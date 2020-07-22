@@ -108,7 +108,7 @@ class StudiesTab extends Component {
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient multiUploader={this.props.multiUploader} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} hidden={this.props.validatedPatient} />
+                            <CheckPatient multiUploader={this.props.multiUploader} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} />
                         </Col>
                         <Col xs={6} md={4}>
                             <DisplayWarning type='study' selectionID={this.props.selectedStudy} />

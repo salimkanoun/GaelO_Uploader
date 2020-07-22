@@ -1,9 +1,7 @@
-import { UPDATE_WARNING_SERIES, VALIDATE_CHECK_PATIENT, UPDATE_WARNING_STUDY, ADD_WARNINGS_SERIES, ADD_WARNINGS_STUDY, CHECK_PATIENT_DATA } from '../actions/actions-types'
+import { UPDATE_WARNING_SERIES, ADD_WARNINGS_SERIES } from '../actions/actions-types'
 
 const initialState = {
     warningsSeries: {},
-    warningsStudies: {},
-    checkPatientDataTable: []
 }
 
 export default function WarningsReducer(state = initialState, action) {
@@ -16,15 +14,6 @@ export default function WarningsReducer(state = initialState, action) {
                 warningsSeries: {
                     ...state.warningsSeries,
                     [action.payload.seriesInstanceUID]: { ...warnings }
-                }
-            }
-        case ADD_WARNINGS_STUDY:
-            warnings = action.payload.warnings
-            return {
-                ...state,
-                warningsStudies: {
-                    ...state.warningsStudies,
-                    [action.payload.studyInstanceUID]: { ...warnings }
                 }
             }
 
@@ -41,39 +30,6 @@ export default function WarningsReducer(state = initialState, action) {
                     }
                 }
             }
-
-        case UPDATE_WARNING_STUDY:
-            const studyWarning = action.payload.warningToUpdate.key
-            const studyInstanceUID = action.payload.studyInstanceUID
-            return {
-                ...state,
-                warningsStudies: {
-                    ...state.warningsStudies,
-                    [studyInstanceUID]: {
-                            ...state.warningsStudies[studyInstanceUID],
-                            [studyWarning]: { ...state.warningsStudies[studyInstanceUID][studyWarning], dismissed: !state.warningsStudies[studyInstanceUID][studyWarning].dismissed }
-                        }
-                    }
-            }
-
-        case CHECK_PATIENT_DATA: {
-            let dataToDisplay = action.payload
-            return {
-                ...state,
-                checkPatientDataTable: [ ...dataToDisplay ]
-            }
-        }
-
-        case VALIDATE_CHECK_PATIENT: {
-            let studyInstanceUID = action.payload
-            let newWarningsStudies = state.warningsStudies
-            console.log(studyInstanceUID)
-            newWarningsStudies[studyInstanceUID]['NOT_EXPECTED_VISIT'].dismissed = true
-            return {
-                ...state,
-                warningsStudies: { ...newWarningsStudies },
-            }
-        }
 
         default:
             return state

@@ -25,10 +25,10 @@ class Util {
 	 * Format text for display
 	 */
 	static ft(text) {
-		if (text == undefined) {
+		if (text === undefined) {
 			return '<span class="unknown">Unknown</span>';
 		}
-		if (text == '[object Object]') {
+		if (text === '[object Object]') {
 			return '<span class="unknown">Unreadable</span>';
 		}
 		return (text);
@@ -43,7 +43,7 @@ class Util {
 		}
 		let res = '';
 
-		if (typeof date == 'string') {
+		if (typeof date === 'string') {
 			let dateStr = date;
 			if (dateStr.split('-').length !== 3) {
 				return '????-??-??';
@@ -84,22 +84,22 @@ class Util {
 		d1 = Util.fDate(d1);
 		d2 = Util.fDate(d2);
 
-		if (d1 == '????-??-??' || d2 == '????-??-??') {
+		if (d1 === '????-??-??' || d2 === '????-??-??') {
 			return false;
 		}
 
 		d1 = d1.split('-');
 		d2 = d2.split('-');
 
-		if (d1[0] !== '****' && d2[0] !== '****' && d1[0] != d2[0]) {
+		if (d1[0] !== '****' && d2[0] !== '****' && d1[0] !== d2[0]) {
 			return false;
 		}
 
-		if (d1[1] !== '**' && d2[1] !== '**' && d1[1] != d2[1]) {
+		if (d1[1] !== '**' && d2[1] !== '**' && d1[1] !== d2[1]) {
 			return false;
 		}
 
-		if (d1[2] !== '**' && d2[2] !== '**' && d1[2] != d2[2]) {
+		if (d1[2] !== '**' && d2[2] !== '**' && d1[2] !== d2[2]) {
 			return false;
 		}
 		return true;

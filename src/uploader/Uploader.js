@@ -15,7 +15,7 @@ import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
 import Util from './Util'
 
-import { getAets, logIn, registerStudy, validateUpload } from '../services/api'
+import { getPossibleImport, logIn, registerStudy, validateUpload } from '../services/api'
 
 import { addSeries, addStudy, addWarningsStudy } from './actions/StudiesSeries'
 import { addWarningsSeries } from './actions/Warnings'
@@ -69,14 +69,12 @@ class Uploader extends Component {
     }
 
     async componentDidMount() {
-        await logIn()
-        //EO Check multi/unique upload => (not) force visitID
+        if (this.config.developerMode) {
+            await logIn()
+            await registerStudy()
+        }
 
-        //Redux visit candidates
-        //Unique//multi upload as key object
-        //IDvisit PK
-        await registerStudy()
-        let answer = await getAets()
+        let answer = await getPossibleImport()
         console.log(answer)
         let visitTypes = Object.values(answer)
         console.log(visitTypes)
@@ -90,7 +88,7 @@ class Uploader extends Component {
                 })
             }
         })
-        if(!this.config.multiUpload) this.props.setExpectedVisitID('1') //this.config.visitID
+        if(!this.config.multiUpload) this.props.setExpectedVisitID(this.config.idVisit) 
         this.props.addVisit(visits)
     }
 
@@ -241,13 +239,11 @@ class Uploader extends Component {
         if (this.props.expectedVisit === null || typeof this.props.expectedVisit === undefined) {
             warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         }
-        console.log(warnings)
         return warnings
     }
 
     findExpectedVisit(studyObject) {
         let thisPatient = studyObject.getObjectPatientName();
-        console.log(thisPatient)
         if (thisPatient.givenName === undefined) {
             return undefined;
         }
@@ -264,9 +260,9 @@ class Uploader extends Component {
 
         // Linear search through expected visits list
         for (let visit of this.props.visits) {
-            if (visit.firstName.trim().toUpperCase().charAt(0) == thisPatient.givenName.trim().toUpperCase().charAt(0)
-                && visit.lastName.trim().toUpperCase().charAt(0) == thisPatient.familyName.trim().toUpperCase().charAt(0)
-                && visit.sex.trim().toUpperCase().charAt(0) == thisPatient.sex.trim().toUpperCase().charAt(0)
+            if (visit.firstName.trim().toUpperCase().charAt(0) === thisPatient.givenName.trim().toUpperCase().charAt(0)
+                && visit.lastName.trim().toUpperCase().charAt(0) === thisPatient.familyName.trim().toUpperCase().charAt(0)
+                && visit.sex.trim().toUpperCase().charAt(0) === thisPatient.sex.trim().toUpperCase().charAt(0)
                 && Util.isProbablyEqualDates(visit.birthDate, thisPatient.birthDate)) {
                 return visit;
             }

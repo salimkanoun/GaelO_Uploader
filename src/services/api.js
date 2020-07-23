@@ -35,7 +35,7 @@ export function logIn () {
 
 export function registerStudy () {
   const formData = new FormData()
-  formData.append('etude', 'GATA')
+  formData.append('etude', 'test')
   formData.append('role', 'Investigator')
 
   return fetch('/root_investigator', {

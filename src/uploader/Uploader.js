@@ -13,11 +13,13 @@ import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
+import Util from './Util'
 
 import { getAets, logIn, registerStudy, validateUpload } from '../services/api'
 
 import { addSeries, addStudy, addWarningsStudy } from './actions/StudiesSeries'
 import { addWarningsSeries } from './actions/Warnings'
+import { addVisit, setExpectedVisitID } from './actions/Visits'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
@@ -69,12 +71,27 @@ class Uploader extends Component {
     async componentDidMount() {
         await logIn()
         //EO Check multi/unique upload => (not) force visitID
+
         //Redux visit candidates
         //Unique//multi upload as key object
         //IDvisit PK
         await registerStudy()
         let answer = await getAets()
         console.log(answer)
+        let visitTypes = Object.values(answer)
+        console.log(visitTypes)
+        let visits = []
+        visitTypes.forEach(types => {
+            for (let type in types) {
+                types[type].forEach(visit => {
+                    let visitToPush = visit
+                    visitToPush['isUsed'] = false
+                    visits.push(visitToPush)
+                })
+            }
+        })
+        if(!this.config.multiUpload) this.props.setExpectedVisitID('1') //this.config.visitID
+        this.props.addVisit(visits)
     }
 
     /**
@@ -190,7 +207,7 @@ class Uploader extends Component {
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
             //If not in multiupload mode
-            if (!this.state.multiUploader) {
+            if (!this.state.multiUpload) {
                 //Check studies warnings
                 let studyWarnings = this.checkStudy(this.uploadModel.data[studyInstanceUID])
                 //Add study to Redux
@@ -221,31 +238,43 @@ class Uploader extends Component {
         }
 
         // Check if visit ID is set
-        if (this.config.idVisit == null || typeof this.config.idVisit === undefined) {
+        if (this.props.expectedVisit === null || typeof this.props.expectedVisit === undefined) {
             warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         }
+        console.log(warnings)
         return warnings
     }
 
-    findExpectedVisit(st) {
-        let thisP = st.getPatientName();
-
-        if (thisP.givenName === undefined) {
+    findExpectedVisit(studyObject) {
+        let thisPatient = studyObject.getObjectPatientName();
+        console.log(thisPatient)
+        if (thisPatient.givenName === undefined) {
             return undefined;
         }
-        if (thisP.familyName === undefined) {
+        if (thisPatient.familyName === undefined) {
             return undefined;
         }
 
-        thisP.birthDate = st.getPatientBirthDate();
-        thisP.sex = st.patientSex;
+        thisPatient.birthDate = studyObject.getPatientBirthDate();
+        thisPatient.sex = studyObject.patientSex;
 
-        if (thisP.birthDate === undefined || thisP.sex === undefined) {
+        if (thisPatient.birthDate === undefined || thisPatient.sex === undefined) {
             return undefined;
         }
+
+        // Linear search through expected visits list
+        for (let visit of this.props.visits) {
+            if (visit.firstName.trim().toUpperCase().charAt(0) == thisPatient.givenName.trim().toUpperCase().charAt(0)
+                && visit.lastName.trim().toUpperCase().charAt(0) == thisPatient.familyName.trim().toUpperCase().charAt(0)
+                && visit.sex.trim().toUpperCase().charAt(0) == thisPatient.sex.trim().toUpperCase().charAt(0)
+                && Util.isProbablyEqualDates(visit.birthDate, thisPatient.birthDate)) {
+                return visit;
+            }
+        };
+        return undefined;
     }
 
-    /**
+    /** 
      * Trigger hide warning if closed
      */
     onHideWarning() {
@@ -268,6 +297,8 @@ class Uploader extends Component {
             return seriesObject.studyInstanceUID
         })
         studyUIDArray = Array.from(new Set(studyUIDArray))
+        //Filter non selected studyUID
+        studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
 
         //group series by studyUID
         for (let studyInstanceUID of studyUIDArray) {
@@ -302,7 +333,7 @@ class Uploader extends Component {
             })
             uploader.on('upload-finished', (visitID, timeStamp, numberOfFiles) => {
                 console.log('Batch Finished')
-                validateUpload(visitID, timeStamp, numberOfFiles , studyOrthancID)
+                validateUpload(visitID, timeStamp, numberOfFiles, studyOrthancID)
             })
 
             uploader.startUpload()
@@ -336,7 +367,7 @@ class Uploader extends Component {
                 </div>
                 <div hidden={!this.state.isFilesLoaded}>
                     <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                    <ControllerStudiesSeries multiUploader={this.config.multiUpload} selectedSeries={this.props.selectedSeries} selectedStudy={this.props.selectedStudy}/>
+                    <ControllerStudiesSeries multiUpload={this.config.multiUpload} selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload multiUpload={this.config.multiUpload} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                 </div>
             </Fragment>
@@ -346,11 +377,13 @@ class Uploader extends Component {
 
 const mapStateToProps = state => {
     return {
+        visits: state.Visits.visits,
+        expectedVisit: state.Visits.expectedVisit,
         studies: state.Studies.studies,
         series: state.Series.series,
-        selectedStudy: state.DisplayTables.selectedStudy,
         selectedSeries: state.DisplayTables.selectedSeries,
         seriesReady: state.DisplayTables.seriesReady,
+        studiesReady: state.DisplayTables.studiesReady,
         warningsSeries: state.Warnings.warningsSeries,
     }
 }
@@ -359,6 +392,8 @@ const mapDispatchToProps = {
     addSeries,
     addWarningsStudy,
     addWarningsSeries,
+    addVisit,
+    setExpectedVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

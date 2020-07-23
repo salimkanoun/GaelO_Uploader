@@ -63,6 +63,10 @@ export default class Study {
         return (this.patientFirstName + this.patientLastName)
     }
 
+    getObjectPatientName(){
+        return {givenName: this.patientFirstName, familyName: this.patientLastName}
+    }
+
     getPatientFirstName() {
         return this.patientFirstName
     }

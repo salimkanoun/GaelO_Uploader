@@ -108,7 +108,7 @@ class ControllerStudiesSeries extends Component {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies multiUploader={this.props.multiUploader} studiesRows={this.buildStudiesRows()} />
+                    <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} />
                 </Row>
                 <Row>
                     <DisplaySeries seriesRows={this.buildSeriesRows()} />

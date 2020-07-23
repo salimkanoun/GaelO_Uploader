@@ -22,8 +22,7 @@ import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
 //Redux
 import { connect } from 'react-redux';
-import { selectStudy } from './actions/DisplayTables'
-import { checkPatientData } from './actions/Warnings'
+import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
 
 class StudiesTab extends Component {
 
@@ -38,14 +37,26 @@ class StudiesTab extends Component {
 
     columns = [
         {
+            dataField: 'selectedStudies',
+            text: 'Select',
+            hidden: (!this.props.multiUpload),
+            formatExtraData: this,
+            formatter: (cell, row, rowIndex, formatExtraData) => {
+                let checked = row.selectedStudies
+                return (
+                    <input disabled={row.status !== 'Valid'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectStudiesReady(row.studiesInstanceUID, !checked) }} />
+                )
+            }
+        },
+        {
             dataField: 'studyInstanceUID',
             text: '',
-            isDummyField: true,
             hidden: false,
-            formatter: (cell, row, rowIndex, extraData) => (
-                <Button onClick={() => { this.toggleCheckPatient(row); }}>
-                    {(this.props.multiUploader) ? 'Select Patient' : 'Check Patient'}
-                </Button>
+            formatter: (cell, row, rowIndex, extraData) => ((this.props.studiesRows[rowIndex].warnings !== undefined 
+                && !this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'].dismissed) ?  
+                <Button onClick={() => { this.toggleCheckPatient(); }}>
+                    {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
+                </Button> : <>{console.log(cell)}</>
             ),
         },
         {
@@ -91,6 +102,7 @@ class StudiesTab extends Component {
     }
 
     render() {
+        console.log(this.props.multiUpload)
         return (
             <>
                 <Container fluid>
@@ -108,7 +120,7 @@ class StudiesTab extends Component {
                                 selectRow={this.selectRow}
                                 wrapperClasses="table-responsive"
                             />
-                            <CheckPatient multiUploader={this.props.multiUploader} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} />
+                            <CheckPatient multiUpload={this.props.multiUpload} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} />
                         </Col>
                         <Col xs={6} md={4}>
                             <DisplayWarning type='study' selectionID={this.props.selectedStudy} />
@@ -136,6 +148,7 @@ const mapStateToProps = state => {
 }
 const mapDispatchToProps = {
     selectStudy,
+    selectStudiesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

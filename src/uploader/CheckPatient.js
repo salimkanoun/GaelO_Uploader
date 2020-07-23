@@ -21,6 +21,8 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import SelectPatient from './SelectPatient'
 import ButtonIgnore from './render_component/ButtonIgnore'
 import { updateWarningStudy } from './actions/StudiesSeries'
+import { setUsedVisit } from './actions/Visits'
+import { NOT_EXPECTED_VISIT } from '../model/Warning';
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
 const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
@@ -60,7 +62,8 @@ class CheckPatient extends Component {
         },
         {
             dataField: 'ignoredStatus',
-            text: 'Status'
+            text: '',
+            hidden: true
         },
     ]
 
@@ -70,9 +73,9 @@ class CheckPatient extends Component {
             if (row2.rowName === thisRow.rowName) row2.ignoredStatus = !row.ignoredStatus
             return row2
         })
-
         this.setState(() => ({ rows: newRows }), () => {
             let isDisabled = false
+            console.log(this.state.rows)
             for (let row in this.state.rows) {
                 if (this.state.rows[row].ignoredStatus === false) isDisabled = true
             }
@@ -81,15 +84,22 @@ class CheckPatient extends Component {
     }
 
     validateCheckPatient = () => {
-        this.props.validateCheckPatient(this.props.selectedStudy)
+        this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
+        //For multiupload this.props.setUsedVisit(this.props.expectedVisitID, true)
         this.props.closeListener()
+    }
+
+    componentDidUpdate(prevState) {
+        if (prevState.selectedStudy !== this.props.selectedStudy || prevState.show !== this.props.show) {
+            this.setState({rows: this.buildRows()})
+        }
     }
 
     /**
      * Check matching of patient information
      */
     buildRows() {
-        if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
+        if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined && !this.props.multiUpload) {
             let rows = []
             let currentStudy = this.props.studies[this.props.selectedStudy]
             //SK ICI patientName peut etre undefined (donc crash ici)
@@ -97,13 +107,14 @@ class CheckPatient extends Component {
             //caractères recherchés pour le match
             currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
             currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
-
-            let expectedStudy = [currentStudy]
-
-            //Fake unmatching fields
-            expectedStudy.patientFirstName = 'A'
-            expectedStudy.patientSex = 'M'
-            expectedStudy.patientBirthDate = '2000-01-01'
+            
+            //Find expected visit
+            let expectedStudy
+            this.props.visits.forEach(visit => {
+                if(visit.idVisit === this.props.expectedVisitID) expectedStudy = visit
+            })
+            expectedStudy.patientFirstName = expectedStudy.firstName
+            expectedStudy.patientLastName = expectedStudy.lastName
 
             for (let i in labels) {
                 rows.push({
@@ -132,10 +143,10 @@ class CheckPatient extends Component {
         return (
             <Modal show={this.props.show} onHide={this.props.closeListener}>
                 <Modal.Header className="modal-header" closeButton>
-                    <Modal.Title className="modal-title" id="du-patientLongTitle">{this.props.multiUploader ? 'Select Patient' : 'Check Patient'}</Modal.Title>
+                    <Modal.Title className="modal-title" id="du-patientLongTitle">{this.props.multiUpload ? 'Select Patient' : 'Check Patient'}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body hidden={!this.props.multiUploader} className="modal-body du-patient" id='du-patp-comparison'>
-                    <SelectPatient />
+                <Modal.Body hidden={!this.props.multiUpload} className="modal-body du-patient" id='du-patp-comparison'>
+                
                 </Modal.Body>
                 <Modal.Body className="modal-body" id="du-patp-comparison">
                     <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
@@ -145,7 +156,7 @@ class CheckPatient extends Component {
                         bodyClasses="du-studies-tbody"
                         headerClasses="du-studies th"
                         rowClasses={rowClasses}
-                        data={this.buildRows()}
+                        data={this.state.rows}
                         columns={this.columns}
                         selectRow={this.selectRow}
                     />
@@ -173,11 +184,14 @@ const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
         studies: state.Studies.studies,
+        visits: state.Visits.visits,
+        expectedVisitID: state.Visits.expectedVisitID
     }
 }
 
 const mapDispatchToProps = {
-    updateWarningStudy
+    updateWarningStudy,
+    setUsedVisit
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckPatient)

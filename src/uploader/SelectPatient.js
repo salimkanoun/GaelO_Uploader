@@ -13,20 +13,39 @@
  */
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 
 import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
 
-export default class SelectPatient extends Component {
+class SelectPatient extends Component {
+
+    constructor(props) {
+        super(props)
+        this.displayPatients = this.displayPatients.bind(this)
+    }
+
+    fetchVisitTypes() {
+        let visitType
+        this.displayPatients(visitType)
+    }
+
+    displayPatients = (visitType) => {
+        let rows = 
+        this.props.visits.forEach((index) => {
+            
+        })
+    }
+
     render() {
         return (
             <>
                 <span className='du-patp-label'>Select Visit Type</span>
-                <Select>
+                <Select options={this.fetchVisitTypes()}>
 
                 </Select>
                 <span className='du-patp-label'>Select Patient</span>
-                <ListGroup>
+                <ListGroup options={this.displayPatients}>
 
                 </ListGroup>
                 <span className='du-patp-label'>Comparison</span>
@@ -35,3 +54,14 @@ export default class SelectPatient extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        visits: state.Visits.visits
+    }
+}
+const mapDispatchToProps = {
+    
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SelectPatient)

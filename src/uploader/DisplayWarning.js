@@ -35,8 +35,11 @@ class DisplayWarning extends Component {
                     onClick={() => {
                         if (this.props.type === 'series')
                             this.props.updateWarningSeries(row, row.seriesInstanceUID)
-                        else if (this.props.type === 'study')
+                        else if (this.props.type === 'study') {
+                            if (this.props.multiUpload) this.props.setUsedVisit(this.props.expectedVisitID, this.props.selectedStudy, row.dismissed)
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
+                        }
+                            
                     }}
                 />
             ),
@@ -102,6 +105,7 @@ const rowClasses = (row, rowIndex) => {
 
 const mapStateToProps = state => {
     return {
+        selectedStudy: state.DisplayTables.selectedStudy,
         studies: state.Studies.studies,
         warningsSeries: state.Warnings.warningsSeries
     }

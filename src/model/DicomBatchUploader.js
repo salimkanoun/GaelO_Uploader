@@ -1,32 +1,36 @@
 import DicomFile from './DicomFile'
 import JSZip from 'jszip'
+const EventEmitter = require('events').EventEmitter;
 
-export default class DicomBatchUploader {
+export default class DicomBatchUploader extends EventEmitter {
 
     uploadProgress=0
     zipProgress=0
 
-    constructor (uppy, files, onUploadDone) {
+    constructor (uppy, idVisit, files) {
+        super()
         this.uppy = uppy
         this.files = files
-        this.onUploadDone = onUploadDone
+        this.idVisit = idVisit
+        this.timeStamp = Date.now()
         this.buildBatches()
-        
+
         this.uppy.on('upload-success', async (file, response) => {
             this.currentBatchUpload = ++this.currentBatchUpload
             let fractionUploaded = ( this.currentBatchUpload * this.batchValue)
             this.uploadProgress = Math.min(fractionUploaded , 100)
+            this.emitProgress()
             await this.batchesIterator.next()
         })
 
     }
 
-    getProgress(){
-        if(this.zipProgress>=100 && this.uploadProgress >= 100) this.onUploadDone()
-        return{
-            uploadProgress : Math.round(this.uploadProgress),
-            zipProgress : Math.round(this.zipProgress)
+    emitProgress(){
+        this.emit('batch-progress', Math.round(this.zipProgress), Math.round(this.uploadProgress) )
+        if(this.zipProgress>=100 && this.uploadProgress >= 100) {
+            this.emit('batch-upload-done', this.timeStamp, this.files.length)
         }
+
     }
 
     async startUpload(){
@@ -62,6 +66,9 @@ export default class DicomBatchUploader {
 
     }
 
+    /**
+     * Generator generating subzips of the bactch
+     */
     buildNextZip = async function*(){
 
         let index = 0
@@ -70,14 +77,24 @@ export default class DicomBatchUploader {
             let zipBlob = await this.zipFiles(batch)
             this.uppy.addFile(
                 {
-                    name: 'uploadBatch'+index+'.zip', // file name
+                    name: this.timeStamp+'_'+this.idVisit+'_'+index+'_'+this.batches.length+'.zip', // file name
                     type: 'application/zip', // file type
+                    meta: {
+                        //add metadata
+                        idVisit : this.idVisit,
+                        timeStamp : this.timeStamp,
+                        zipNumber : index,
+                        numberOfZips : this.batches.length,
+                        dicomFiles : batch.length,
+                        totalDicomFiles :  this.files.length
+                    },
                     data: zipBlob // file blob
                 }
             )
 
             let fractionZipped = index * this.batchValue
             this.zipProgress = Math.min( fractionZipped , 100)
+            this.emitProgress()
 
             yield true
 

@@ -12,13 +12,15 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+import SHA1 from 'crypto-js/sha1'
+
 export default class Study {
 
     series = {}
 
-    constructor(studyUID, studyID, studyDate, studyDescription, accessionNumber, patientID, patientFirstName, patientLastName,
+    constructor(studyInstanceUID, studyID, studyDate, studyDescription, accessionNumber, patientID, patientFirstName, patientLastName,
         patientBirthDate, patientSex, acquisitionDate) {
-        this.studyUID = studyUID
+        this.studyInstanceUID = studyInstanceUID
         this.studyID = studyID
         this.studyDate = studyDate
         this.studyDescription = studyDescription
@@ -30,7 +32,6 @@ export default class Study {
         this.patientSex = patientSex
         this.acquisitionDate = this.getDate(acquisitionDate)
         this.patientName = patientFirstName + ' ' + patientLastName
-        this.warnings = {}
     }
 
     addSeries(seriesObject) {
@@ -41,8 +42,8 @@ export default class Study {
     }
 
     isExistingSeries(seriesInstanceUID) {
-        let existingSeriesUID = Object.keys(this.series)
-        return existingSeriesUID.includes(seriesInstanceUID)
+        let existingSeriesInstanceUID = Object.keys(this.series)
+        return existingSeriesInstanceUID.includes(seriesInstanceUID)
     }
 
     getSeries(seriesInstanceUID) {
@@ -54,8 +55,16 @@ export default class Study {
         return series
     }
 
+    getChildSeriesInstanceUIDs() {
+        return Object.keys(this.series)
+    }
+
     getPatientName() {
         return (this.patientFirstName + this.patientLastName)
+    }
+
+    getObjectPatientName(){
+        return {givenName: this.patientFirstName, familyName: this.patientLastName}
     }
 
     getPatientFirstName() {
@@ -66,8 +75,8 @@ export default class Study {
         return this.patientLastName
     }
 
-    getStudyUID() {
-        return this.studyUID
+    getStudyInstanceUID() {
+        return this.studyInstanceUID
     }
 
     getStudyID() {
@@ -106,11 +115,13 @@ export default class Study {
         return this.patientID
     }
 
-    setStatusStudy(key, dismissed) {
-        this.warnings[key]['dismissed'] = dismissed
+    //SK Pour envoyer au back pour savoir si etude connue ou pas et au moment du post processing
+    getOrthancStudyID() {
+        let hash = SHA1(this.patientID + '|' + this.studyInstanceUID).toString()
+        return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`
     }
 
-    getArrayWarnings() {
-        return Object.values(this.warnings)
+    getWarnings() {
+        return this.warnings
     }
 }

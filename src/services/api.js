@@ -54,3 +54,27 @@ export function registerStudy () {
       console.warn(error)
     })
 }
+
+export function validateUpload(idVisit, timeStamp, totalFiles, originalOrthancStudyID){
+
+  const formData = new FormData()
+  formData.append('id_visit', idVisit)
+  formData.append('timeStamp', timeStamp)
+  formData.append('totalDicomFiles', totalFiles)
+  formData.append('originalOrthancStudyID', originalOrthancStudyID)
+
+  return fetch('/scripts/validate_dicom_upload_tus.php', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json'
+    },
+    body: formData
+
+  }).then((answer) => {
+      if (!answer.ok) { throw answer }
+      return (answer.json())
+  }).catch((error) => {
+      console.warn(error)
+    })
+
+}

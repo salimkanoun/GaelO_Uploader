@@ -5,7 +5,18 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 
 const config = {
-
+        // Declare default config
+            multiUpload: false,
+            minNbOfInstances: 30,
+            idVisit: null,
+            /*callbackOnComplete: null,
+			callbackOnBeforeUnload: function (event) {
+				event.preventDefault();
+				event.returnValue = ''; // Needed for Chrome
+			},
+			callbackOnAbort: function(){
+				refreshInvestigatorDiv()
+			}*/
 }
 
 const container = document.getElementById('root')

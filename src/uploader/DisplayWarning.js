@@ -3,12 +3,14 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import ButtonIgnore from './render_component/ButtonIgnore'
 //Redux
 import { connect } from 'react-redux';
-import { updateWarningSeries } from './actions/StudiesSeries'
+import { updateWarningSeries } from './actions/Warnings'
+import { updateWarningStudy } from './actions/StudiesSeries'
 class DisplayWarning extends Component {
 
     columns = [
         {
-            dataField: 'seriesInstanceUID',
+            dataField: `${this.props.type}InstanceUID`,
+            text: `${this.props.type}InstanceUID`,
             hidden: true,
         },
         {
@@ -28,29 +30,44 @@ class DisplayWarning extends Component {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => (
-                <ButtonIgnore 
-                    warning={ this.props.series[row.seriesInstanceUID].warnings[row.key].dismissed } 
-                    onClick={ () => this.props.updateWarningSeries(row) }
+                <ButtonIgnore
+                    warning={this.getWarningStatus(row)}
+                    onClick={() => {
+                        if (this.props.type === 'series')
+                            this.props.updateWarningSeries(row, row.seriesInstanceUID)
+                        else if (this.props.type === 'study')
+                            this.props.updateWarningStudy(row, row.studyInstanceUID)
+                    }}
                 />
             ),
         },
     ]
 
     /**
+     * Get warning status of selected row 
+     */
+    getWarningStatus(row) {
+        if (this.props.type === 'study')
+            return this.props.studies[row.studyInstanceUID].warnings[row.key].dismissed
+        else if (this.props.type === 'series')
+            return this.props.warningsSeries[row.seriesInstanceUID][row.key].dismissed
+    }
+
+    /**
      * Build the tab rows according to the type of object
      */
     buildRow() {
-        if (this.props.selectionID !== undefined && this.props.selectionID !== null){
+        if (this.props.selectionID !== undefined && this.props.selectionID !== null) {
             let rows = []
-            switch(this.props.type) {
-                case 'studies':
-                    for (let warning in this.props.studies[this.props.selectionID].warnings) {
-                        rows.push(this.props.studies[this.props.selectionID].warnings[warning])
+            switch (this.props.type) {
+                case 'study':
+                    for (let i in this.props.studies[this.props.selectionID].warnings) {
+                        rows.push({ studyInstanceUID: this.props.selectionID, ...this.props.studies[this.props.selectionID].warnings[i] })
                     }
                     return rows
                 case 'series':
-                    for (let warning in this.props.series[this.props.selectionID].warnings) {
-                        rows.push({seriesInstanceUID: this.props.selectionID, ...this.props.series[this.props.selectionID].warnings[warning]})
+                    for (let i in this.props.warningsSeries[this.props.selectionID]) {
+                        rows.push({ seriesInstanceUID: this.props.selectionID, ...this.props.warningsSeries[this.props.selectionID][i] })
                     }
                     return rows
                 default:
@@ -63,18 +80,18 @@ class DisplayWarning extends Component {
     }
 
     render() {
-            return (
-                <BootstrapTable
-                    keyField='key'
-                    classes="table table-borderless"
-                    bodyClasses="du-warnings"
-                    headerClasses="du-warnings th"
-                    rowClasses={ rowClasses }
-                    wrapperClasses="table-responsive"
-                    data={this.buildRow()}
-                    columns={this.columns}
-                />
-            )
+        return (
+            <BootstrapTable
+                keyField='key'
+                classes="table table-borderless"
+                bodyClasses="du-warnings"
+                headerClasses="du-warnings th"
+                rowClasses={rowClasses}
+                wrapperClasses="table-responsive"
+                data={this.buildRow()}
+                columns={this.columns}
+            />
+        )
     }
 }
 
@@ -86,11 +103,12 @@ const rowClasses = (row, rowIndex) => {
 const mapStateToProps = state => {
     return {
         studies: state.Studies.studies,
-        series: state.Series.series
+        warningsSeries: state.Warnings.warningsSeries
     }
 }
 const mapDispatchToProps = {
-    updateWarningSeries
+    updateWarningSeries,
+    updateWarningStudy
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplayWarning)

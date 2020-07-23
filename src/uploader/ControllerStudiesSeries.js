@@ -20,49 +20,98 @@ import Row from 'react-bootstrap/Row'
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 import { selectSeriesReady } from './actions/DisplayTables'
+
 class ControllerStudiesSeries extends Component {
 
-    componentDidUpdate(prevState) {
-        if (prevState.seriesReady !== this.props.seriesReady) {
-            this.prepareSeriesToUpload()
+    /* STUDIES TABLE CONTROLLER */
+
+    /**
+     * Fetch studies from Redux State to display in table
+     */
+    buildStudiesRows() {
+        let studies = []
+        if (Object.keys(this.props.studies).length > 0) {
+            for (let study in this.props.studies) {
+                let tempStudy = this.props.studies[study]
+                tempStudy['status'] = this.studyWarningsPassed(study)
+                studies.push({ ...tempStudy })
+            }
         }
+        return studies
     }
 
     /**
-     * Prepare series ready to upload 
-     * to send to master controller
+     * Check the study status according to its warnings and its series' warnings 
      */
-    prepareSeriesToUpload = () => {
-        let seriesIDs = this.props.seriesReady
-        let series = {}
-        //Fetch series in the model
-        let studies = Object.values(this.props.studies)
-        studies.forEach(study => {
-            let studyID = study.studyUID
-            //Check if there is no warning on study level
-            if (this.props.studies[studyID].warnings = {}) {
-                //If there isn't, series are OK to be uploaded
-                Object.values(study.series).forEach(theSeries => {
-                    if (seriesIDs.includes(theSeries.seriesInstanceUID)) {
-                        if (series[studyID] === undefined) {
-                            series[studyID] = []
-                        }
-                        series[studyID].push(theSeries.seriesInstanceUID)
+    studyWarningsPassed(study) {
+        let studyStatus = 'Valid'
+        //Check for warnings in study
+        for (let warning in this.props.studies[study].warnings) {
+            if (!this.props.studies[study].warnings[warning].dismissed) {
+                studyStatus = 'Rejected'
+                return studyStatus
+            }
+        }
+        //Check for warnings in series
+        for (let series in this.props.series) {
+            if (Object.keys(this.props.studies[study].series).includes(series)) {
+                for (let warning in this.props.warningsSeries[series]) {
+                    if (!this.props.warningsSeries[series][warning].dismissed) {
+                        studyStatus = 'Incomplete'
                     }
+                }
+            }
+        }
+        return studyStatus
+    }
+
+    /* SERIES TABLE CONTROLLER */
+
+    /**
+     * Add status and selection state to previous information from the selected study's series 
+     * in order to build table
+     */
+    buildSeriesRows() {
+        if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
+            let seriesArray = []
+            let seriesToDisplay = Object.keys(this.props.studies[this.props.selectedStudy].series)
+            seriesToDisplay.forEach((series) => {
+                let seriesToPush = this.props.series[series]
+                seriesToPush['status'] = this.seriesWarningsPassed(series) ? 'Valid' : 'Rejected'
+                seriesToPush['selectedSeries'] = false
+                if (this.props.seriesReady.includes(seriesToPush.seriesInstanceUID)) {
+                    seriesToPush['selectedSeries'] = true
+                }
+                seriesArray.push({
+                    ...seriesToPush
                 })
             }
-        })
-        this.props.seriesValidated(series)
+            )
+            return seriesArray
+        }
+        else return []
+    }
+
+    /**
+     * Check if the series warnings have been all passed
+     */
+    seriesWarningsPassed(series) {
+        for (let warning in this.props.warningsSeries[series]) {
+            if (!this.props.warningsSeries[series][warning].dismissed) {
+                return false
+            }
+        }
+        return true
     }
 
     render() {
         return (
             <Fragment>
                 <Row>
-                    <DisplayStudies multiUploader={this.props.multiUploader} studies={this.props.studies} series={this.props.series} validateCheckPatient={this.validateCheckPatient} ignoreStudyWarning={this.ignoreStudyWarning} />
+                    <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} />
                 </Row>
                 <Row>
-                    <DisplaySeries selectedStudy={this.props.selectedStudy} />
+                    <DisplaySeries seriesRows={this.buildSeriesRows()} />
                 </Row>
             </Fragment>
         )
@@ -72,10 +121,12 @@ class ControllerStudiesSeries extends Component {
 
 const mapStateToProps = state => {
     return {
-        studies: state.Studies.studies,
         series: state.Series.series,
+        studies: state.Studies.studies,
+        seriesReady: state.DisplayTables.seriesReady,
         selectedStudy: state.DisplayTables.selectedStudy,
-        seriesReady: state.DisplayTables.seriesReady
+        selectedSeries: state.DisplayTables.selectedSeries,
+        warningsSeries: state.Warnings.warningsSeries,
     }
 }
 

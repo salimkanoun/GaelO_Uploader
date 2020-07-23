@@ -6,7 +6,6 @@ import Tus from '@uppy/tus'
 
 import Model from '../model/Model'
 import DicomFile from '../model/DicomFile'
-import DicomBatchUploader from '../model/DicomBatchUploader'
 
 import DicomDropZone from './render_component/DicomDropZone'
 
@@ -14,38 +13,36 @@ import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
+import Util from './Util'
 
-import { getAets, logIn, registerStudy } from '../services/api'
+import { getAets, logIn, registerStudy, validateUpload } from '../services/api'
 
-import { addSeries, addStudy } from './actions/StudiesSeries'
-import Button from 'react-bootstrap/Button'
-
+import { addSeries, addStudy, addWarningsStudy } from './actions/StudiesSeries'
+import { addWarningsSeries } from './actions/Warnings'
+import { addVisit, setExpectedVisitID } from './actions/Visits'
+import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from '../model/Warning'
+import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
 
     state = {
-        multiUpload: false,
         isFilesLoaded: false,
         isParsingFiles: false,
-        isUploadStarted : false,
+        isUploadStarted: false,
         fileParsed: 0,
         fileLoaded: 0,
         zipProgress: 0,
         uploadProgress: 0,
         ignoredFiles: {},
         showWarning: false,
-        seriesValidated: {}
     }
 
     constructor(props) {
-
         super(props)
+        this.config = this.props.config
         this.uploadModel = new Model();
         this.addFile = this.addFile.bind(this)
         this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
-        this.onUploadDone = this.onUploadDone.bind(this)
-        this.triggerMultiUpload = this.triggerMultiUpload.bind(this)
-        this.seriesValidated = this.seriesValidated.bind(this)
 
         this.uppy = Uppy({
             id: 'uppy',
@@ -55,7 +52,7 @@ class Uploader extends Component {
         })
 
         this.uppy.use(Tus, {
-            endpoint: '/tus', // use your tus endpoint here
+            endpoint: 'tus', // use your tus endpoint here
             resume: true,
             autoRetry: true,
             chunkSize: 2000000,
@@ -73,9 +70,28 @@ class Uploader extends Component {
 
     async componentDidMount() {
         await logIn()
+        //EO Check multi/unique upload => (not) force visitID
+
+        //Redux visit candidates
+        //Unique//multi upload as key object
+        //IDvisit PK
         await registerStudy()
         let answer = await getAets()
         console.log(answer)
+        let visitTypes = Object.values(answer)
+        console.log(visitTypes)
+        let visits = []
+        visitTypes.forEach(types => {
+            for (let type in types) {
+                types[type].forEach(visit => {
+                    let visitToPush = visit
+                    visitToPush['isUsed'] = false
+                    visits.push(visitToPush)
+                })
+            }
+        })
+        if(!this.config.multiUpload) this.props.setExpectedVisitID('1') //this.config.visitID
+        this.props.addVisit(visits)
     }
 
     /**
@@ -85,10 +101,10 @@ class Uploader extends Component {
     addFile(files) {
 
         //Add number of files to be parsed to the previous number (incremental parsing)
-        this.setState((previousState) => { 
-            return { 
-                fileLoaded: (previousState.fileLoaded + files.length), 
-                isParsingFiles : true 
+        this.setState((previousState) => {
+            return {
+                fileLoaded: (previousState.fileLoaded + files.length),
+                isParsingFiles: true
             }
         })
 
@@ -99,25 +115,28 @@ class Uploader extends Component {
 
         //Once all promised resolved update state and refresh redux with parsing results
         Promise.all(readPromises).then(() => {
-            this.setState({ isFilesLoaded : true, isParsingFiles : false })
+            this.setState({ isFilesLoaded: true, isParsingFiles: false })
             this.checkSeriesAndUpdateRedux()
         })
-        
+
     }
 
     /**
-	 * Read and parse a single dicom file
-	 */
+     * Read and parse a single dicom file
+     * @param {File} file 
+     */
     async read(file) {
         try {
+            this.uploadModel = new Model()
+
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
 
             //if Secondary capture or DicomDir do no register file
-            if( dicomFile.isDicomDir() ){
+            if (dicomFile.isDicomDir()) {
                 throw Error('Dicomdir file')
             }
-            if( dicomFile.isSecondaryCaptureImg() ){
+            if (dicomFile.isSecondaryCaptureImg()) {
                 throw Error('Secondary Capture Image')
             }
 
@@ -139,10 +158,10 @@ class Uploader extends Component {
                 series = study.getSeries(seriesInstanceUID)
             }
 
-            series.addInstance( dicomFile.getInstanceObject() )
+            series.addInstance(dicomFile.getInstanceObject())
 
-            this.setState( (previousState) => { 
-                return { fileParsed: ++previousState.fileParsed } 
+            this.setState((previousState) => {
+                return { fileParsed: ++previousState.fileParsed }
             })
 
         } catch (error) {
@@ -185,101 +204,172 @@ class Uploader extends Component {
             }
         }
 
-        //ICI A VOIR DIFFEREMENT IL FAUT QUE LE CONTROLEUR INJECTE SEPARAMENT 
-        //LES NOUVELLES STUDIES + WARNING SI PATIENT NE MATCH PAS PATIENT ATTENDU
-        // LES NOUVELLES SERIES + LES WARNING
-        console.log(this.uploadModel.data)
-        this.props.addStudy(this.uploadModel.data)
-        for (let study in this.uploadModel.data) {
-            for (let series in this.uploadModel.data[study].series) {
-                this.props.addSeries(this.uploadModel.data[study].series[series])
+        //Scan every study in Model
+        for (let studyInstanceUID in this.uploadModel.data) {
+            //If not in multiupload mode
+            if (!this.state.multiUpload) {
+                //Check studies warnings
+                let studyWarnings = this.checkStudy(this.uploadModel.data[studyInstanceUID])
+                //Add study to Redux
+                this.props.addStudy(this.uploadModel.data[studyInstanceUID])
+                //Add study warnings to Redux
+                this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
+                //If study has warnings, trigger a warning message
+                if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
+                    this.setState({ showWarning: true })
+                }
+            }
+            //Scan every series in Model
+            for (let seriesInstanceUID in this.uploadModel.data[studyInstanceUID].series) {
+                //Add series to Redux
+                this.props.addSeries(this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID])
+                //Add series warnings to Redux
+                this.props.addWarningsSeries(seriesInstanceUID, this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID].getWarnings())
             }
         }
     }
 
-    /**
-     * 
-     */
-    triggerMultiUpload() {
-        this.setState((state) => ({multiUpload: !state.multiUpload}))
+    checkStudy(study) {
+        let warnings = {}
+        // Check if the study corresponds to the visits in wait for series upload
+        let expectedVisit = this.findExpectedVisit(study);
+        if (expectedVisit === undefined) {
+            warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
+        }
+
+        // Check if visit ID is set
+        if (this.props.expectedVisit === null || typeof this.props.expectedVisit === undefined) {
+            warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        }
+        console.log(warnings)
+        return warnings
     }
 
-    /**
+    findExpectedVisit(studyObject) {
+        let thisPatient = studyObject.getObjectPatientName();
+        console.log(thisPatient)
+        if (thisPatient.givenName === undefined) {
+            return undefined;
+        }
+        if (thisPatient.familyName === undefined) {
+            return undefined;
+        }
+
+        thisPatient.birthDate = studyObject.getPatientBirthDate();
+        thisPatient.sex = studyObject.patientSex;
+
+        if (thisPatient.birthDate === undefined || thisPatient.sex === undefined) {
+            return undefined;
+        }
+
+        // Linear search through expected visits list
+        for (let visit of this.props.visits) {
+            if (visit.firstName.trim().toUpperCase().charAt(0) == thisPatient.givenName.trim().toUpperCase().charAt(0)
+                && visit.lastName.trim().toUpperCase().charAt(0) == thisPatient.familyName.trim().toUpperCase().charAt(0)
+                && visit.sex.trim().toUpperCase().charAt(0) == thisPatient.sex.trim().toUpperCase().charAt(0)
+                && Util.isProbablyEqualDates(visit.birthDate, thisPatient.birthDate)) {
+                return visit;
+            }
+        };
+        return undefined;
+    }
+
+    /** 
      * Trigger hide warning if closed
      */
     onHideWarning() {
         this.setState((state) => { return { showWarning: !state.showWarning } });
     }
 
-    //SK ICI devrait etre envoyé directement depuis le controlleur studies/series vers le redux
-    seriesValidated = (series) => {
-        this.setState(() => { return { seriesValidated: { ...series } } })
-    }
-
     /**
      * Upload selected and validated series on click
      */
     async onUploadClick(e) {
-        let instancesToUpload = []
 
-        //Gather all instances to upload
-        for (let studyID in this.state.seriesValidated) {
-            for (let seriesID in this.state.seriesValidated[studyID]) {
-                seriesID = this.state.seriesValidated[studyID][seriesID]
-                let mySeries = this.uploadModel.getStudy(studyID).getSeries(seriesID)
-                instancesToUpload.push(...mySeries.getArrayInstances())
-            }
-        }
-
-        let fileArray = instancesToUpload.map(instance => {
-            return instance.getFile()
+        //build array of series object to be uploaded
+        console.log(this.props.seriesReady)
+        let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
+            return this.props.series[seriesUID]
         })
 
-        let uploader = new DicomBatchUploader(this.uppy, fileArray, this.onUploadDone)
-        this.intervalProgress = setInterval(() => {
-            console.log(uploader.getProgress())
-            this.setState({
-                ...uploader.getProgress()
+        //get unique StudyUID in series arrays
+        let studyUIDArray = seriesObjectArrays.map((seriesObject) => {
+            return seriesObject.studyInstanceUID
+        })
+        studyUIDArray = Array.from(new Set(studyUIDArray))
+        //Filter non selected studyUID
+        studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
+
+        //group series by studyUID
+        for (let studyInstanceUID of studyUIDArray) {
+
+            let seriesInstanceUID = seriesObjectArrays.filter((seriesObject) => {
+                return (seriesObject.studyInstanceUID === studyInstanceUID)
             })
-        }, 200)
+            let studyOrthancID = this.uploadModel.getStudy(studyInstanceUID).getOrthancStudyID()
+
+            let filesToUpload = []
+
+            seriesInstanceUID.forEach(seriesObject => {
+                console.log(studyInstanceUID)
+                console.log(seriesObject.seriesInstanceUID)
+                let getSeriesObject = this.uploadModel.getStudy(studyInstanceUID).getSeries(seriesObject.seriesInstanceUID)
+                let fileArray = getSeriesObject.getArrayInstances().map(instance => {
+                    return instance.getFile()
+                })
+                filesToUpload.push(...fileArray)
+            })
+            console.log(filesToUpload)
+            let uploader = new DicomMultiStudyUploader(this.uppy)
+            uploader.addStudyToUpload(282, filesToUpload)
+            uploader.on('upload-progress', (studyNumber, zipProgress, uploadProgress) => {
+                this.setState({
+                    uploadProgress: uploadProgress,
+                    zipProgress: zipProgress
+                })
+                console.log(zipProgress)
+                console.log(uploadProgress)
+
+            })
+            uploader.on('upload-finished', (visitID, timeStamp, numberOfFiles) => {
+                console.log('Batch Finished')
+                validateUpload(visitID, timeStamp, numberOfFiles, studyOrthancID)
+            })
+
+            uploader.startUpload()
+            this.setState({ isUploadStarted: true })
 
 
-        uploader.startUpload()
-        this.setState({isUploadStarted : true})
+        }
 
-    }
 
-    onUploadDone() {
-        clearInterval(this.intervalProgress)
-        console.log("upload Finished")
     }
 
     render() {
         return (
             <Fragment>
-                    <div>
-                        <Button className="btn btn-dark" onClick={this.triggerMultiUpload}>{this.state.multiUpload ? 'Exit Uploader' : 'Multi Uploader'}</Button>
-                        <DicomDropZone 
-                            addFile={this.addFile} 
-                            isParsingFiles={this.state.isParsingFiles}
-                            isUploadStarted = {this.state.isUploadStarted}
-                            fileParsed = {this.state.fileParsed}
-                            fileIgnored = {Object.keys(this.state.ignoredFiles).length}
-                            fileLoaded = {this.state.fileLoaded}
-                        />
-                    </div>
-                    <div className="mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
-                        <ParsingDetails 
-                            fileLoaded={this.state.fileLoaded} 
-                            fileParsed={this.state.fileParsed} 
-                            dataIgnoredFiles = {this.state.ignoredFiles} 
-                        />
-                    </div>
-                    <div hidden={!this.state.isFilesLoaded}>
-                        <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                        <ControllerStudiesSeries multiUploader={this.state.multiUpload} selectedSeries={this.props.selectedSeries} seriesValidated={this.seriesValidated} />
-                        <ProgressUpload multiUpload={false} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
-                    </div>
+                <div>
+                    <DicomDropZone
+                        addFile={this.addFile}
+                        isParsingFiles={this.state.isParsingFiles}
+                        isUploadStarted={this.state.isUploadStarted}
+                        fileParsed={this.state.fileParsed}
+                        fileIgnored={Object.keys(this.state.ignoredFiles).length}
+                        fileLoaded={this.state.fileLoaded}
+                    />
+                </div>
+                <div className="mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
+                    <ParsingDetails
+                        fileLoaded={this.state.fileLoaded}
+                        fileParsed={this.state.fileParsed}
+                        dataIgnoredFiles={this.state.ignoredFiles}
+                    />
+                </div>
+                <div hidden={!this.state.isFilesLoaded}>
+                    <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
+                    <ControllerStudiesSeries multiUpload={this.config.multiUpload} selectedSeries={this.props.selectedSeries} />
+                    <ProgressUpload multiUpload={this.config.multiUpload} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
+                </div>
             </Fragment>
         )
     }
@@ -287,14 +377,23 @@ class Uploader extends Component {
 
 const mapStateToProps = state => {
     return {
+        visits: state.Visits.visits,
+        expectedVisit: state.Visits.expectedVisit,
         studies: state.Studies.studies,
         series: state.Series.series,
         selectedSeries: state.DisplayTables.selectedSeries,
+        seriesReady: state.DisplayTables.seriesReady,
+        studiesReady: state.DisplayTables.studiesReady,
+        warningsSeries: state.Warnings.warningsSeries,
     }
 }
 const mapDispatchToProps = {
     addStudy,
     addSeries,
+    addWarningsStudy,
+    addWarningsSeries,
+    addVisit,
+    setExpectedVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

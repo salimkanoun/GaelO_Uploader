@@ -1,10 +1,11 @@
 // Gérer les IDs, selected study, warnings
-import { SELECT_STUDY, SERIES_READY, SELECT_SERIES } from '../actions/actions-types'
+import { SELECT_STUDY, SERIES_READY, SELECT_SERIES, STUDIES_READY } from '../actions/actions-types'
 
 const initialState = {
   selectedStudy: undefined,
   selectedSeries: undefined,
-  seriesReady: []
+  seriesReady: [],
+  studiesReady: []
 }
 
 export default function DisplayTablesReducer(state = initialState, action) {
@@ -21,6 +22,21 @@ export default function DisplayTablesReducer(state = initialState, action) {
       return {
         ...state,
         selectedSeries: action.payload
+      }
+
+    case STUDIES_READY:
+      let studiesReady
+      if (action.payload.isSelect) {
+        //If select add SeriesInstanceUID to selectedSeries
+        studiesReady = [...state.studiesReady, action.payload.validStudiesInstanceUID]
+      } else if (!action.payload.isSelect) {
+        //If not remove SeriesInstanceUID from selected Series Array
+        studiesReady = state.studiesReady.filter(thisRowID => thisRowID !== action.payload.validStudiesInstanceUID)
+
+      }
+      return {
+        ...state,
+        studiesReady: studiesReady
       }
 
     case SERIES_READY:

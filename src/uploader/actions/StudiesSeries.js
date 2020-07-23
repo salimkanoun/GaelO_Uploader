@@ -24,6 +24,6 @@ export function addWarningsStudy(studyInstanceUID, warnings) {
 export function updateWarningStudy(warningToUpdate, studyInstanceUID) {
   return {
       type: UPDATE_WARNING_STUDY,
-      payload: {warningToUpdate: warningToUpdate, studyInstanceUID}
+      payload: {warningToUpdate: warningToUpdate, studyInstanceUID: studyInstanceUID}
   }
 }

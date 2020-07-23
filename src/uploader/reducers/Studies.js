@@ -24,35 +24,41 @@ export default function StudiesReducer(state = initialState, action) {
       return {
         studies: {
           ...state.studies,
-          [studyInstanceUID]: { ...state.studies[studyInstanceUID], warnings: {...warningsStudy}}
+          [studyInstanceUID]: { ...state.studies[studyInstanceUID], warnings: { ...warningsStudy } }
         }
       }
 
-      case UPDATE_WARNING_STUDY:
-        studyInstanceUID = action.payload.studyInstanceUID
-        let studyWarning = action.payload.warningToUpdate.key
+    case UPDATE_WARNING_STUDY:
+      studyInstanceUID = action.payload.studyInstanceUID
+      let studyWarning = action.payload.warningToUpdate.key
+      return {
+        ...state,
+        studies: {
+          ...state.studies,
+          [studyInstanceUID]: {
+            ...state.studies[studyInstanceUID],
+            warnings: {
+              ...state.studies[studyInstanceUID].warnings,
+              [studyWarning]: {
+                ...state.studies[studyInstanceUID].warnings[studyWarning],
+                dismissed: !state.studies[studyInstanceUID].warnings[studyWarning].dismissed
+              }
+            }
+          }
+        }
+      }
+
+
+    /*case VALIDATE_CHECK_PATIENT: {
+        let studyInstanceUID = action.payload
+        let newWarningsStudies = state.warningsStudies
+        console.log(studyInstanceUID)
+        newWarningsStudies[studyInstanceUID]['NOT_EXPECTED_VISIT'].dismissed = true
         return {
             ...state,
-            warningsStudies: {
-                ...state.warningsStudies,
-                [studyInstanceUID]: {
-                        ...state.warningsStudies[studyInstanceUID],
-                        [studyWarning]: { ...state.warningsStudies[studyInstanceUID][studyWarning], dismissed: !state.warningsStudies[studyInstanceUID][studyWarning].dismissed }
-                    }
-                }
+            warningsStudies: { ...newWarningsStudies },
         }
-
-
-      /*case VALIDATE_CHECK_PATIENT: {
-          let studyInstanceUID = action.payload
-          let newWarningsStudies = state.warningsStudies
-          console.log(studyInstanceUID)
-          newWarningsStudies[studyInstanceUID]['NOT_EXPECTED_VISIT'].dismissed = true
-          return {
-              ...state,
-              warningsStudies: { ...newWarningsStudies },
-          }
-      }*/
+    }*/
 
     default:
       return state

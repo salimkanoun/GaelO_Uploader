@@ -1,5 +1,4 @@
-
-export function getAets () {
+export function getPossibleImport () {
   return fetch('/scripts/get_possible_import.php')
     .then((answer) => {
       if (!answer.ok) { throw answer }

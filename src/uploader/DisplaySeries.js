@@ -20,7 +20,7 @@ import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
 //Redux
 import { connect } from 'react-redux';
-import { selectSeries, selectSeriesReady } from './actions/DisplayTables'
+import { selectSeriesReady, selectSeries } from './actions/DisplayTables'
 
 class DisplaySeries extends Component {
 
@@ -29,16 +29,15 @@ class DisplaySeries extends Component {
             dataField: 'seriesInstanceUID',
             isDummyField: true,
             hidden: true,
-
         },
         {
             dataField: 'selectedSeries',
             text: 'Select',
-            formatExtraData : this,
-            formatter : (cell, row, rowIndex, formatExtraData) => {
-                let checked  = row.selectedSeries
+            formatExtraData: this,
+            formatter: (cell, row, rowIndex, formatExtraData) => {
+                let checked = row.selectedSeries
                 return (
-                    <input disabled ={row.status === 'Rejected'} checked = {checked} type = "checkbox" onChange={() => {formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked)}} />
+                    <input disabled={row.status === 'Rejected'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked) }} />
                 )
             }
         },
@@ -83,68 +82,31 @@ class DisplaySeries extends Component {
         classes: "row-clicked",
         selected: this.selectedSeries,
         onSelect: (row, isSelect) => {
-            this.props.selectSeries(row, isSelect)
+            this.props.selectSeries(row.seriesInstanceUID)
         }
-    }
-
-    /**
-     * Add status and selection state to previous information from the selected study's series 
-     * in order to build table
-     */
-    buildRows(selectedStudy) {
-        if (selectedStudy !== null && selectedStudy !== undefined) {
-            let seriesArray = []
-            let seriesToDisplay = Object.keys(this.props.studies[selectedStudy].series)
-            seriesToDisplay.forEach((series) => {
-                let seriesToPush = this.props.series[series]
-                seriesToPush['status'] = (this.warningsPassed(series)) ? 'Valid' : 'Rejected'
-                seriesToPush['selectedSeries'] = false
-                if (this.props.seriesReady.includes(seriesToPush.seriesInstanceUID)){
-                    seriesToPush['selectedSeries'] = true
-                } 
-                seriesArray.push({
-                    ...seriesToPush
-                })
-            }
-            )
-            return seriesArray
-        }
-        else return []
-    }
-
-    /**
-     * Check if the series warnings have been all passed
-     */
-    warningsPassed(series) {
-        for (let warning in this.props.series[series].warnings) {
-            if (!this.props.series[series].warnings[warning].dismissed) {
-                return false
-            }
-        }
-        return true
     }
 
     render() {
         return (
             <Container fluid>
-                <span class="title">Series</span>
+                <span className="title">Series</span>
                 <Row>
                     <Col xs={12} md={8}>
                         <BootstrapTable
-                            classes="table table-borderless"
                             bodyClasses="du-series-tbody"
+                            classes="table table-borderless"
                             headerClasses="du-series th"
                             rowClasses={rowClasses}
                             wrapperClasses="table-responsive"
                             keyField='seriesInstanceUID'
-                            data={this.buildRows(this.props.selectedStudy)}
+                            data={this.props.seriesRows}
                             columns={this.columns}
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>
-                        <DisplayWarning 
-                            type='series' 
-                            selectionID={this.props.selectedSeries} 
+                        <DisplayWarning
+                            type='series'
+                            selectionID={this.props.selectedSeries}
                         />
                     </Col>
                 </Row>
@@ -164,15 +126,12 @@ const rowClasses = (row, rowIndex) => {
 
 const mapStateToProps = state => {
     return {
-        series: state.Series.series,
-        studies: state.Studies.studies,
         selectedSeries: state.DisplayTables.selectedSeries,
-        seriesReady: state.DisplayTables.seriesReady
     }
 }
 const mapDispatchToProps = {
-    selectSeries,
-    selectSeriesReady
+    selectSeriesReady,
+    selectSeries
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplaySeries)

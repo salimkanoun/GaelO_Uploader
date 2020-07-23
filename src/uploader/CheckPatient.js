@@ -16,16 +16,17 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import Modal from 'react-bootstrap/Modal'
-import DropdownButton from 'react-bootstrap/DropdownButton'
-import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/Button'
 import BootstrapTable from 'react-bootstrap-table-next';
-
+import SelectPatient from './SelectPatient'
 import ButtonIgnore from './render_component/ButtonIgnore'
-import { validateCheckPatient } from './actions/DisplayTables'
+import { updateWarningStudy } from './actions/StudiesSeries'
+import { setUsedVisit } from './actions/Visits'
+import { NOT_EXPECTED_VISIT } from '../model/Warning';
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
 const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
+
 class CheckPatient extends Component {
 
     state = {
@@ -36,6 +37,7 @@ class CheckPatient extends Component {
     constructor(props) {
         super(props)
         this.onClick = this.onClick.bind(this)
+        this.validateCheckPatient = this.validateCheckPatient.bind(this)
     }
 
     columns = [
@@ -54,105 +56,99 @@ class CheckPatient extends Component {
         {
             dataField: 'ignoreButton',
             text: '',
-            formatter: (cell, row, rowIndex, extraData) => ((row.ignoredStatus !== null) ? <ButtonIgnore rowName={row.rowName} onClick={this.onClick}
-                warning={row['ignoredStatus']} /> : null)
+            formatter: (cell, row, rowIndex, extraData) => ((row.ignoredStatus !== null) ?
+                <ButtonIgnore row={row} onClick={this.onClick}
+                    warning={row.ignoredStatus} /> : null)
         },
         {
             dataField: 'ignoredStatus',
+            text: '',
             hidden: true
         },
     ]
 
-    onClick(rowName) {
-        this.setState((state) => {
-            let rows = state.rows.map(row => {
-                if (row.rowName === rowName)
-                    return { ...row, ignoredStatus: !row.ignoredStatus }
-                else
-                    return row
-            })
-
-            return {
-                rows: [...rows],
-            }
-
-        }, () => {
-            let nonIgnoredList = this.state.rows.filter(row => (row.ignoredStatus === false))
-            this.setState({ isDisabled: (nonIgnoredList.length !== 0) })
+    onClick(thisRow) {
+        let newRows = this.state.rows.map((row) => {
+            let row2 = { ...row }
+            if (row2.rowName === thisRow.rowName) row2.ignoredStatus = !row.ignoredStatus
+            return row2
         })
-
+        this.setState(() => ({ rows: newRows }), () => {
+            let isDisabled = false
+            console.log(this.state.rows)
+            for (let row in this.state.rows) {
+                if (this.state.rows[row].ignoredStatus === false) isDisabled = true
+            }
+            this.setState(() => ({ isDisabled: isDisabled }))
+        })
     }
 
-    /**
-     * Check correspondance between expected and given data
-     */
-    checkRow(expected, current) {
-        if(expected === undefined || expected === ''){
-            //if exected is empty check is true
-            return true
-        }else{
-             //Call function checkPatientIdentity instead
-             // SK ?
-            if (expected === current) {
-                return true
-            } else {
-                return false
-            }
+    validateCheckPatient = () => {
+        this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
+        //For multiupload this.props.setUsedVisit(this.props.expectedVisitID, true)
+        this.props.closeListener()
+    }
+
+    componentDidUpdate(prevState) {
+        if (prevState.selectedStudy !== this.props.selectedStudy || prevState.show !== this.props.show) {
+            this.setState({rows: this.buildRows()})
         }
     }
 
     /**
-     * Build table rows when study datacomments have been downloaded
+     * Check matching of patient information
      */
-    shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.studyUID !== nextProps.studyUID && nextProps.studyUID !== undefined) {
+    buildRows() {
+        if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined && !this.props.multiUpload) {
             let rows = []
-            let currentStudy = this.props.studies[nextProps.studyUID]
+            let currentStudy = this.props.studies[this.props.selectedStudy]
             //SK ICI patientName peut etre undefined (donc crash ici)
             //Peut etre plutot a gerer quand on construit l'entree study mettre les
             //caractères recherchés pour le match
             currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
             currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
-
-            let expectedStudy = [currentStudy]
-
-            //Fake unmatching fields
-            expectedStudy.patientFirstName = 'A'
-            expectedStudy.patientSex = 'M'
-            expectedStudy.patientBirthDate = '01-01-2000'
+            
+            //Find expected visit
+            let expectedStudy
+            this.props.visits.forEach(visit => {
+                if(visit.idVisit === this.props.expectedVisitID) expectedStudy = visit
+            })
+            expectedStudy.patientFirstName = expectedStudy.firstName
+            expectedStudy.patientLastName = expectedStudy.lastName
 
             for (let i in labels) {
                 rows.push({
                     rowName: labels[i],
                     expectedStudy: expectedStudy[keys[i]],
                     currentStudy: currentStudy[keys[i]],
-                    ignoredStatus: (this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])) ? null : this.checkRow(expectedStudy[keys[i]], currentStudy[keys[i]])
+                    ignoredStatus: this.setRowStatus(expectedStudy[keys[i]], currentStudy[keys[i]])
                 })
             }
-            this.setState({ rows: [...rows] })
+            return rows
+        } else return []
+    }
+
+    /**
+     * Check correspondance between expected and given data and set rowStatus accordingly
+     */
+    setRowStatus(expected, current) {
+        if (expected === undefined || expected === '' || expected === current) {
+            return null
+        } else {
+            return false
         }
-        return true
     }
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.props.closeListener} updatedData={this.props.studyUID}>
-                <Modal.Header class="modal-header" closeButton>
-                    <Modal.Title class="modal-title" id="du-patientLongTitle">{this.props.multiUploader ? 'Select Patient' : 'Check Patient'}</Modal.Title>
+            <Modal show={this.props.show} onHide={this.props.closeListener}>
+                <Modal.Header className="modal-header" closeButton>
+                    <Modal.Title className="modal-title" id="du-patientLongTitle">{this.props.multiUpload ? 'Select Patient' : 'Check Patient'}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body hidden={!this.props.multiUploader} class="modal-body du-patient" id='du-patp-comparison'>
-                    <span class='du-patp-label'>Select Visit Type</span>
-                    <DropdownButton>
-
-                    </DropdownButton>
-                    <span class='du-patp-label'>Select Patient</span>
-                    <ListGroup>
-
-                    </ListGroup>
-                    <span class='du-patp-label'>Comparison</span>
-                    <p>We let you check if the selected patient and the imported patient informations are matching:</p>
+                <Modal.Body hidden={!this.props.multiUpload} className="modal-body du-patient" id='du-patp-comparison'>
+                
                 </Modal.Body>
-                <Modal.Body class="modal-body" id="du-patp-comparison">
+                <Modal.Body className="modal-body" id="du-patp-comparison">
                     <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
                     <BootstrapTable
                         keyField='rowName'
@@ -166,8 +162,8 @@ class CheckPatient extends Component {
                     />
                     <p>If you want to force the upload you may have to ignore all the warnings.</p>
                 </Modal.Body>
-                <Modal.Footer class="modal-footer">
-                    <Button id="du-patp-btn-confirm" type="button" onClick={this.props.closeListener} class="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>This is the correct patient</Button>
+                <Modal.Footer className="modal-footer">
+                    <Button id="du-patp-btn-confirm" type="button" onClick={this.validateCheckPatient} className="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>This is the correct patient</Button>
                 </Modal.Footer>
             </Modal>
         )
@@ -180,17 +176,22 @@ const rowClasses = (row, rowIndex) => {
     } else if (row.ignoredStatus === null) {
         return 'du-studies row-success'
     }
+    console.log(row)
     return 'du-studies td'
 }
 
 const mapStateToProps = state => {
     return {
-        studies: state.Studies.studies
+        selectedStudy: state.DisplayTables.selectedStudy,
+        studies: state.Studies.studies,
+        visits: state.Visits.visits,
+        expectedVisitID: state.Visits.expectedVisitID
     }
 }
 
 const mapDispatchToProps = {
-    validateCheckPatient
+    updateWarningStudy,
+    setUsedVisit
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckPatient)

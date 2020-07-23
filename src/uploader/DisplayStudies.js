@@ -56,7 +56,7 @@ class StudiesTab extends Component {
                 && !this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'].dismissed) ?  
                 <Button onClick={() => { this.toggleCheckPatient(); }}>
                     {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
-                </Button> : <>{console.log(cell)}</>
+                </Button> : <></>
             ),
         },
         {
@@ -102,7 +102,6 @@ class StudiesTab extends Component {
     }
 
     render() {
-        console.log(this.props.multiUpload)
         return (
             <>
                 <Container fluid>

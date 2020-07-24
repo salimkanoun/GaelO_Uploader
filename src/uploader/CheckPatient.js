@@ -20,9 +20,8 @@ import Button from 'react-bootstrap/Button'
 import BootstrapTable from 'react-bootstrap-table-next';
 import SelectPatient from './SelectPatient'
 import ButtonIgnore from './render_component/ButtonIgnore'
-import { updateWarningStudy } from './actions/StudiesSeries'
+import { updateWarningStudy, attributeIdVisit } from './actions/StudiesSeries'
 import { setUsedVisit } from './actions/Visits'
-import { NOT_EXPECTED_VISIT } from '../model/Warning';
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
 const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
@@ -86,7 +85,10 @@ class CheckPatient extends Component {
     validateCheckPatient = () => {
         this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
         //For multiupload 
-        if (this.props.multiUpload) this.props.setUsedVisit(this.props.expectedVisitID, this.props.selectedStudy, true)
+        if (this.props.multiUpload) {
+            this.props.setUsedVisit(this.props.expectedVisitID, this.props.selectedStudy, true)
+            this.props.attributeIdVisit(this.props.selectedStudy, this.props.expectedVisitID)
+        }
         this.props.closeListener()
     }
 
@@ -196,7 +198,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     updateWarningStudy,
-    setUsedVisit
+    setUsedVisit,
+    attributeIdVisit
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckPatient)

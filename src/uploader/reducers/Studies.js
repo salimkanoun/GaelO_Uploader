@@ -1,5 +1,5 @@
 // Gérer les IDs, selected study, warnings
-import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, CHECK_PATIENT_DATA } from '../actions/actions-types'
+import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, ATTRIBUTE_ID_VISIT } from '../actions/actions-types'
 
 const initialState = {
   studies: {}
@@ -49,17 +49,25 @@ export default function StudiesReducer(state = initialState, action) {
       }
 
 
-    /*case VALIDATE_CHECK_PATIENT: {
-        let studyInstanceUID = action.payload
-        let newWarningsStudies = state.warningsStudies
-        console.log(studyInstanceUID)
-        newWarningsStudies[studyInstanceUID]['NOT_EXPECTED_VISIT'].dismissed = true
-        return {
-            ...state,
-            warningsStudies: { ...newWarningsStudies },
+    case ATTRIBUTE_ID_VISIT:
+      let idVisit = action.payload.idVisit
+      studyInstanceUID = action.payload.studyInstanceUID
+      return {
+        ...state,
+        studies: {
+          ...state.studies,
+          [studyInstanceUID]: {
+            ...state.studies[studyInstanceUID],
+            warnings: {
+              ...state.studies[studyInstanceUID].warnings,
+              NOT_EXPECTED_VISIT: {
+                ...state.studies[studyInstanceUID].warnings.NOT_EXPECTED_VISIT,
+                idVisit: idVisit
+              }
+            }
+          }
         }
-    }*/
-
+      }
     default:
       return state
   }

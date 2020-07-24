@@ -1,4 +1,4 @@
-import { ADD_STUDY, ADD_SERIES, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY } from './actions-types'
+import { ADD_STUDY, ADD_SERIES, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, ATTRIBUTE_ID_VISIT } from './actions-types'
 
 export function addSeries (series) {
   return {
@@ -25,5 +25,12 @@ export function updateWarningStudy(warningToUpdate, studyInstanceUID) {
   return {
       type: UPDATE_WARNING_STUDY,
       payload: {warningToUpdate: warningToUpdate, studyInstanceUID: studyInstanceUID}
+  }
+}
+
+export function attributeIdVisit(studyInstanceUID, idVisit) {
+  return {
+    type: ATTRIBUTE_ID_VISIT,
+    payload: {studyInstanceUID: studyInstanceUID, idVisit:idVisit}
   }
 }

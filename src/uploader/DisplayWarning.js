@@ -28,6 +28,10 @@ class DisplayWarning extends Component {
             hidden: true
         },
         {
+            dataField: 'idVisit',
+            hidden: true
+        },
+        {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => (
@@ -37,7 +41,7 @@ class DisplayWarning extends Component {
                         if (this.props.type === 'series')
                             this.props.updateWarningSeries(row, row.seriesInstanceUID)
                         else if (this.props.type === 'study') {
-                            if (this.props.multiUpload) this.props.setUsedVisit(this.props.expectedVisitID, this.props.selectedStudy, !row.dismissed)
+                            if (this.props.multiUpload && row.idVisit !== undefined) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
                         }
                             

@@ -24,17 +24,23 @@ export default function VisitsReducer(state = initialState, action) {
       }
 
     case SET_USED:
-      let isUsed = action.payload.isUsed
       let visitID = action.payload.visitID
       let studyID = action.payload.studyID
-      console.log(typeof state.visits)
-      let thisNewVisit = state.visits.filter(thisRowID => thisRowID.idVisit !== visitID)
-      (isUsed) ? thisNewVisit.studyID = [studyID] : delete thisNewVisit.studyID
-      let newVisits = state.visits.filter(thisRowID => thisRowID.idVisit !== visitID)
-      newVisits.push(thisNewVisit)
+      let isUsed = action.payload.isUsed
+      console.log(action.payload)
+      let thisNewVisit = {} 
+      let newVisitsArray = []
+      for(let thisRow in state.visits) {
+        if (state.visits[thisRow].idVisit === visitID) {
+          thisNewVisit = state.visits[thisRow]
+        } else newVisitsArray.push(state.visits[thisRow])
+      }
+      (isUsed) ? thisNewVisit['studyID'] = studyID : delete thisNewVisit.studyID
+      thisNewVisit.isUsed = isUsed
+      newVisitsArray.push(thisNewVisit)
       return {
         ...state,
-        visits: [...newVisits]
+        visits: [...newVisitsArray]
       }
 
     default:

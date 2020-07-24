@@ -18,6 +18,8 @@ import { connect } from 'react-redux'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
 
+import { setExpectedVisitID } from './actions/Visits'
+
 class SelectPatient extends Component {
 
     state = {
@@ -43,7 +45,7 @@ class SelectPatient extends Component {
         let finalDisplay = []
         this.props.visits.forEach((visit) => {
             if (this.state.selectedType !== undefined && visit.visitType === this.state.selectedType.value){
-                finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={(id) => this.selectPatient(visit.idVisit)}>{visit.numeroPatient}</ListGroup.Item>)
+                finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={(id) => this.selectPatient(visit.idVisit)} disabled={visit.isUsed}>{visit.numeroPatient}</ListGroup.Item>)
             } 
         })
         
@@ -52,6 +54,7 @@ class SelectPatient extends Component {
 
     selectPatient = selectedVisit => {
         this.setState( {selectedVisit}, this.props.generateRows(selectedVisit))
+        this.props.setExpectedVisitID(selectedVisit)
     }
 
     selectType = selectedType => {
@@ -60,7 +63,6 @@ class SelectPatient extends Component {
     
 
     render() {
-        console.log(this.state)
         return (
             <>
                 <span className='du-patp-label'>Select Visit Type</span>
@@ -84,7 +86,7 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
-
+    setExpectedVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SelectPatient)

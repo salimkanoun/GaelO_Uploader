@@ -122,7 +122,7 @@ class StudiesTab extends Component {
                             <CheckPatient multiUpload={this.props.multiUpload} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} />
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} />
+                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload}/>
                         </Col>
                     </Row>
                 </Container>

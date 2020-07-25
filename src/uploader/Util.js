@@ -12,27 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-class Util {
-	/**
-	 * Format jquery selector by
-	 * escaping character used in css notation
-	 */
-	static jq(id) {
-		return id.replace(/(:|\.|\[|\]|,|=|@)/g, "\\$1");
-	}
-
-	/**
-	 * Format text for display
-	 */
-	static ft(text) {
-		if (text === undefined) {
-			return '<span class="unknown">Unknown</span>';
-		}
-		if (text === '[object Object]') {
-			return '<span class="unknown">Unreadable</span>';
-		}
-		return (text);
-	}
+export default class Util {
 
 	/**
 	 * Format date for display
@@ -116,48 +96,4 @@ class Util {
 		return integer;
 	}
 
-	/**
-	 * Convert array to string
-	 * Each element are sparated with a separator
-	 */
-	static arrayToString(array, separator = ', ') {
-		if (array.length === 0) {
-			return '';
-		}
-		let res = array[0].toString();
-		for (let i = 1; i < array.length; i++) {
-			res += separator + array[i].toString();
-		}
-		return res;
-	}
-
-	/**
-	 * Dispatch custom event on specified target
-	 */
-	static dispatchEventOn(name, target, options) {
-		if (options !== undefined) {
-			var e = new CustomEvent(name, {
-				detail: options
-			});
-		} else {
-			var e = new CustomEvent(name);
-		}
-		target.dispatchEvent(e);
-	}
-
-	/**
-	 * Concatenate two Uint8Arrays
-	 */
-	static concat(arrays) {
-		let size = arrays.reduce((sum, value) => sum + value.length, 0);
-		let res = new Uint8Array(size);
-
-		let length = 0;
-		for (let a of arrays) {
-			res.set(a, length);
-			length += a.length;
-		}
-
-		return res;
-	}
 }

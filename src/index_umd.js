@@ -3,22 +3,15 @@ import ReactDOM from 'react-dom'
 
 import App from './App'
 
-const config = {
-  // Declare default config
+const configDefault = {
+      // Declare default config
       multiUpload: false,
       minNbOfInstances: 30,
       idVisit: null,
-      /*callbackOnComplete: null,
-      callbackOnBeforeUnload: function (event) {
-        event.preventDefault();
-        event.returnValue = ''; // Needed for Chrome
-      },
-      callbackOnAbort: function(){
-        refreshInvestigatorDiv()
-      }*/
+      callbackOnComplete: function(){console.log('callbackComplete')},
       }
 
-function installUploader (config = config, containerId = 'root') {
+function installUploader (config = configDefault, containerId = 'root') {
   const container = document.getElementById(containerId)
 
   if (!container) {

@@ -39,12 +39,12 @@ class StudiesTab extends Component {
         {
             dataField: 'selectedStudies',
             text: 'Select',
-            hidden: (!this.props.multiUpload),
+            hidden: false,
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedStudies
                 return (
-                    <input disabled={row.status !== 'Valid'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectStudiesReady(row.studiesInstanceUID, !checked) }} />
+                    <input disabled={row.status !== 'Valid'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, !checked) }} />
                 )
             }
         },

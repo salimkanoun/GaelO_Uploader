@@ -7,17 +7,10 @@ import * as serviceWorker from './serviceWorker'
 const config = {
 	// Declare default config
 	developerMode: true,
-	multiUpload: true,
+	multiUpload: false,
 	minNbOfInstances: 30,
-	idVisit: '1',
-	/*callbackOnComplete: null,
-	callbackOnBeforeUnload: function (event) {
-		event.preventDefault();
-		event.returnValue = ''; // Needed for Chrome
-	},
-	callbackOnAbort: function(){
-		refreshInvestigatorDiv()
-	}*/
+	idVisit: 155,
+	callbackOnComplete: ()=>{},
 }
 
 const container = document.getElementById('root')

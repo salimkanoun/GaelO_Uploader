@@ -32,6 +32,8 @@ class Uploader extends Component {
         fileLoaded: 0,
         zipProgress: 0,
         uploadProgress: 0,
+        studyProgress : 0,
+        studyLenght : 0,
         ignoredFiles: {},
         showWarning: false,
     }
@@ -284,6 +286,7 @@ class Uploader extends Component {
 
         //build array of series object to be uploaded
         console.log(this.props.seriesReady)
+        console.log(this.props.studiesReady)
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
             return this.props.series[seriesUID]
         })
@@ -293,6 +296,7 @@ class Uploader extends Component {
             return seriesObject.studyInstanceUID
         })
         studyUIDArray = Array.from(new Set(studyUIDArray))
+        console.log(studyUIDArray)
         //Filter non selected studyUID
         studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
 
@@ -320,6 +324,8 @@ class Uploader extends Component {
             uploader.addStudyToUpload(282, filesToUpload)
             uploader.on('upload-progress', (studyNumber, zipProgress, uploadProgress) => {
                 this.setState({
+                    studyLength : studyUIDArray.length,
+                    studyProgress : studyNumber,
                     uploadProgress: uploadProgress,
                     zipProgress: zipProgress
                 })
@@ -328,6 +334,7 @@ class Uploader extends Component {
 
             })
             uploader.on('upload-finished', (visitID, timeStamp, numberOfFiles) => {
+                this.config.callbackOnComplete()
                 console.log('Batch Finished')
                 validateUpload(visitID, timeStamp, numberOfFiles, studyOrthancID)
             })
@@ -364,7 +371,7 @@ class Uploader extends Component {
                 <div hidden={!this.state.isFilesLoaded}>
                     <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
                     <ControllerStudiesSeries multiUpload={this.config.multiUpload} selectedSeries={this.props.selectedSeries} />
-                    <ProgressUpload multiUpload={this.config.multiUpload} studyProgress={3} studyLength={6} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
+                    <ProgressUpload multiUpload={this.config.multiUpload} studyProgress={this.state.studyProgress} studyLength={this.state.studyLenght} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
                 </div>
             </Fragment>
         )

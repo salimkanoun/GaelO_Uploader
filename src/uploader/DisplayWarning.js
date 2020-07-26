@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import BootstrapTable from 'react-bootstrap-table-next'
-import ButtonIgnore from './render_component/ButtonIgnore'
-//Redux
+
 import { connect } from 'react-redux';
 import { updateWarningSeries } from './actions/Warnings'
 import { updateWarningStudy } from './actions/StudiesSeries'
 import { setUsedVisit } from './actions/Visits'
+
+import ButtonIgnore from './render_component/ButtonIgnore'
+
 class DisplayWarning extends Component {
 
     columns = [

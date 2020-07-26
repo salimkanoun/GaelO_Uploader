@@ -103,31 +103,28 @@ class StudiesTab extends Component {
 
     render() {
         return (
-            <>
-                <Container fluid>
-                    <span className='title'>Studies</span>
-                    <Row>
-                        <Col xs={12} md={8}>
-                            <BootstrapTable
-                                keyField='studyInstanceUID'
-                                classes="table table-borderless"
-                                bodyClasses="du-studies-tbody"
-                                headerClasses="du-studies th"
-                                rowClasses={rowClasses}
-                                data={this.props.studiesRows}
-                                columns={this.columns}
-                                selectRow={this.selectRow}
-                                wrapperClasses="table-responsive"
-                            />
-                            <CheckPatient multiUpload={this.props.multiUpload} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} />
-                        </Col>
-                        <Col xs={6} md={4}>
-                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload}/>
-                        </Col>
-                    </Row>
-                </Container>
-
-            </>
+            <Container fluid>
+                <span className='title'>Studies</span>
+                <Row>
+                    <Col xs={12} md={8}>
+                        <BootstrapTable
+                            keyField='studyInstanceUID'
+                            classes="table table-borderless"
+                            bodyClasses="du-studies-tbody"
+                            headerClasses="du-studies th"
+                            rowClasses={rowClasses}
+                            data={this.props.studiesRows}
+                            columns={this.columns}
+                            selectRow={this.selectRow}
+                            wrapperClasses="table-responsive"
+                        />
+                        <CheckPatient multiUpload={this.props.multiUpload} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} />
+                    </Col>
+                    <Col xs={6} md={4}>
+                        <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload}/>
+                    </Col>
+                </Row>
+            </Container>
         )
     }
 }

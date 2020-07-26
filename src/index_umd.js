@@ -3,15 +3,7 @@ import ReactDOM from 'react-dom'
 
 import App from './App'
 
-const configDefault = {
-      // Declare default config
-      multiUpload: false,
-      minNbOfInstances: 30,
-      idVisit: null,
-      callbackOnComplete: function(){console.log('callbackComplete')},
-      }
-
-function installUploader (config = configDefault, containerId = 'root') {
+function installUploader (config, containerId = 'root') {
   const container = document.getElementById(containerId)
 
   if (!container) {

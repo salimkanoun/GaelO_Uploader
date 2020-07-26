@@ -14,23 +14,23 @@ export function addStudy (studyObject) {
   }
 }
 
-export function addWarningsStudy(studyInstanceUID, warnings) {
+export function addWarningsStudy (studyInstanceUID, warnings) {
   return {
     type: ADD_WARNING_STUDY,
-    payload: {studyInstanceUID: studyInstanceUID, warnings: warnings}
+    payload: { studyInstanceUID: studyInstanceUID, warnings: warnings }
   }
 }
 
-export function updateWarningStudy(warningToUpdate, studyInstanceUID) {
+export function updateWarningStudy (warningToUpdate, studyInstanceUID) {
   return {
-      type: UPDATE_WARNING_STUDY,
-      payload: {warningToUpdate: warningToUpdate, studyInstanceUID: studyInstanceUID}
+    type: UPDATE_WARNING_STUDY,
+    payload: { warningToUpdate: warningToUpdate, studyInstanceUID: studyInstanceUID }
   }
 }
 
-export function attributeIdVisit(studyInstanceUID, idVisit) {
+export function attributeIdVisit (studyInstanceUID, idVisit) {
   return {
     type: ATTRIBUTE_ID_VISIT,
-    payload: {studyInstanceUID: studyInstanceUID, idVisit:idVisit}
+    payload: { studyInstanceUID: studyInstanceUID, idVisit: idVisit }
   }
 }

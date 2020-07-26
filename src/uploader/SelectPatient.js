@@ -25,7 +25,7 @@ class SelectPatient extends Component {
     state = {
         selectedType: undefined,
         selectedVisit: undefined
-      };    
+    }
 
     constructor(props) {
         super(props)
@@ -44,31 +44,28 @@ class SelectPatient extends Component {
     displayPatients() {
         let finalDisplay = []
         this.props.visits.forEach((visit) => {
-            if (this.state.selectedType !== undefined && visit.visitType === this.state.selectedType.value){
+            if (this.state.selectedType !== undefined && visit.visitType === this.state.selectedType.value) {
                 finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={(id) => this.selectPatient(visit.idVisit)} disabled={visit.isUsed}>{visit.numeroPatient}</ListGroup.Item>)
-            } 
+            }
         })
-        
+
         return finalDisplay
     }
 
     selectPatient = selectedVisit => {
-        this.setState( {selectedVisit}, this.props.generateRows(selectedVisit))
+        this.setState({ selectedVisit }, this.props.generateRows(selectedVisit))
         this.props.setExpectedVisitID(selectedVisit)
     }
 
     selectType = selectedType => {
-        this.setState( { selectedType });
-      };
-    
+        this.setState({ selectedType });
+    }
 
     render() {
         return (
             <>
                 <span className='du-patp-label'>Select Visit Type</span>
-                <Select options={this.fetchVisitTypes()} onChange={this.selectType}>
-
-                </Select>
+                <Select options={this.fetchVisitTypes()} onChange={this.selectType} />
                 <span className='du-patp-label'>Select Patient</span>
                 <ListGroup variant='flush'>
                     {this.displayPatients(this.state.selectedType)}

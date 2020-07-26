@@ -13,7 +13,7 @@ import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
-import Util from './Util'
+import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload } from '../services/api'
 

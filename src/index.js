@@ -5,12 +5,12 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 
 const config = {
-	// Declare default config
-	developerMode: true,
-	multiUpload: false,
-	minNbOfInstances: 30,
-	idVisit: 155,
-	callbackOnComplete: ()=>{},
+  // Declare default config
+  developerMode: true,
+  multiUpload: false,
+  minNbOfInstances: 30,
+  idVisit: 155,
+  callbackOnComplete: () => {}
 }
 
 const container = document.getElementById('root')

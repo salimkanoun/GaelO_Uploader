@@ -8,7 +8,7 @@ const initialState = {
   studiesReady: []
 }
 
-export default function DisplayTablesReducer(state = initialState, action) {
+export default function DisplayTablesReducer (state = initialState, action) {
   switch (action.type) {
     case SELECT_STUDY:
       // SK ICI PREVOIR LE MEME TYPE DE FONCTION QUE SERIES POUR LE MULTIUPLOADER
@@ -27,12 +27,11 @@ export default function DisplayTablesReducer(state = initialState, action) {
     case STUDIES_READY:
       let studiesReady
       if (action.payload.isSelect) {
-        //If select add SeriesInstanceUID to selectedSeries
+        // If select add SeriesInstanceUID to selectedSeries
         studiesReady = [...state.studiesReady, action.payload.studiesInstanceUID]
       } else if (!action.payload.isSelect) {
-        //If not remove SeriesInstanceUID from selected Series Array
+        // If not remove SeriesInstanceUID from selected Series Array
         studiesReady = state.studiesReady.filter(thisRowID => thisRowID !== action.payload.studiesInstanceUID)
-
       }
       console.log(studiesReady)
       return {
@@ -43,12 +42,11 @@ export default function DisplayTablesReducer(state = initialState, action) {
     case SERIES_READY:
       let seriesReady
       if (action.payload.isSelect) {
-        //If select add SeriesInstanceUID to selectedSeries
+        // If select add SeriesInstanceUID to selectedSeries
         seriesReady = [...state.seriesReady, action.payload.validSeriesInstanceUID]
       } else if (!action.payload.isSelect) {
-        //If not remove SeriesInstanceUID from selected Series Array
+        // If not remove SeriesInstanceUID from selected Series Array
         seriesReady = state.seriesReady.filter(thisRowID => thisRowID !== action.payload.validSeriesInstanceUID)
-
       }
       return {
         ...state,

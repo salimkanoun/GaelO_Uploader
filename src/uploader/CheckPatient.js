@@ -151,12 +151,14 @@ class CheckPatient extends Component {
         return (
             <Modal show={this.props.show} onHide={this.props.closeListener}>
                 <Modal.Header className="modal-header" closeButton>
-                    <Modal.Title className="modal-title" id="du-patientLongTitle">{this.props.multiUpload ? 'Select Patient' : 'Check Patient'}</Modal.Title>
+                    <Modal.Title className="modal-title">
+                        {this.props.multiUpload ? 'Select Patient' : 'Check Patient'}
+                    </Modal.Title>
                 </Modal.Header>
-                <Modal.Body hidden={!this.props.multiUpload} className="modal-body du-patient" id='du-patp-comparison'>
+                <Modal.Body hidden={!this.props.multiUpload} className="modal-body du-patient">
                     <SelectPatient generateRows={this.generateRows}/>
                 </Modal.Body>
-                <Modal.Body className="modal-body" id="du-patp-comparison">
+                <Modal.Body className="modal-body">
                     <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
                     <BootstrapTable
                         keyField='rowName'
@@ -171,7 +173,9 @@ class CheckPatient extends Component {
                     <p>If you want to force the upload you may have to ignore all the warnings.</p>
                 </Modal.Body>
                 <Modal.Footer className="modal-footer">
-                    <Button id="du-patp-btn-confirm" type="button" onClick={this.validateCheckPatient} className="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>This is the correct patient</Button>
+                    <Button type="button" onClick={this.validateCheckPatient} className="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>
+                        This is the correct patient
+                    </Button>
                 </Modal.Footer>
             </Modal>
         )

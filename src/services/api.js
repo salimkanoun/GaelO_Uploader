@@ -54,8 +54,7 @@ export function registerStudy () {
     })
 }
 
-export function validateUpload(idVisit, timeStamp, totalFiles, originalOrthancStudyID){
-
+export function validateUpload (idVisit, timeStamp, totalFiles, originalOrthancStudyID) {
   const formData = new FormData()
   formData.append('id_visit', idVisit)
   formData.append('timeStamp', timeStamp)
@@ -70,10 +69,9 @@ export function validateUpload(idVisit, timeStamp, totalFiles, originalOrthancSt
     body: formData
 
   }).then((answer) => {
-      if (!answer.ok) { throw answer }
-      return (answer.json())
+    if (!answer.ok) { throw answer }
+    return (answer.json())
   }).catch((error) => {
-      console.warn(error)
-    })
-
+    console.warn(error)
+  })
 }

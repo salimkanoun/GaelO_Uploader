@@ -19,14 +19,12 @@ import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 
 export default class ProgressUpload extends Component {
-
   render () {
-
-    let fullProgression = Math.max(this.props.uploadPercent, this.props.zipPercent)
+    const fullProgression = Math.max(this.props.uploadPercent, this.props.zipPercent)
     let uploadedFraction = 0
     let zippedFraction = 0
     if (this.props.zipPercent !== 0) {
-      let uploadFractionOfZipped = this.props.uploadPercent / this.props.zipPercent
+      const uploadFractionOfZipped = this.props.uploadPercent / this.props.zipPercent
       uploadedFraction = fullProgression * uploadFractionOfZipped
       zippedFraction = fullProgression * (1 - uploadFractionOfZipped)
     }
@@ -49,7 +47,5 @@ export default class ProgressUpload extends Component {
         </Row>
       </>
     )
-    
   }
-
 }

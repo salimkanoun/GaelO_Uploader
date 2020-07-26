@@ -7,16 +7,16 @@ export function addVisit (visitObject) {
   }
 }
 
-export function setExpectedVisitID(visitID) {
+export function setExpectedVisitID (idVisit) {
   return {
     type: SET_EXPECTED_VISIT_ID,
-    payload: visitID
+    payload: idVisit
   }
 }
 
-export function setUsedVisit (visitID, isUsed) {
-    return {
-      type: SET_USED,
-      payload: {visitID: visitID, isUsed:isUsed}
-    }
+export function setUsedVisit (idVisit, studyID, isUsed) {
+  return {
+    type: SET_USED,
+    payload: { idVisit: idVisit, studyID: studyID, isUsed: isUsed }
   }
+}

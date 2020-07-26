@@ -5,6 +5,7 @@ import ButtonIgnore from './render_component/ButtonIgnore'
 import { connect } from 'react-redux';
 import { updateWarningSeries } from './actions/Warnings'
 import { updateWarningStudy } from './actions/StudiesSeries'
+import { setUsedVisit } from './actions/Visits'
 class DisplayWarning extends Component {
 
     columns = [
@@ -27,6 +28,10 @@ class DisplayWarning extends Component {
             hidden: true
         },
         {
+            dataField: 'idVisit',
+            hidden: true
+        },
+        {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => (
@@ -35,8 +40,11 @@ class DisplayWarning extends Component {
                     onClick={() => {
                         if (this.props.type === 'series')
                             this.props.updateWarningSeries(row, row.seriesInstanceUID)
-                        else if (this.props.type === 'study')
+                        else if (this.props.type === 'study') {
+                            if (this.props.multiUpload && row.idVisit !== undefined) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
+                        }
+                            
                     }}
                 />
             ),
@@ -102,13 +110,15 @@ const rowClasses = (row, rowIndex) => {
 
 const mapStateToProps = state => {
     return {
+        selectedStudy: state.DisplayTables.selectedStudy,
         studies: state.Studies.studies,
         warningsSeries: state.Warnings.warningsSeries
     }
 }
 const mapDispatchToProps = {
     updateWarningSeries,
-    updateWarningStudy
+    updateWarningStudy,
+    setUsedVisit
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplayWarning)

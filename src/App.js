@@ -18,11 +18,10 @@ import reducers from './uploader/reducers'
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
 
 function App (props) {
-  
   return (
-   
+
     <Provider store={createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())}>
-      <Uploader {...props}/>
+      <Uploader {...props} />
     </Provider>
   )
 }

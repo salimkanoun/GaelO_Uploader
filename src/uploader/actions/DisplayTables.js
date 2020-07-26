@@ -1,4 +1,4 @@
-import { SELECT_STUDY, SERIES_READY , SELECT_SERIES, STUDIES_READY } from './actions-types'
+import { SELECT_STUDY, SERIES_READY, SELECT_SERIES, STUDIES_READY } from './actions-types'
 
 export function selectStudy (studyInstanceUID) {
   return {
@@ -21,9 +21,9 @@ export function selectSeriesReady (validSeriesInstanceUID, isSelect) {
   }
 }
 
-export function selectStudiesReady (validStudiesInstanceUID, isSelect) {
+export function selectStudiesReady (studiesInstanceUID, isSelect) {
   return {
     type: STUDIES_READY,
-    payload: { validStudiesInstanceUID: validStudiesInstanceUID, isSelect: isSelect }
+    payload: { studiesInstanceUID: studiesInstanceUID, isSelect: isSelect }
   }
 }

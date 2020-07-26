@@ -39,12 +39,12 @@ class StudiesTab extends Component {
         {
             dataField: 'selectedStudies',
             text: 'Select',
-            hidden: (!this.props.multiUpload),
+            hidden: false,
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedStudies
                 return (
-                    <input disabled={row.status !== 'Valid'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectStudiesReady(row.studiesInstanceUID, !checked) }} />
+                    <input disabled={row.status !== 'Valid'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, !checked) }} />
                 )
             }
         },
@@ -56,7 +56,7 @@ class StudiesTab extends Component {
                 && !this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'].dismissed) ?  
                 <Button onClick={() => { this.toggleCheckPatient(); }}>
                     {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
-                </Button> : <>{console.log(cell)}</>
+                </Button> : <></>
             ),
         },
         {
@@ -102,7 +102,6 @@ class StudiesTab extends Component {
     }
 
     render() {
-        console.log(this.props.multiUpload)
         return (
             <>
                 <Container fluid>
@@ -123,7 +122,7 @@ class StudiesTab extends Component {
                             <CheckPatient multiUpload={this.props.multiUpload} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} />
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} />
+                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload}/>
                         </Col>
                     </Row>
                 </Container>

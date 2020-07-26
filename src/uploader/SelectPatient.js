@@ -18,35 +18,57 @@ import { connect } from 'react-redux'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
 
+import { setExpectedVisitID } from './actions/Visits'
+
 class SelectPatient extends Component {
+
+    state = {
+        selectedType: undefined,
+        selectedVisit: undefined
+    }
 
     constructor(props) {
         super(props)
-        this.displayPatients = this.displayPatients.bind(this)
+        this.selectType = this.selectType.bind(this)
     }
 
     fetchVisitTypes() {
-        let visitType
-        this.displayPatients(visitType)
+        let visitTypeArray = []
+        this.props.visits.forEach(visit => {
+            let thisVisitType = visit.visitType
+            if (!visitTypeArray.includes(thisVisitType)) visitTypeArray.push({ value: thisVisitType, label: thisVisitType })
+        })
+        return visitTypeArray
     }
 
-    displayPatients = (visitType) => {
-        let rows = 
-        this.props.visits.forEach((index) => {
-            
+    displayPatients() {
+        let finalDisplay = []
+        this.props.visits.forEach((visit) => {
+            if (this.state.selectedType !== undefined && visit.visitType === this.state.selectedType.value) {
+                finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={(id) => this.selectPatient(visit.idVisit)} disabled={visit.isUsed}>{visit.numeroPatient}</ListGroup.Item>)
+            }
         })
+
+        return finalDisplay
+    }
+
+    selectPatient = selectedVisit => {
+        this.setState({ selectedVisit }, this.props.generateRows(selectedVisit))
+        this.props.setExpectedVisitID(selectedVisit)
+    }
+
+    selectType = selectedType => {
+        this.setState({ selectedType });
     }
 
     render() {
         return (
             <>
                 <span className='du-patp-label'>Select Visit Type</span>
-                <Select options={this.fetchVisitTypes()}>
-
-                </Select>
+                <Select options={this.fetchVisitTypes()} onChange={this.selectType} />
                 <span className='du-patp-label'>Select Patient</span>
-                <ListGroup options={this.displayPatients}>
-
+                <ListGroup variant='flush'>
+                    {this.displayPatients(this.state.selectedType)}
                 </ListGroup>
                 <span className='du-patp-label'>Comparison</span>
                 <p>We let you check if the selected patient and the imported patient informations are matching:</p>
@@ -61,7 +83,7 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
-    
+    setExpectedVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SelectPatient)

@@ -1,5 +1,4 @@
-
-export function getAets () {
+export function getPossibleImport () {
   return fetch('/scripts/get_possible_import.php')
     .then((answer) => {
       if (!answer.ok) { throw answer }
@@ -13,7 +12,7 @@ export function getAets () {
 export function logIn () {
   const formData = new FormData()
   formData.append('username', 'administrator')
-  formData.append('mdp', 'Emiliedu31')
+  formData.append('mdp', '')
   formData.append('formSent', '1')
 
   return fetch('/index.php', {
@@ -55,8 +54,7 @@ export function registerStudy () {
     })
 }
 
-export function validateUpload(idVisit, timeStamp, totalFiles, originalOrthancStudyID){
-
+export function validateUpload (idVisit, timeStamp, totalFiles, originalOrthancStudyID) {
   const formData = new FormData()
   formData.append('id_visit', idVisit)
   formData.append('timeStamp', timeStamp)
@@ -71,10 +69,9 @@ export function validateUpload(idVisit, timeStamp, totalFiles, originalOrthancSt
     body: formData
 
   }).then((answer) => {
-      if (!answer.ok) { throw answer }
-      return (answer.json())
+    if (!answer.ok) { throw answer }
+    return (answer.json())
   }).catch((error) => {
-      console.warn(error)
-    })
-
+    console.warn(error)
+  })
 }

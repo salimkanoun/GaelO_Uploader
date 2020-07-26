@@ -5,12 +5,11 @@ const initialState = {
   series: {}
 }
 
-export default function SeriesReducer(state = initialState, action) {
+export default function SeriesReducer (state = initialState, action) {
   switch (action.type) {
-
     case ADD_SERIES:
-      //Add Series to reducer
-      let seriesObject = action.payload
+      // Add Series to reducer
+      const seriesObject = action.payload
       seriesObject.numberOfInstances = Object.keys(seriesObject.instances).length
       return {
         ...state,

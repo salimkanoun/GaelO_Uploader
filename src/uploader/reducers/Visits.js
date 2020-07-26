@@ -5,14 +5,15 @@ const initialState = {
   expectedVisitID: undefined
 }
 
-export default function VisitsReducer(state = initialState, action) {
+export default function VisitsReducer (state = initialState, action) {
   switch (action.type) {
-
     case ADD_VISIT:
-      let visitObject = action.payload
+      const visitObject = action.payload
+      const newVisitArray = []
+      newVisitArray.push(...visitObject)
       return {
         ...state,
-        visits: visitObject
+        visits: newVisitArray
       }
 
     case SET_EXPECTED_VISIT_ID:
@@ -22,19 +23,23 @@ export default function VisitsReducer(state = initialState, action) {
       }
 
     case SET_USED:
-      let isUsed = action.payload.isUsed
-      let visitID = action.payload.visitID
-      let index
-      for (let visit in state.visits) {
-        if (state.visits[visit].idVisit === visitID) index = visit
+      const idVisit = action.payload.idVisit
+      const studyID = action.payload.studyID
+      const isUsed = action.payload.isUsed
+      console.log(action.payload)
+      let thisNewVisit = {}
+      const newVisitsArray = []
+      for (const thisRow in state.visits) {
+        if (state.visits[thisRow].idVisit === idVisit) {
+          thisNewVisit = state.visits[thisRow]
+        } else newVisitsArray.push(state.visits[thisRow])
       }
-      let thisNewVisit = state.visits[index]
+      (isUsed) ? thisNewVisit.studyID = studyID : delete thisNewVisit.studyID
       thisNewVisit.isUsed = isUsed
-      let newVisits = state.visits.filter(thisRowID => thisRowID !== index)
-      newVisits.push(thisNewVisit)
+      newVisitsArray.push(thisNewVisit)
       return {
         ...state,
-        visits: [newVisits]
+        visits: [...newVisitsArray]
       }
 
     default:

@@ -74,7 +74,7 @@ export default class DicomBatchUploader extends EventEmitter {
         let index = 0
         for (let batch of this.batches){
             index = ++index
-            let zipBlob = await this.zipFiles(batch)
+            let zipBlob = await this.zipFiles(batch, index)
             this.uppy.addFile(
                 {
                     name: this.timeStamp+'_'+this.idVisit+'_'+index+'_'+this.batches.length+'.zip', // file name
@@ -92,10 +92,6 @@ export default class DicomBatchUploader extends EventEmitter {
                 }
             )
 
-            let fractionZipped = index * this.batchValue
-            this.zipProgress = Math.min( fractionZipped , 100)
-            this.emitProgress()
-
             yield true
 
         }
@@ -105,7 +101,7 @@ export default class DicomBatchUploader extends EventEmitter {
     }
 
 
-    async zipFiles(files){
+    async zipFiles(files, index){
 
         let jszip = new JSZip();
         for (let file of files){
@@ -125,7 +121,13 @@ export default class DicomBatchUploader extends EventEmitter {
                     streamFiles: true
                 }
             }
-        )
+        , (progress)=>{ 
+            let fractionZipped = (index-1) * this.batchValue
+            let currentZipProgress = (this.batchValue * progress.percent)/100
+            this.zipProgress = Math.min( (fractionZipped + currentZipProgress)  , 100)
+            this.emitProgress()
+           
+        })
         let zipBlob = new Blob([uintarray], { type: 'application/zip' });
         return zipBlob
 

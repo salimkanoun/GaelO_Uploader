@@ -105,9 +105,7 @@ class CheckPatient extends Component {
         if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined && uploadDataReady) {
             let rows = []
             let currentStudy = this.props.studies[this.props.selectedStudy]
-            //SK ICI patientName peut etre undefined (donc crash ici)
-            //Peut etre plutot a gerer quand on construit l'entree study mettre les
-            //caractères recherchés pour le match
+
             currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
             currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
             
@@ -116,6 +114,7 @@ class CheckPatient extends Component {
             this.props.visits.forEach(visit => {
                 if(visit.idVisit === idVisit) expectedStudy = visit
             })
+            
             expectedStudy.patientFirstName = expectedStudy.firstName
             expectedStudy.patientLastName = expectedStudy.lastName
 

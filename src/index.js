@@ -4,8 +4,7 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
-const dotenv = require('dotenv');
-dotenv.config();
+require('dotenv').config()
 console.log(process.env)
 
 const config = {
@@ -13,7 +12,7 @@ const config = {
   developerMode: true,
   multiUpload: false,
   minNbOfInstances: 30,
-  idVisit: process.env.GAELO_VISITID,
+  idVisit: parseInt(process.env.REACT_APP_GAELO_VISITID),
   callbackOnComplete: () => {}
 }
 

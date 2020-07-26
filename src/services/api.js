@@ -46,8 +46,8 @@ export function validateUpload (idVisit, timeStamp, totalFiles, originalOrthancS
  */
 export function logIn () {
   const formData = new FormData()
-  formData.append('username', process.env.GAELO_LOGIN)
-  formData.append('mdp', process.env.GAELO_PASSWORD)
+  formData.append('username', process.env.REACT_APP_GAELO_LOGIN)
+  formData.append('mdp', process.env.REACT_APP_GAELO_PASSWORD)
   formData.append('formSent', '1')
 
   return fetch('/index.php', {
@@ -72,7 +72,7 @@ export function logIn () {
  */
 export function registerStudy () {
   const formData = new FormData()
-  formData.append('etude', process.env.GAELO_STUDY)
+  formData.append('etude', process.env.REACT_APP_GAELO_STUDY)
   formData.append('role', 'Investigator')
 
   return fetch('/root_investigator', {

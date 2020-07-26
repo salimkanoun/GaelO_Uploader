@@ -12,7 +12,7 @@ export function getPossibleImport () {
 export function logIn () {
   const formData = new FormData()
   formData.append('username', 'administrator')
-  formData.append('mdp', 'Salim1985')
+  formData.append('mdp', '')
   formData.append('formSent', '1')
 
   return fetch('/index.php', {
@@ -34,7 +34,7 @@ export function logIn () {
 
 export function registerStudy () {
   const formData = new FormData()
-  formData.append('etude', 'GATA')
+  formData.append('etude', 'test')
   formData.append('role', 'Investigator')
 
   return fetch('/root_investigator', {

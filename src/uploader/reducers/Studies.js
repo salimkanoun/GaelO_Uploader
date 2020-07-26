@@ -1,5 +1,5 @@
 // Gérer les IDs, selected study, warnings
-import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, ATTRIBUTE_ID_VISIT } from '../actions/actions-types'
+import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, ATTRIBUTE_ID_VISIT, SET_EXPECTED_VISIT_ID } from '../actions/actions-types'
 
 const initialState = {
   studies: {}
@@ -24,6 +24,17 @@ export default function StudiesReducer (state = initialState, action) {
         studies: {
           ...state.studies,
           [studyInstanceUID]: { ...state.studies[studyInstanceUID], warnings: { ...warningsStudy } }
+        }
+      }
+
+    case SET_EXPECTED_VISIT_ID:
+      studyInstanceUID = action.payload.studyInstanceUID
+      let visitID = action.payload.visitID
+
+      return {
+        studies: {
+          ...state.studies,
+          [studyInstanceUID]: { ...state.studies[studyInstanceUID], visitID: visitID }
         }
       }
 

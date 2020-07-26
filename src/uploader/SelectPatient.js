@@ -18,7 +18,7 @@ import { connect } from 'react-redux'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
 
-import { setExpectedVisitID } from './actions/Visits'
+import { setExpectedVisitID } from './actions/StudiesSeries'
 
 class SelectPatient extends Component {
 
@@ -54,7 +54,7 @@ class SelectPatient extends Component {
 
     selectPatient = selectedVisit => {
         this.setState({ selectedVisit }, this.props.generateRows(selectedVisit))
-        this.props.setExpectedVisitID(selectedVisit)
+        this.props.setExpectedVisitID(this.props.studyInstanceUID, selectedVisit)
     }
 
     selectType = selectedType => {

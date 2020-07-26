@@ -1,16 +1,9 @@
-import { ADD_VISIT, SET_USED, SET_EXPECTED_VISIT_ID } from './actions-types'
+import { ADD_VISIT, SET_USED } from './actions-types'
 
 export function addVisit (visitObject) {
   return {
     type: ADD_VISIT,
     payload: visitObject
-  }
-}
-
-export function setExpectedVisitID (idVisit) {
-  return {
-    type: SET_EXPECTED_VISIT_ID,
-    payload: idVisit
   }
 }
 

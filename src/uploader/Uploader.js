@@ -20,7 +20,8 @@ import { getPossibleImport, logIn, registerStudy, validateUpload } from '../serv
 
 import { addSeries, addStudy, addWarningsStudy } from './actions/StudiesSeries'
 import { addWarningsSeries } from './actions/Warnings'
-import { addVisit, setExpectedVisitID } from './actions/Visits'
+import { setExpectedVisitID } from './actions/StudiesSeries'
+import { addVisit } from './actions/Visits'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
@@ -308,6 +309,11 @@ class Uploader extends Component {
         //group series by studyUID
         for (let studyInstanceUID of studyUIDArray) {
 
+            //SK ICI IL MANQUE LA RECUPERATION DE L ID VISITE AFFECTE A LA STUDY
+            let visitID = this.props.studies[studyInstanceUID].visitID
+            visitID=283
+            
+
             let seriesInstanceUID = seriesObjectArrays.filter((seriesObject) => {
                 return (seriesObject.studyInstanceUID === studyInstanceUID)
             })
@@ -326,7 +332,7 @@ class Uploader extends Component {
             })
             console.log(filesToUpload)
             let uploader = new DicomMultiStudyUploader(this.uppy)
-            uploader.addStudyToUpload(282, filesToUpload)
+            uploader.addStudyToUpload(visitID, filesToUpload)
             uploader.on('upload-progress', (studyNumber, zipProgress, uploadProgress) => {
                 this.setState({
                     studyLength : studyUIDArray.length,
@@ -339,9 +345,9 @@ class Uploader extends Component {
 
             })
             uploader.on('upload-finished', (visitID, timeStamp, numberOfFiles) => {
-                this.config.callbackOnComplete()
                 console.log('Batch Finished')
                 validateUpload(visitID, timeStamp, numberOfFiles, studyOrthancID)
+                this.config.callbackOnComplete()
             })
 
             uploader.startUpload()

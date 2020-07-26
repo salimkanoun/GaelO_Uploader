@@ -1,8 +1,7 @@
-import { ADD_VISIT, SET_USED, SET_EXPECTED_VISIT_ID } from '../actions/actions-types'
+import { ADD_VISIT, SET_USED } from '../actions/actions-types'
 
 const initialState = {
-  visits: [],
-  expectedVisitID: undefined
+  visits: []
 }
 
 export default function VisitsReducer (state = initialState, action) {
@@ -14,12 +13,6 @@ export default function VisitsReducer (state = initialState, action) {
       return {
         ...state,
         visits: newVisitArray
-      }
-
-    case SET_EXPECTED_VISIT_ID:
-      return {
-        ...state,
-        expectedVisitID: action.payload
       }
 
     case SET_USED:

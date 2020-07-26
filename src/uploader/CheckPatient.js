@@ -155,7 +155,7 @@ class CheckPatient extends Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body hidden={!this.props.multiUpload} className="modal-body du-patient">
-                    <SelectPatient generateRows={this.generateRows}/>
+                    <SelectPatient studyInstanceUID={this.props.selectedStudy} generateRows={this.generateRows}/>
                 </Modal.Body>
                 <Modal.Body className="modal-body">
                     <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
@@ -189,6 +189,11 @@ const rowClasses = (row, rowIndex) => {
     }
     return 'du-studies td'
 }
+
+//SK tout l'access a ce reducer devrait se faire dans un composant 'select patient'
+//voir un 'select patient controlleur' qui repererait si on est en unique ou multiple
+//qui afficherai un select si multiple et qui recupererai les click en callback de checkpatient
+//check patient deviendrai un composant de renderer
 
 const mapStateToProps = state => {
     return {

@@ -60,7 +60,7 @@ export function logIn () {
   })
     .then((answer) => {
       if (!answer.ok) { throw answer }
-      return (answer.json())
+      return (answer)
     })
     .catch((error) => {
       console.warn(error)
@@ -85,7 +85,7 @@ export function registerStudy () {
   })
     .then((answer) => {
       if (!answer.ok) { throw answer }
-      return (answer.json())
+      return (answer)
     })
     .catch((error) => {
       console.warn(error)

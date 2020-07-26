@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
+import {toast} from 'react-toastify'
 
 import Model from '../model/Model'
 import DicomFile from '../model/DicomFile'
@@ -300,6 +301,10 @@ class Uploader extends Component {
         //Filter non selected studyUID
         studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
 
+        if(studyUIDArray.length ===0 ) {
+            toast.error('No Selected Series to Upload')
+            return
+        }
         //group series by studyUID
         for (let studyInstanceUID of studyUIDArray) {
 

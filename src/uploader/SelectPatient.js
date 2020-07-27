@@ -18,7 +18,7 @@ import { connect } from 'react-redux'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
 
-import { setExpectedVisitID } from './actions/StudiesSeries'
+import { setExpectedVisitID } from './actions/Studies'
 
 class SelectPatient extends Component {
 

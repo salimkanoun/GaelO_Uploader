@@ -20,7 +20,7 @@ import Button from 'react-bootstrap/Button'
 import BootstrapTable from 'react-bootstrap-table-next';
 import SelectPatient from './SelectPatient'
 import ButtonIgnore from './render_component/ButtonIgnore'
-import { updateWarningStudy, attributeIdVisit } from './actions/StudiesSeries'
+import { updateWarningStudy, attributeIdVisit } from './actions/Studies'
 import { setUsedVisit } from './actions/Visits'
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']

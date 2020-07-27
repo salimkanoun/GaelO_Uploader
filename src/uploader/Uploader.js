@@ -18,9 +18,9 @@ import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload } from '../services/api'
 
-import { addSeries, addStudy, addWarningsStudy } from './actions/StudiesSeries'
+import { addStudy, addWarningsStudy, setExpectedVisitID } from './actions/Studies'
+import { addSeries } from './actions/Series'
 import { addWarningsSeries } from './actions/Warnings'
-import { setExpectedVisitID } from './actions/StudiesSeries'
 import { addVisit } from './actions/Visits'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'

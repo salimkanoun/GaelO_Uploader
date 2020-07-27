@@ -3,7 +3,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 
 import { connect } from 'react-redux';
 import { updateWarningSeries } from './actions/Warnings'
-import { updateWarningStudy } from './actions/StudiesSeries'
+import { updateWarningStudy } from './actions/Studies'
 import { setUsedVisit } from './actions/Visits'
 
 import ButtonIgnore from './render_component/ButtonIgnore'

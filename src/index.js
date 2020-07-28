@@ -12,7 +12,7 @@ const config = {
   developerMode: true,
   multiUpload: false,
   minNbOfInstances: 30,
-  idVisit: parseInt(process.env.REACT_APP_GAELO_VISITID),
+  idVisit: process.env.REACT_APP_GAELO_VISITID,
   callbackOnComplete: () => {}
 }
 

@@ -14,17 +14,14 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
 import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
-
-import { setExpectedVisitID } from './actions/Visits'
 
 class SelectPatient extends Component {
 
     state = {
-        selectedType: undefined,
-        selectedVisit: undefined
+        selectedType: undefined, //Selected visit type
+        selectedVisit: undefined //Selected visit ID
     }
 
     constructor(props) {
@@ -32,6 +29,10 @@ class SelectPatient extends Component {
         this.selectType = this.selectType.bind(this)
     }
 
+    /**
+     * Fetch available visit types from Redux
+     * @return {Array}
+     */
     fetchVisitTypes() {
         let visitTypeArray = []
         this.props.visits.forEach(visit => {
@@ -41,6 +42,11 @@ class SelectPatient extends Component {
         return visitTypeArray
     }
 
+    /**
+     * Fetch patient list of selected visit type from Redux
+     * and create item for each
+     * @return {Array}
+     */
     displayPatients() {
         let finalDisplay = []
         this.props.visits.forEach((visit) => {
@@ -48,17 +54,24 @@ class SelectPatient extends Component {
                 finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={(id) => this.selectPatient(visit.idVisit)} disabled={visit.isUsed}>{visit.numeroPatient}</ListGroup.Item>)
             }
         })
-
         return finalDisplay
     }
 
-    selectPatient = selectedVisit => {
-        this.setState({ selectedVisit }, this.props.generateRows(selectedVisit))
-        this.props.setExpectedVisitID(selectedVisit)
-    }
-
+    /**
+     * Update selectedType state of visit
+     * @param {String} selectedType 
+     */
     selectType = selectedType => {
         this.setState({ selectedType });
+    }    
+    
+    /**
+     * Update selectedVisit state and call parent function
+     * to generate rows to check
+     * @param {String} selectedVisit 
+     */
+    selectPatient (selectedVisit) {
+        this.setState({ selectedVisit }, () => this.props.generateRows(selectedVisit))
     }
 
     render() {
@@ -71,7 +84,7 @@ class SelectPatient extends Component {
                     {this.displayPatients(this.state.selectedType)}
                 </ListGroup>
                 <span className='du-patp-label'>Comparison</span>
-                <p>We let you check if the selected patient and the imported patient informations are matching:</p>
+                <p>Please check if the selected patient and the imported patient informations are matching:</p>
             </>
         )
     }
@@ -82,8 +95,6 @@ const mapStateToProps = state => {
         visits: state.Visits.visits
     }
 }
-const mapDispatchToProps = {
-    setExpectedVisitID
-}
+const mapDispatchToProps = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(SelectPatient)

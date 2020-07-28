@@ -1,13 +1,15 @@
-import { ADD_VISIT, SET_USED, SET_EXPECTED_VISIT_ID } from '../actions/actions-types'
+import { ADD_VISIT, SET_USED } from '../actions/actions-types'
 
 const initialState = {
-  visits: [],
-  expectedVisitID: undefined
+  visits: []
 }
+
+/* MULTIUPLOAD mode reducer */
 
 export default function VisitsReducer (state = initialState, action) {
   switch (action.type) {
     case ADD_VISIT:
+      // Add visit to reducer
       const visitObject = action.payload
       const newVisitArray = []
       newVisitArray.push(...visitObject)
@@ -16,25 +18,23 @@ export default function VisitsReducer (state = initialState, action) {
         visits: newVisitArray
       }
 
-    case SET_EXPECTED_VISIT_ID:
-      return {
-        ...state,
-        expectedVisitID: action.payload
-      }
-
     case SET_USED:
+      // Set used state of given visit
       const idVisit = action.payload.idVisit
       const studyID = action.payload.studyID
       const isUsed = action.payload.isUsed
       console.log(action.payload)
       let thisNewVisit = {}
       const newVisitsArray = []
+      // Find idVist in state
       for (const thisRow in state.visits) {
+        // Once found, save it in thisNewVisit
         if (state.visits[thisRow].idVisit === idVisit) {
           thisNewVisit = state.visits[thisRow]
-        } else newVisitsArray.push(state.visits[thisRow])
+        } else newVisitsArray.push(state.visits[thisRow]) // Save all the other rows in a new array
       }
-      (isUsed) ? thisNewVisit.studyID = studyID : delete thisNewVisit.studyID
+      if (isUsed) thisNewVisit.studyID = studyID
+      else delete thisNewVisit.studyID
       thisNewVisit.isUsed = isUsed
       newVisitsArray.push(thisNewVisit)
       return {

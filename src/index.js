@@ -4,13 +4,19 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
+require('dotenv').config()
+console.log(process.env)
+
 const config = {
   // Declare default config
   developerMode: true,
   multiUpload: false,
   minNbOfInstances: 30,
-  idVisit: 155,
-  callbackOnComplete: () => {}
+  idVisit: process.env.REACT_APP_GAELO_VISITID,
+  callbackOnComplete: () => {},
+  callbackOnStartAction: ()=>{},
+  callbackOnUploadComplete: ()=>{},
+  callbackOnValidationSent: ()=>{}
 }
 
 const container = document.getElementById('root')

@@ -11,7 +11,6 @@ const initialState = {
 export default function DisplayTablesReducer (state = initialState, action) {
   switch (action.type) {
     case SELECT_STUDY:
-      // SK ICI PREVOIR LE MEME TYPE DE FONCTION QUE SERIES POUR LE MULTIUPLOADER
       return {
         ...state,
         selectedStudy: action.payload,

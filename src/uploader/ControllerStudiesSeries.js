@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import Row from 'react-bootstrap/Row'
@@ -25,8 +25,9 @@ class ControllerStudiesSeries extends Component {
   /* STUDIES TABLE CONTROLLER */
 
   /**
-     * Fetch studies from Redux State to display in table
-     */
+   * Fetch studies from Redux State to display in table
+   * @return {Object}
+   */
   buildStudiesRows () {
     const studies = []
     if (Object.keys(this.props.studies).length > 0) {
@@ -40,8 +41,10 @@ class ControllerStudiesSeries extends Component {
   }
 
   /**
-     * Check the study status according to its warnings and its series' warnings
-     */
+   * Check the study status according to its warnings and its series' warnings
+   * @param {Object} study
+   * @return {Boolean}
+   */
   studyWarningsPassed (study) {
     let studyStatus = 'Valid'
     // Check for warnings in study
@@ -67,9 +70,10 @@ class ControllerStudiesSeries extends Component {
   /* SERIES TABLE CONTROLLER */
 
   /**
-     * Add status and selection state to previous information from the selected study's series
-     * in order to build table
-     */
+   * Add status and selection state to previous information from the selected study's series
+   * in order to build table
+   * @return {Array}
+   */
   buildSeriesRows () {
     if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
       const seriesArray = []
@@ -91,8 +95,10 @@ class ControllerStudiesSeries extends Component {
   }
 
   /**
-     * Check if the series warnings have been all passed
-     */
+   * Check if the series warnings have been all passed
+   * @param {Object} series
+   * @return {Boolean}
+   */
   seriesWarningsPassed (series) {
     for (const warning in this.props.warningsSeries[series]) {
       if (!this.props.warningsSeries[series][warning].dismissed) {

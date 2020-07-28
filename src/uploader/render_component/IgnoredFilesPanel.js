@@ -52,12 +52,12 @@ export default class IgnoredFilesPanel extends Component {
     render() {
         return (
             <Modal show={this.props.display} onHide={this.props.closeListener}>
-                <Modal.Header class="modal-header" closeButton>
-                    <Modal.Title class="modal-title"> 
+                <Modal.Header className="modal-header" closeButton>
+                    <Modal.Title className="modal-title"> 
                         <Badge variant='warning'> {Object.keys(this.props.dataIgnoredFiles).length} File(s) Ignored</Badge>
                     </Modal.Title>
                 </Modal.Header>
-                <Modal.Body class="modal-body">
+                <Modal.Body className="modal-body">
                     <BootstrapTable
                         keyField='key'
                         bodyClasses="du-ignored-files-modal td"

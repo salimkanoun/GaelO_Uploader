@@ -4,7 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import { connect } from 'react-redux';
 import { updateWarningSeries } from './actions/Warnings'
 import { updateWarningStudy } from './actions/Studies'
-import { setUsedVisit } from './actions/Visits'
+import { setUsedVisit } from './actions/Visits'
 
 import ButtonIgnore from './render_component/ButtonIgnore'
 
@@ -18,7 +18,7 @@ class DisplayWarning extends Component {
         },
         {
             dataField: 'key',
-            isDummyField: true,
+            text: '',
             hidden: true,
         },
         {
@@ -37,7 +37,7 @@ class DisplayWarning extends Component {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => (
-                <ButtonIgnore
+                <ButtonIgnore hidden={(row.key === 'NOT_EXPECTED_VISIT' && !row.dismissed)}
                     warning={this.getWarningStatus(row)}
                     onClick={() => {
                         if (this.props.type === 'series')
@@ -46,9 +46,7 @@ class DisplayWarning extends Component {
                             if (this.props.multiUpload && row.idVisit !== undefined) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
                         }
-                            
-                    }}
-                />
+                    }}/>
             ),
         },
     ]

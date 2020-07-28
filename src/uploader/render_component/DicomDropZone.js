@@ -40,7 +40,7 @@ export default class DicomDropZone extends Component {
                     <section>
                         <div className={this.getClasses()} {...getRootProps()}>
                             <input directory="" webkitdirectory="" {...getInputProps()} />
-                        <p> {this.props.isParsingFiles ? 'Parsing '+( Math.round(( (this.props.fileParsed+this.props.fileIgnored) / this.props.fileLoaded) *100) )+'%' : 'Drag\'n drop some files here, or click to select files'}</p>
+                        <p> {this.props.isParsingFiles ? 'Parsing '+( Math.round(( (this.props.fileParsed+this.props.fileIgnored) / this.props.fileLoaded) *100) )+'%' : 'Drag\'n drop Dicom files here, or click to select folder'}</p>
                         </div>
                     </section>
                 )}

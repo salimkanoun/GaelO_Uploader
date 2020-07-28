@@ -1,16 +1,15 @@
-// Gérer les IDs, selected study, warnings
-import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, CHECK_PATIENT_DATA } from '../actions/actions-types'
+import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, SET_VISIT_ID } from '../actions/actions-types'
 
 const initialState = {
   studies: {}
 }
 
-export default function StudiesReducer(state = initialState, action) {
+export default function StudiesReducer (state = initialState, action) {
   let studyInstanceUID
   switch (action.type) {
-
     case ADD_STUDY:
-      let studyObject = action.payload
+      // Add study to reducer
+      const studyObject = action.payload
       return {
         studies: {
           ...state.studies,
@@ -19,8 +18,9 @@ export default function StudiesReducer(state = initialState, action) {
       }
 
     case ADD_WARNING_STUDY:
+      // Add warning to given study in reducer
       studyInstanceUID = action.payload.studyInstanceUID
-      let warningsStudy = action.payload.warnings
+      const warningsStudy = action.payload.warnings
       return {
         studies: {
           ...state.studies,
@@ -28,9 +28,22 @@ export default function StudiesReducer(state = initialState, action) {
         }
       }
 
-    case UPDATE_WARNING_STUDY:
+    case SET_VISIT_ID:
+      // MULTIUPLOAD mode
+      // Set idVisit for given study in reducer
       studyInstanceUID = action.payload.studyInstanceUID
-      let studyWarning = action.payload.warningToUpdate.key
+      const idVisit = action.payload.idVisit
+      return {
+        studies: {
+          ...state.studies,
+          [studyInstanceUID]: { ...state.studies[studyInstanceUID], idVisit: idVisit }
+        }
+      }
+
+    case UPDATE_WARNING_STUDY:
+      // Update given study warning in reducer
+      studyInstanceUID = action.payload.studyInstanceUID
+      const studyWarning = action.payload.warningToUpdate.key
       return {
         ...state,
         studies: {
@@ -48,25 +61,10 @@ export default function StudiesReducer(state = initialState, action) {
         }
       }
 
-
-    /*case VALIDATE_CHECK_PATIENT: {
-        let studyInstanceUID = action.payload
-        let newWarningsStudies = state.warningsStudies
-        console.log(studyInstanceUID)
-        newWarningsStudies[studyInstanceUID]['NOT_EXPECTED_VISIT'].dismissed = true
-        return {
-            ...state,
-            warningsStudies: { ...newWarningsStudies },
-        }
-    }*/
-
     default:
       return state
   }
 }
-
-//Manage study warnings here
-//Add expected data
-//IsValidatedPatient
-//VisitID
-//IsKnownFromServer
+// EO Add expected data
+// IsValidatedPatient
+// IsKnownFromServer

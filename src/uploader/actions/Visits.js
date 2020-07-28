@@ -1,5 +1,10 @@
-import { ADD_VISIT, SET_USED, SET_EXPECTED_VISIT_ID } from './actions-types'
+import { ADD_VISIT, SET_USED } from './actions-types'
+/* MULTIUPLOAD mode functions */
 
+/**
+ * Add visit to Redux visits Object
+ * @param {Object} visitObject
+ */
 export function addVisit (visitObject) {
   return {
     type: ADD_VISIT,
@@ -7,16 +12,15 @@ export function addVisit (visitObject) {
   }
 }
 
-export function setExpectedVisitID(visitID) {
+/**
+ * Update Redux passed visit status
+ * @param {String} idVisit
+ * @param {String} studyID
+ * @param {Boolean} isUsed new status of visit
+ */
+export function setUsedVisit (idVisit, studyID, isUsed) {
   return {
-    type: SET_EXPECTED_VISIT_ID,
-    payload: visitID
+    type: SET_USED,
+    payload: { idVisit: idVisit, studyID: studyID, isUsed: isUsed }
   }
 }
-
-export function setUsedVisit (visitID, isUsed) {
-    return {
-      type: SET_USED,
-      payload: {visitID: visitID, isUsed:isUsed}
-    }
-  }

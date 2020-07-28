@@ -17,7 +17,6 @@ export default class DicomMultiStudyUploader extends EventEmitter {
 
     uploadNextStudy(){
         let uploader = this.uploadIterator.next().value
-        console.log(uploader)
         uploader.on('batch-upload-done', (timeStamp, numberOfFiles)=>{
             if(this.studyNumber === Object.keys(this.visitsToUpload).length ){
                 this.emit('upload-finished', this.currentVisitID, timeStamp, numberOfFiles)

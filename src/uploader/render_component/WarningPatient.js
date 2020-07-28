@@ -20,11 +20,9 @@ export default class WarningPatient extends Component {
     return (
       <>
         <Alert variant='warning' show={this.props.show} dismissible onClose={this.props.closeListener}>
-                    Please, check/select the patient. The imported patient informations do not correspond with the expected ones.
+          Please, check/select the patient. The imported patient informations do not correspond with the expected ones.
         </Alert>
       </>
     )
   }
 }
-
-// SK CE COMPONENT PEUT ETRE ETENDU AUX WARNING SERIES (en jouant sur des constante pour la string)

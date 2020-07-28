@@ -1,6 +1,6 @@
 {
   "name": "gaelo-uploader",
-  "version": "0.1.0",
+  "version": "0.2.5",
   "main": "index.js",
   "proxy": "http://localhost:8080",
   "private": false,
@@ -15,6 +15,7 @@
     "bootstrap": "^4.5.0",
     "crypto-js": "^4.0.0",
     "dicom-parser": "^1.8.5",
+    "dotenv": "^8.2.0",
     "jszip": "^3.5.0",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
@@ -25,6 +26,7 @@
     "react-redux": "^7.2.0",
     "react-scripts": "3.4.1",
     "react-select": "^3.1.0",
+    "react-toastify": "^6.0.8",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "regenerator-runtime": "^0.13.5",

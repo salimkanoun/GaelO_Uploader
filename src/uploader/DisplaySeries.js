@@ -18,7 +18,7 @@ import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
-//Redux
+
 import { connect } from 'react-redux';
 import { selectSeriesReady, selectSeries } from './actions/DisplayTables'
 

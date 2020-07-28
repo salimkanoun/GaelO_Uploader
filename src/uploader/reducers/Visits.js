@@ -1,40 +1,45 @@
-import { ADD_VISIT, SET_USED, SET_EXPECTED_VISIT_ID } from '../actions/actions-types'
+import { ADD_VISIT, SET_USED } from '../actions/actions-types'
 
 const initialState = {
-  visits: [],
-  expectedVisitID: undefined
+  visits: []
 }
 
-export default function VisitsReducer(state = initialState, action) {
+/* MULTIUPLOAD mode reducer */
+
+export default function VisitsReducer (state = initialState, action) {
   switch (action.type) {
-
     case ADD_VISIT:
-      let visitObject = action.payload
+      // Add visit to reducer
+      const visitObject = action.payload
+      const newVisitArray = []
+      newVisitArray.push(...visitObject)
       return {
         ...state,
-        visits: visitObject
-      }
-
-    case SET_EXPECTED_VISIT_ID:
-      return {
-        ...state,
-        expectedVisitID: action.payload
+        visits: newVisitArray
       }
 
     case SET_USED:
-      let isUsed = action.payload.isUsed
-      let visitID = action.payload.visitID
-      let index
-      for (let visit in state.visits) {
-        if (state.visits[visit].idVisit === visitID) index = visit
+      // Set used state of given visit
+      const idVisit = action.payload.idVisit
+      const studyID = action.payload.studyID
+      const isUsed = action.payload.isUsed
+      console.log(action.payload)
+      let thisNewVisit = {}
+      const newVisitsArray = []
+      // Find idVist in state
+      for (const thisRow in state.visits) {
+        // Once found, save it in thisNewVisit
+        if (state.visits[thisRow].idVisit === idVisit) {
+          thisNewVisit = state.visits[thisRow]
+        } else newVisitsArray.push(state.visits[thisRow]) // Save all the other rows in a new array
       }
-      let thisNewVisit = state.visits[index]
+      if (isUsed) thisNewVisit.studyID = studyID
+      else delete thisNewVisit.studyID
       thisNewVisit.isUsed = isUsed
-      let newVisits = state.visits.filter(thisRowID => thisRowID !== index)
-      newVisits.push(thisNewVisit)
+      newVisitsArray.push(thisNewVisit)
       return {
         ...state,
-        visits: [newVisits]
+        visits: [...newVisitsArray]
       }
 
     default:

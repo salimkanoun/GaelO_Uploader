@@ -27,7 +27,7 @@ import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
 class StudiesTab extends Component {
 
     state = {
-        isCheck: false,
+        isToggled: false, //Status of CheckPatient modal
     }
 
     constructor(props) {
@@ -39,12 +39,12 @@ class StudiesTab extends Component {
         {
             dataField: 'selectedStudies',
             text: 'Select',
-            hidden: (!this.props.multiUpload),
+            hidden: false,
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedStudies
                 return (
-                    <input disabled={row.status !== 'Valid'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectStudiesReady(row.studiesInstanceUID, !checked) }} />
+                    <input disabled={row.status !== 'Valid'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, !checked) }} />
                 )
             }
         },
@@ -56,7 +56,7 @@ class StudiesTab extends Component {
                 && !this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'].dismissed) ?  
                 <Button onClick={() => { this.toggleCheckPatient(); }}>
                     {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
-                </Button> : <>{console.log(cell)}</>
+                </Button> : <></>
             ),
         },
         {
@@ -98,37 +98,33 @@ class StudiesTab extends Component {
      * Toggle modal 'CheckPatient' of given row 
      */
     toggleCheckPatient() {
-        this.setState((state) => { return { isCheck: !state.isCheck } })
+        this.setState((state) => { return { isToggled: !state.isToggled } })
     }
 
     render() {
-        console.log(this.props.multiUpload)
         return (
-            <>
-                <Container fluid>
-                    <span className='title'>Studies</span>
-                    <Row>
-                        <Col xs={12} md={8}>
-                            <BootstrapTable
-                                keyField='studyInstanceUID'
-                                classes="table table-borderless"
-                                bodyClasses="du-studies-tbody"
-                                headerClasses="du-studies th"
-                                rowClasses={rowClasses}
-                                data={this.props.studiesRows}
-                                columns={this.columns}
-                                selectRow={this.selectRow}
-                                wrapperClasses="table-responsive"
-                            />
-                            <CheckPatient multiUpload={this.props.multiUpload} show={this.state.isCheck} closeListener={() => this.toggleCheckPatient()} />
-                        </Col>
-                        <Col xs={6} md={4}>
-                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} />
-                        </Col>
-                    </Row>
-                </Container>
-
-            </>
+            <Container fluid>
+                <span className='title'>Studies</span>
+                <Row>
+                    <Col xs={12} md={8}>
+                        <BootstrapTable
+                            keyField='studyInstanceUID'
+                            classes="table table-borderless"
+                            bodyClasses="du-studies-tbody"
+                            headerClasses="du-studies th"
+                            rowClasses={rowClasses}
+                            data={this.props.studiesRows}
+                            columns={this.columns}
+                            selectRow={this.selectRow}
+                            wrapperClasses="table-responsive"
+                        />
+                        <CheckPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} />
+                    </Col>
+                    <Col xs={6} md={4}>
+                        <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload}/>
+                    </Col>
+                </Row>
+            </Container>
         )
     }
 }

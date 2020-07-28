@@ -324,8 +324,6 @@ class Uploader extends Component {
             let filesToUpload = []
 
             seriesInstanceUID.forEach(seriesObject => {
-                console.log(studyInstanceUID)
-                console.log(seriesObject.seriesInstanceUID)
                 let getSeriesObject = this.uploadModel.getStudy(studyInstanceUID).getSeries(seriesObject.seriesInstanceUID)
                 let fileArray = getSeriesObject.getArrayInstances().map(instance => {
                     return instance.getFile()
@@ -346,8 +344,9 @@ class Uploader extends Component {
             })
             uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles) => {
                 console.log('Batch Finished')
+                this.config.callbackOnUploadComplete()
                 validateUpload(idVisit, timeStamp, numberOfFiles, studyOrthancID)
-                this.config.callbackOnComplete()
+                this.config.callbackOnValidationSent()
             })
 
             uploader.startUpload()

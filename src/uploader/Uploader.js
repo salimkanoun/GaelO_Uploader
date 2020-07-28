@@ -101,6 +101,11 @@ class Uploader extends Component {
      */
     addFile(files) {
 
+        if(this.state.fileParsed ===0){
+            //At first drop notify user started action
+            this.config.callbackOnStartAction()
+        }
+
         //Add number of files to be parsed to the previous number (incremental parsing)
         this.setState((previousState) => {
             return {

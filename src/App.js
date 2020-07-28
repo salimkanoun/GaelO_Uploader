@@ -11,7 +11,7 @@ import { ToastContainer } from 'react-toastify'
 import 'bootstrap/dist/css/bootstrap.min.css'
 // Boostrap Table CSS
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
-//Toastify CSS
+// Toastify CSS
 import 'react-toastify/dist/ReactToastify.css'
 // Custom CSS
 import './style/dicomupload.css'
@@ -25,14 +25,14 @@ function App (props) {
   return (
     <Provider store={createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())}>
       <ToastContainer
-        position="top-right"
+        position='top-right'
         autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
         rtl={false}
         pauseOnHover
-        />
+      />
       <Uploader {...props} />
     </Provider>
   )

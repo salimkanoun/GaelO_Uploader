@@ -28,7 +28,7 @@ class ControllerStudiesSeries extends Component {
    * Fetch studies from Redux State to display in table
    * @return {Object}
    */
-  buildStudiesRows() {
+  buildStudiesRows () {
     const studies = []
     if (Object.keys(this.props.studies).length > 0) {
       for (const study in this.props.studies) {
@@ -45,7 +45,7 @@ class ControllerStudiesSeries extends Component {
    * @param {Object} study
    * @return {Boolean}
    */
-  studyWarningsPassed(study) {
+  studyWarningsPassed (study) {
     let studyStatus = 'Valid'
     // Check for warnings in study
     for (const warning in this.props.studies[study].warnings) {
@@ -74,7 +74,7 @@ class ControllerStudiesSeries extends Component {
    * in order to build table
    * @return {Array}
    */
-  buildSeriesRows() {
+  buildSeriesRows () {
     if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
       const seriesArray = []
       const seriesToDisplay = Object.keys(this.props.studies[this.props.selectedStudy].series)
@@ -99,7 +99,7 @@ class ControllerStudiesSeries extends Component {
    * @param {Object} series
    * @return {Boolean}
    */
-  seriesWarningsPassed(series) {
+  seriesWarningsPassed (series) {
     for (const warning in this.props.warningsSeries[series]) {
       if (!this.props.warningsSeries[series][warning].dismissed) {
         return false
@@ -108,7 +108,7 @@ class ControllerStudiesSeries extends Component {
     return true
   }
 
-  render() {
+  render () {
     return (
       <>
         <Row>

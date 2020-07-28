@@ -2,9 +2,9 @@ import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, SET_VISIT_ID } from
 
 /**
  * Add study to Redux studies Object
- * @param {Object} studyObject 
+ * @param {Object} studyObject
  */
-export function addStudy(studyObject) {
+export function addStudy (studyObject) {
   return {
     type: ADD_STUDY,
     payload: studyObject
@@ -13,10 +13,10 @@ export function addStudy(studyObject) {
 
 /**
  * Add warnings to Redux studies after check
- * @param {String} studyInstanceUID 
- * @param {Object} warnings 
+ * @param {String} studyInstanceUID
+ * @param {Object} warnings
  */
-export function addWarningsStudy(studyInstanceUID, warnings) {
+export function addWarningsStudy (studyInstanceUID, warnings) {
   return {
     type: ADD_WARNING_STUDY,
     payload: { studyInstanceUID: studyInstanceUID, warnings: warnings }
@@ -24,11 +24,11 @@ export function addWarningsStudy(studyInstanceUID, warnings) {
 }
 
 /**
- * Update Redux passed study warning 
- * @param {Object} warningToUpdate 
- * @param {String} studyInstanceUID 
+ * Update Redux passed study warning
+ * @param {Object} warningToUpdate
+ * @param {String} studyInstanceUID
  */
-export function updateWarningStudy(warningToUpdate, studyInstanceUID) {
+export function updateWarningStudy (warningToUpdate, studyInstanceUID) {
   return {
     type: UPDATE_WARNING_STUDY,
     payload: { warningToUpdate: warningToUpdate, studyInstanceUID: studyInstanceUID }
@@ -38,10 +38,10 @@ export function updateWarningStudy(warningToUpdate, studyInstanceUID) {
 /**
  * MULTIUPLOAD mode function only
  * Set idVisit to the passed study awaiting check
- * @param {String} studyInstanceUID 
- * @param {String} idVisit 
+ * @param {String} studyInstanceUID
+ * @param {String} idVisit
  */
-export function setVisitID(studyInstanceUID, idVisit) {
+export function setVisitID (studyInstanceUID, idVisit) {
   return {
     type: SET_VISIT_ID,
     payload: {

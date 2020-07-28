@@ -16,7 +16,7 @@ import React, { Component } from 'react'
 import Alert from 'react-bootstrap/Alert'
 
 export default class WarningPatient extends Component {
-  render() {
+  render () {
     return (
       <>
         <Alert variant='warning' show={this.props.show} dismissible onClose={this.props.closeListener}>

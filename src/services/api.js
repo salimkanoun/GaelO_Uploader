@@ -14,10 +14,10 @@ export function getPossibleImport () {
 
 /**
  * Trigger upload validation API after upload done for server side processing
- * @param {int} idVisit 
- * @param {int} timeStamp 
- * @param {int} totalFiles 
- * @param {string} originalOrthancStudyID 
+ * @param {int} idVisit
+ * @param {int} timeStamp
+ * @param {int} totalFiles
+ * @param {string} originalOrthancStudyID
  */
 export function validateUpload (idVisit, timeStamp, totalFiles, originalOrthancStudyID) {
   const formData = new FormData()
@@ -91,5 +91,3 @@ export function registerStudy () {
       console.warn(error)
     })
 }
-
-

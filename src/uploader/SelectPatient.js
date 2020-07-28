@@ -20,8 +20,8 @@ import Select from 'react-select'
 class SelectPatient extends Component {
 
     state = {
-        selectedType: undefined,
-        selectedVisit: undefined
+        selectedType: undefined, //Selected visit type
+        selectedVisit: undefined //Selected visit ID
     }
 
     constructor(props) {
@@ -29,6 +29,10 @@ class SelectPatient extends Component {
         this.selectType = this.selectType.bind(this)
     }
 
+    /**
+     * Fetch available visit types from Redux
+     * @return {Array}
+     */
     fetchVisitTypes() {
         let visitTypeArray = []
         this.props.visits.forEach(visit => {
@@ -38,6 +42,11 @@ class SelectPatient extends Component {
         return visitTypeArray
     }
 
+    /**
+     * Fetch patient list of selected visit type from Redux
+     * and create item for each
+     * @return {Array}
+     */
     displayPatients() {
         let finalDisplay = []
         this.props.visits.forEach((visit) => {
@@ -45,17 +54,24 @@ class SelectPatient extends Component {
                 finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={(id) => this.selectPatient(visit.idVisit)} disabled={visit.isUsed}>{visit.numeroPatient}</ListGroup.Item>)
             }
         })
-
         return finalDisplay
     }
 
-    selectPatient (selectedVisit) {
-        this.setState({ selectedVisit }, () => this.props.generateRows(selectedVisit))
-        this.props.selectedVisit(selectedVisit)
-    }
-
+    /**
+     * Update selectedType state of visit
+     * @param {String} selectedType 
+     */
     selectType = selectedType => {
         this.setState({ selectedType });
+    }    
+    
+    /**
+     * Update selectedVisit state and call parent function
+     * to generate rows to check
+     * @param {String} selectedVisit 
+     */
+    selectPatient (selectedVisit) {
+        this.setState({ selectedVisit }, () => this.props.generateRows(selectedVisit))
     }
 
     render() {
@@ -79,7 +95,6 @@ const mapStateToProps = state => {
         visits: state.Visits.visits
     }
 }
-const mapDispatchToProps = {
-}
+const mapDispatchToProps = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(SelectPatient)

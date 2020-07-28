@@ -25,9 +25,10 @@ class ControllerStudiesSeries extends Component {
   /* STUDIES TABLE CONTROLLER */
 
   /**
-     * Fetch studies from Redux State to display in table
-     */
-  buildStudiesRows () {
+   * Fetch studies from Redux State to display in table
+   * @return {Object}
+   */
+  buildStudiesRows() {
     const studies = []
     if (Object.keys(this.props.studies).length > 0) {
       for (const study in this.props.studies) {
@@ -40,9 +41,11 @@ class ControllerStudiesSeries extends Component {
   }
 
   /**
-     * Check the study status according to its warnings and its series' warnings
-     */
-  studyWarningsPassed (study) {
+   * Check the study status according to its warnings and its series' warnings
+   * @param {Object} study
+   * @return {Boolean}
+   */
+  studyWarningsPassed(study) {
     let studyStatus = 'Valid'
     // Check for warnings in study
     for (const warning in this.props.studies[study].warnings) {
@@ -67,10 +70,11 @@ class ControllerStudiesSeries extends Component {
   /* SERIES TABLE CONTROLLER */
 
   /**
-     * Add status and selection state to previous information from the selected study's series
-     * in order to build table
-     */
-  buildSeriesRows () {
+   * Add status and selection state to previous information from the selected study's series
+   * in order to build table
+   * @return {Array}
+   */
+  buildSeriesRows() {
     if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
       const seriesArray = []
       const seriesToDisplay = Object.keys(this.props.studies[this.props.selectedStudy].series)
@@ -91,9 +95,11 @@ class ControllerStudiesSeries extends Component {
   }
 
   /**
-     * Check if the series warnings have been all passed
-     */
-  seriesWarningsPassed (series) {
+   * Check if the series warnings have been all passed
+   * @param {Object} series
+   * @return {Boolean}
+   */
+  seriesWarningsPassed(series) {
     for (const warning in this.props.warningsSeries[series]) {
       if (!this.props.warningsSeries[series][warning].dismissed) {
         return false
@@ -102,7 +108,7 @@ class ControllerStudiesSeries extends Component {
     return true
   }
 
-  render () {
+  render() {
     return (
       <>
         <Row>

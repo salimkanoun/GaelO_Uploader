@@ -4,9 +4,12 @@ const initialState = {
   visits: []
 }
 
+/* MULTIUPLOAD mode reducer */
+
 export default function VisitsReducer(state = initialState, action) {
   switch (action.type) {
     case ADD_VISIT:
+      // Add visit to reducer
       const visitObject = action.payload
       const newVisitArray = []
       newVisitArray.push(...visitObject)
@@ -16,6 +19,7 @@ export default function VisitsReducer(state = initialState, action) {
       }
 
     case SET_USED:
+      // Set used state of given visit
       const idVisit = action.payload.idVisit
       const studyID = action.payload.studyID
       const isUsed = action.payload.isUsed

@@ -12,6 +12,8 @@ export const SELECT_STUDY = 'SELECT_STUDY'
 export const SELECT_SERIES = 'SELECT_SERIES'
 export const SERIES_READY = 'SERIES_READY'
 export const STUDIES_READY = 'STUDIES_READY'
+
+/* MULTIUPLOAD mode */
 // Visits Actions
 export const ADD_VISIT = 'ADD_VISIT'
 export const SET_VISIT_ID = 'SET_VISIT_ID'

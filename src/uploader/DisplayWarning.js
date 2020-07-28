@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { updateWarningSeries } from './actions/Warnings'
 import { updateWarningStudy } from './actions/Studies'
 import { setUsedVisit } from './actions/Visits'
-
 import ButtonIgnore from './render_component/ButtonIgnore'
 
 class DisplayWarning extends Component {
@@ -18,7 +17,6 @@ class DisplayWarning extends Component {
         },
         {
             dataField: 'key',
-            text: '',
             hidden: true,
         },
         {
@@ -53,6 +51,8 @@ class DisplayWarning extends Component {
 
     /**
      * Get warning status of selected row 
+     * @param {Object} row
+     * @return {Boolean}
      */
     getWarningStatus(row) {
         if (this.props.type === 'study')
@@ -63,6 +63,7 @@ class DisplayWarning extends Component {
 
     /**
      * Build the tab rows according to the type of object
+     * @return {Array}
      */
     buildRow() {
         if (this.props.selectionID !== undefined && this.props.selectionID !== null) {
@@ -79,7 +80,10 @@ class DisplayWarning extends Component {
                     return rows
                 case 'series':
                     for (let i in this.props.warningsSeries[this.props.selectionID]) {
-                        rows.push({ seriesInstanceUID: this.props.selectionID, ...this.props.warningsSeries[this.props.selectionID][i] })
+                        rows.push({ 
+                            seriesInstanceUID: this.props.selectionID, 
+                            ...this.props.warningsSeries[this.props.selectionID][i] 
+                        })
                     }
                     return rows
                 default:
@@ -88,7 +92,6 @@ class DisplayWarning extends Component {
         } else {
             return []
         }
-
     }
 
     render() {

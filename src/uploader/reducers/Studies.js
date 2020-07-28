@@ -1,4 +1,3 @@
-// Gérer les IDs, selected study, warnings
 import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, SET_VISIT_ID } from '../actions/actions-types'
 
 const initialState = {
@@ -9,6 +8,7 @@ export default function StudiesReducer (state = initialState, action) {
   let studyInstanceUID
   switch (action.type) {
     case ADD_STUDY:
+      // Add study to reducer
       const studyObject = action.payload
       return {
         studies: {
@@ -18,6 +18,7 @@ export default function StudiesReducer (state = initialState, action) {
       }
 
     case ADD_WARNING_STUDY:
+      // Add warning to given study in reducer
       studyInstanceUID = action.payload.studyInstanceUID
       const warningsStudy = action.payload.warnings
       return {
@@ -28,6 +29,8 @@ export default function StudiesReducer (state = initialState, action) {
       }
 
     case SET_VISIT_ID:
+      // MULTIUPLOAD mode
+      // Set idVisit for given study in reducer
       studyInstanceUID = action.payload.studyInstanceUID
       let idVisit = action.payload.idVisit
       return {
@@ -38,6 +41,7 @@ export default function StudiesReducer (state = initialState, action) {
       }
 
     case UPDATE_WARNING_STUDY:
+      // Update given study warning in reducer 
       studyInstanceUID = action.payload.studyInstanceUID
       const studyWarning = action.payload.warningToUpdate.key
       return {
@@ -61,9 +65,6 @@ export default function StudiesReducer (state = initialState, action) {
       return state
   }
 }
-
-// Manage study warnings here
-// Add expected data
+// EO Add expected data
 // IsValidatedPatient
-// VisitID
 // IsKnownFromServer

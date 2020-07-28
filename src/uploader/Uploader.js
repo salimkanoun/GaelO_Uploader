@@ -289,8 +289,6 @@ class Uploader extends Component {
     async onUploadClick(e) {
 
         //build array of series object to be uploaded
-        console.log(this.props.seriesReady)
-        console.log(this.props.studiesReady)
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
             return this.props.series[seriesUID]
         })
@@ -311,10 +309,7 @@ class Uploader extends Component {
         //group series by studyUID
         for (let studyInstanceUID of studyUIDArray) {
 
-            //SK ICI IL MANQUE LA RECUPERATION DE L ID VISITE AFFECTE A LA STUDY
-            let idVisit = this.props.studies[studyInstanceUID].idVisit
-            idVisit=283
-            
+            let idVisit = this.props.studies[studyInstanceUID].idVisit 
 
             let seriesInstanceUID = seriesObjectArrays.filter((seriesObject) => {
                 return (seriesObject.studyInstanceUID === studyInstanceUID)
@@ -332,7 +327,7 @@ class Uploader extends Component {
                 })
                 filesToUpload.push(...fileArray)
             })
-            console.log(filesToUpload)
+
             let uploader = new DicomMultiStudyUploader(this.uppy)
             uploader.addStudyToUpload(idVisit, filesToUpload)
             uploader.on('upload-progress', (studyNumber, zipProgress, uploadProgress) => {
@@ -342,8 +337,6 @@ class Uploader extends Component {
                     uploadProgress: uploadProgress,
                     zipProgress: zipProgress
                 })
-                console.log(zipProgress)
-                console.log(uploadProgress)
 
             })
             uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles) => {

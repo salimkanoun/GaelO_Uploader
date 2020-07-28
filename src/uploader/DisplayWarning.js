@@ -43,7 +43,7 @@ class DisplayWarning extends Component {
                         if (this.props.type === 'series')
                             this.props.updateWarningSeries(row, row.seriesInstanceUID)
                         else if (this.props.type === 'study') {
-                            if (this.props.multiUpload && row.idVisit !== undefined) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
+                            if (this.props.multiUpload) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
                         }
                     }}/>
@@ -70,7 +70,11 @@ class DisplayWarning extends Component {
             switch (this.props.type) {
                 case 'study':
                     for (let i in this.props.studies[this.props.selectionID].warnings) {
-                        rows.push({ studyInstanceUID: this.props.selectionID, ...this.props.studies[this.props.selectionID].warnings[i] })
+                        rows.push({ 
+                            studyInstanceUID: this.props.selectionID, 
+                            idVisit: this.props.studies[this.props.selectionID].idVisit, 
+                            ...this.props.studies[this.props.selectionID].warnings[i] 
+                        })
                     }
                     return rows
                 case 'series':

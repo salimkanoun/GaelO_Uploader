@@ -20,7 +20,7 @@ import Button from 'react-bootstrap/Button'
 import BootstrapTable from 'react-bootstrap-table-next';
 import SelectPatient from './SelectPatient'
 import ButtonIgnore from './render_component/ButtonIgnore'
-import { updateWarningStudy, attributeIdVisit } from './actions/Studies'
+import { updateWarningStudy, setVisitID } from './actions/Studies'
 import { setUsedVisit } from './actions/Visits'
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
@@ -30,7 +30,8 @@ class CheckPatient extends Component {
 
     state = {
         rows: [],
-        isDisabled: true
+        isDisabled: true,
+        selectedVisit: undefined
     }
 
     constructor(props) {
@@ -38,6 +39,7 @@ class CheckPatient extends Component {
         this.onClick = this.onClick.bind(this)
         this.validateCheckPatient = this.validateCheckPatient.bind(this)
         this.generateRows = this.generateRows.bind(this)
+        this.selectedVisit = this.selectedVisit.bind(this)
     }
 
     columns = [
@@ -86,8 +88,8 @@ class CheckPatient extends Component {
         this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
         //For multiupload 
         if (this.props.multiUpload) {
-            this.props.setUsedVisit(this.props.expectedVisitID, this.props.selectedStudy, true)
-            this.props.attributeIdVisit(this.props.selectedStudy, this.props.expectedVisitID)
+            this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
+            this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy, true)
         }
         this.props.closeListener()
     }
@@ -101,7 +103,7 @@ class CheckPatient extends Component {
     /**
      * Check matching of patient information
      */
-    buildRows(idVisit = this.props.expectedVisitID, uploadDataReady = !this.props.multiUpload) {
+    buildRows(uploadDataReady = !this.props.multiUpload, idVisit = this.props.studies[this.props.selectedStudy].idVisit) {
         if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined && uploadDataReady) {
             let rows = []
             let currentStudy = this.props.studies[this.props.selectedStudy]
@@ -130,11 +132,13 @@ class CheckPatient extends Component {
         } else return []
     }
 
-    generateRows = (expectedVisitID) => {
-        this.setState(() => ({rows: this.buildRows(expectedVisitID, true)}))
-        
+    generateRows = (selectedVisit) => {
+        this.setState(() => ({rows: this.buildRows(true, selectedVisit)}))        
     }
 
+    selectedVisit = selectedVisit => {
+        this.setState({selectedVisit: selectedVisit})
+    }
     /**
      * Check correspondance between expected and given data and set rowStatus accordingly
      */
@@ -155,7 +159,7 @@ class CheckPatient extends Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body hidden={!this.props.multiUpload} className="modal-body du-patient">
-                    <SelectPatient studyInstanceUID={this.props.selectedStudy} generateRows={this.generateRows}/>
+                    <SelectPatient studyInstanceUID={this.props.selectedStudy} generateRows={this.generateRows} selectedVisit={this.selectedVisit}/>
                 </Modal.Body>
                 <Modal.Body className="modal-body">
                     <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
@@ -200,14 +204,13 @@ const mapStateToProps = state => {
         selectedStudy: state.DisplayTables.selectedStudy,
         studies: state.Studies.studies,
         visits: state.Visits.visits,
-        expectedVisitID: state.Visits.expectedVisitID
     }
 }
 
 const mapDispatchToProps = {
     updateWarningStudy,
     setUsedVisit,
-    attributeIdVisit
+    setVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckPatient)

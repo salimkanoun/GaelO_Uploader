@@ -18,7 +18,7 @@ import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload } from '../services/api'
 
-import { addStudy, addWarningsStudy, setExpectedVisitID } from './actions/Studies'
+import { addStudy, addWarningsStudy, setVisitID } from './actions/Studies'
 import { addSeries } from './actions/Series'
 import { addWarningsSeries } from './actions/Warnings'
 import { addVisit } from './actions/Visits'
@@ -92,7 +92,6 @@ class Uploader extends Component {
                 })
             }
         })
-        if(!this.config.multiUpload) this.props.setExpectedVisitID(this.config.idVisit) 
         this.props.addVisit(visits)
     }
 
@@ -212,8 +211,11 @@ class Uploader extends Component {
             if (!this.state.multiUpload) {
                 //Check studies warnings
                 let studyWarnings = this.checkStudy(this.uploadModel.data[studyInstanceUID])
+                let studyToAdd = this.uploadModel.data[studyInstanceUID]
+                studyToAdd['idVisit'] = undefined
+                if(!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
                 //Add study to Redux
-                this.props.addStudy(this.uploadModel.data[studyInstanceUID])
+                this.props.addStudy(studyToAdd)
                 //Add study warnings to Redux
                 this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
                 //If study has warnings, trigger a warning message
@@ -310,8 +312,8 @@ class Uploader extends Component {
         for (let studyInstanceUID of studyUIDArray) {
 
             //SK ICI IL MANQUE LA RECUPERATION DE L ID VISITE AFFECTE A LA STUDY
-            let visitID = this.props.studies[studyInstanceUID].visitID
-            visitID=283
+            let idVisit = this.props.studies[studyInstanceUID].idVisit
+            idVisit=283
             
 
             let seriesInstanceUID = seriesObjectArrays.filter((seriesObject) => {
@@ -332,7 +334,7 @@ class Uploader extends Component {
             })
             console.log(filesToUpload)
             let uploader = new DicomMultiStudyUploader(this.uppy)
-            uploader.addStudyToUpload(visitID, filesToUpload)
+            uploader.addStudyToUpload(idVisit, filesToUpload)
             uploader.on('upload-progress', (studyNumber, zipProgress, uploadProgress) => {
                 this.setState({
                     studyLength : studyUIDArray.length,
@@ -344,19 +346,16 @@ class Uploader extends Component {
                 console.log(uploadProgress)
 
             })
-            uploader.on('upload-finished', (visitID, timeStamp, numberOfFiles) => {
+            uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles) => {
                 console.log('Batch Finished')
-                validateUpload(visitID, timeStamp, numberOfFiles, studyOrthancID)
+                validateUpload(idVisit, timeStamp, numberOfFiles, studyOrthancID)
                 this.config.callbackOnComplete()
             })
 
             uploader.startUpload()
             this.setState({ isUploadStarted: true })
 
-
         }
-
-
     }
 
     render() {
@@ -407,7 +406,7 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
-    setExpectedVisitID
+    setVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

@@ -4,7 +4,7 @@ const initialState = {
   visits: []
 }
 
-export default function VisitsReducer (state = initialState, action) {
+export default function VisitsReducer(state = initialState, action) {
   switch (action.type) {
     case ADD_VISIT:
       const visitObject = action.payload
@@ -22,12 +22,15 @@ export default function VisitsReducer (state = initialState, action) {
       console.log(action.payload)
       let thisNewVisit = {}
       const newVisitsArray = []
+      //Find idVist in state
       for (const thisRow in state.visits) {
+        //Once found, save it in thisNewVisit
         if (state.visits[thisRow].idVisit === idVisit) {
           thisNewVisit = state.visits[thisRow]
-        } else newVisitsArray.push(state.visits[thisRow])
+        } else newVisitsArray.push(state.visits[thisRow]) //Save all the other rows in a new array
       }
-      (isUsed) ? thisNewVisit.studyID = studyID : delete thisNewVisit.studyID
+      if (isUsed) thisNewVisit.studyID = studyID
+      else delete thisNewVisit.studyID
       thisNewVisit.isUsed = isUsed
       newVisitsArray.push(thisNewVisit)
       return {

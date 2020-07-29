@@ -39,7 +39,7 @@ class StudiesTab extends Component {
         {
             dataField: 'selectedStudies',
             text: 'Select',
-            hidden: false,
+            hidden: (!this.props.multiUpload),
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedStudies

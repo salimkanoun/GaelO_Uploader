@@ -44,7 +44,7 @@ class StudiesTab extends Component {
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedStudies
                 return (
-                    <input disabled={row.status !== 'Valid'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, !checked) }} />
+                    <input disabled={row.status !== 'Valid'} checked={(row.status !== 'Valid') ? false : checked} type='checkbox' onChange={(e) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, e.target.checked)}} />
                 )
             }
         },

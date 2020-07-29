@@ -62,6 +62,7 @@ class Uploader extends Component {
             chunkSize: 2000000,
             limit: 3,
             headers: {},
+            overridePatchMethod :true,
             retryDelays: [0, 1000, 3000, 5000]
         })
 

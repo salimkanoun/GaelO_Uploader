@@ -13,7 +13,10 @@ const config = {
   multiUpload: false,
   minNbOfInstances: 30,
   idVisit: process.env.REACT_APP_GAELO_VISITID,
-  callbackOnComplete: () => {}
+  callbackOnComplete: () => {},
+  callbackOnStartAction: ()=>{},
+  callbackOnUploadComplete: ()=>{},
+  callbackOnValidationSent: ()=>{}
 }
 
 const container = document.getElementById('root')

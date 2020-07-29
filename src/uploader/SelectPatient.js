@@ -84,7 +84,7 @@ class SelectPatient extends Component {
                     {this.displayPatients(this.state.selectedType)}
                 </ListGroup>
                 <span className='du-patp-label'>Comparison</span>
-                <p>We let you check if the selected patient and the imported patient informations are matching:</p>
+                <p>Please check if the selected patient and the imported patient informations are matching:</p>
             </>
         )
     }

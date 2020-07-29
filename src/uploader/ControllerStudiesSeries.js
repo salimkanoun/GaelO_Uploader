@@ -65,7 +65,6 @@ class ControllerStudiesSeries extends Component {
         }
       }
     }
-    console.log(studyStatus)
     //If not in multiUpload, valid studies are ready to be uploaded
     if (!this.props.multiUpload) this.props.selectStudiesReady(study, (studyStatus === 'Valid' ? true : false))
     return studyStatus

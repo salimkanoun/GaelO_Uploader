@@ -27,6 +27,7 @@ export default function DisplayTablesReducer (state = initialState, action) {
       let studiesReady
       if (action.payload.isSelect) {
         // If select add SeriesInstanceUID to selectedSeries
+        // Distinct cases for uniqueUpload mode purpose
         if (state.studiesReady === undefined) studiesReady = [action.payload.studiesInstanceUID]
         else if (!state.studiesReady.includes(action.payload.studiesInstanceUID)) studiesReady = [...state.studiesReady, action.payload.studiesInstanceUID]
         else studiesReady = [...state.studiesReady]

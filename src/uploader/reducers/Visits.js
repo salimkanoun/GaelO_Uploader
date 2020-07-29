@@ -23,7 +23,6 @@ export default function VisitsReducer (state = initialState, action) {
       const idVisit = action.payload.idVisit
       const studyID = action.payload.studyID
       const isUsed = action.payload.isUsed
-      console.log(action.payload)
       let thisNewVisit = {}
       const newVisitsArray = []
       // Find idVist in state

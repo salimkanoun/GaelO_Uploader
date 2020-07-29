@@ -215,7 +215,7 @@ class Uploader extends Component {
             //If not in multiupload mode
             if (!this.state.multiUpload) {
                 //Check studies warnings
-                let studyWarnings = this.checkStudy(this.uploadModel.data[studyInstanceUID])
+                let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
                 let studyToAdd = this.uploadModel.data[studyInstanceUID]
                 studyToAdd['idVisit'] = undefined
                 if(!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
@@ -238,7 +238,7 @@ class Uploader extends Component {
         }
     }
 
-    checkStudy(study) {
+    async checkStudy(study) {
         let warnings = {}
         // Check if the study corresponds to the visits in wait for series upload
         let expectedVisit = this.findExpectedVisit(study);
@@ -246,7 +246,8 @@ class Uploader extends Component {
         // Check if visit ID is set
         if (this.props.expectedVisit === null || typeof this.props.expectedVisit === undefined) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         // Check if study is already known by server
-        if (isNewStudy(study.getOrthancStudyID)) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
+        let newStudy = await isNewStudy( study.getOrthancStudyID() )
+        if ( !newStudy ) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
         return warnings
     }
 

@@ -28,11 +28,10 @@ export function isNewStudy(originalOrthancID) {
 
   }).then((answer) => {
       if (!answer.ok) { throw answer }
-      return (answer)
-    })
-    .catch((error) => {
+      return (answer.json())
+  }).catch((error) => {
       console.warn(error)
-    })
+  })
 }
 
 /**

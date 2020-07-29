@@ -93,4 +93,18 @@ export default class Util {
     }
     return integer
   }
+
+  /**
+   * Search for an object in an Array of Objects
+   * using the key of wanted object
+   * @param {Array} array 
+   * @param {*} objectKey 
+   * @param {*} key
+   */
+  static arrayIncludesObject (array, objectKey, key) {
+    for (const i in array) {
+      if (array[i][objectKey] === key) return true
+    }
+    return false
+  }
 }

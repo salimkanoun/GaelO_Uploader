@@ -18,8 +18,8 @@ export default class DicomBatchUploader extends EventEmitter {
         uppy.on('upload-progress', (file, progress) => {
             // file: { id, name, type, ... }
             // progress: { uploader, bytesUploaded, bytesTotal }
-            console.log(progress)
-            let fractionUploaded = ( this.currentBatchUpload * this.batchValue) + (progress*this.batchValue/100)
+            let uploadedFraction = progress.bytesUploaded / progress.bytesTotal
+            let fractionUploaded = ( this.currentBatchUpload * this.batchValue) + (uploadedFraction*this.batchValue)
             this.uploadProgress = Math.min(fractionUploaded , 100)
             this.emitProgress()
           })

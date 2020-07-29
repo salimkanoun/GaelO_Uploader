@@ -15,7 +15,7 @@
 import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
 import Button from 'react-bootstrap/Button'
-import CheckPatient from './CheckPatient'
+import ControllerSelectPatient from './ControllerSelectPatient'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -44,7 +44,7 @@ class StudiesTab extends Component {
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedStudies
                 return (
-                    <input disabled={row.status !== 'Valid'} checked={(row.status !== 'Valid') ? false : checked} type='checkbox' onChange={(e) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, e.target.checked)}} />
+                    <input disabled={row.status !== 'Valid'} checked={(row.status !== 'Valid') ? false : checked} type='checkbox' onChange={(e) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, e.target.checked) }} />
                 )
             }
         },
@@ -118,7 +118,7 @@ class StudiesTab extends Component {
                             selectRow={this.selectRow}
                             wrapperClasses="table-responsive"
                         />
-                        <CheckPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} />
+                        <ControllerSelectPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} />
                     </Col>
                     <Col xs={6} md={4}>
                         <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload}/>

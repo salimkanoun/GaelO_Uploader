@@ -16,7 +16,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
-
+import Util from '../model/Util'
 class SelectPatient extends Component {
 
     state = {
@@ -37,7 +37,7 @@ class SelectPatient extends Component {
         let visitTypeArray = []
         this.props.visits.forEach(visit => {
             let thisVisitType = visit.visitType
-            if (!visitTypeArray.includes(thisVisitType)) visitTypeArray.push({ value: thisVisitType, label: thisVisitType })
+            if (!Util.arrayIncludesObject(visitTypeArray, 'value', thisVisitType)) visitTypeArray.push({ value: thisVisitType, label: thisVisitType })
         })
         return visitTypeArray
     }

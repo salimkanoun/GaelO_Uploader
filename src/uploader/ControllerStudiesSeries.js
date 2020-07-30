@@ -19,7 +19,7 @@ import Row from 'react-bootstrap/Row'
 
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
-import { selectSeriesReady } from './actions/DisplayTables'
+import { selectSeriesReady, selectStudiesReady } from './actions/DisplayTables'
 
 class ControllerStudiesSeries extends Component {
   /* STUDIES TABLE CONTROLLER */
@@ -51,6 +51,7 @@ class ControllerStudiesSeries extends Component {
     for (const warning in this.props.studies[study].warnings) {
       if (!this.props.studies[study].warnings[warning].dismissed) {
         studyStatus = 'Rejected'
+        if (!this.props.multiUpload) this.props.selectStudiesReady(study, false)
         return studyStatus
       }
     }
@@ -64,7 +65,22 @@ class ControllerStudiesSeries extends Component {
         }
       }
     }
+    //If not in multiUpload, valid studies are ready to be uploaded
+    if (!this.props.multiUpload) this.props.selectStudiesReady(study, (studyStatus === 'Valid' ? true : false))
     return studyStatus
+  }
+
+  /**
+   * SINGLEUPLOAD mode function only
+   * Update studies ready to be uploaded considering their current status
+   * @param {*} prevProps 
+   */
+  componentDidUpdate(prevProps) {
+    if(!this.props.multiUpload) {
+      for (const study in this.props.studies) {
+        if (study.status !== prevProps.status) this.props.selectStudiesReady(study.studyInstanceUID, (study.status === 'Valid' ? true : false))
+      }
+    }
   }
 
   /* SERIES TABLE CONTROLLER */
@@ -134,7 +150,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-  selectSeriesReady
+  selectSeriesReady,
+  selectStudiesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

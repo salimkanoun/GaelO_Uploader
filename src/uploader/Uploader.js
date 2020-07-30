@@ -16,13 +16,13 @@ import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
 import Util from '../model/Util'
 
-import { getPossibleImport, logIn, registerStudy, validateUpload } from '../services/api'
+import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
 import { addStudy, addWarningsStudy, setVisitID } from './actions/Studies'
 import { addSeries } from './actions/Series'
 import { addWarningsSeries } from './actions/Warnings'
 import { addVisit } from './actions/Visits'
-import { NOT_EXPECTED_VISIT, NULL_VISIT_ID } from '../model/Warning'
+import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
 
@@ -59,7 +59,7 @@ class Uploader extends Component {
             endpoint: 'tus', // use your tus endpoint here
             resume: true,
             autoRetry: true,
-            chunkSize: 2000000,
+            chunkSize: 500000,
             limit: 3,
             headers: {},
             retryDelays: [0, 1000, 3000, 5000]
@@ -215,7 +215,7 @@ class Uploader extends Component {
             //If not in multiupload mode
             if (!this.state.multiUpload) {
                 //Check studies warnings
-                let studyWarnings = this.checkStudy(this.uploadModel.data[studyInstanceUID])
+                let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
                 let studyToAdd = this.uploadModel.data[studyInstanceUID]
                 studyToAdd['idVisit'] = undefined
                 if(!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
@@ -238,18 +238,16 @@ class Uploader extends Component {
         }
     }
 
-    checkStudy(study) {
+    async checkStudy(study) {
         let warnings = {}
         // Check if the study corresponds to the visits in wait for series upload
         let expectedVisit = this.findExpectedVisit(study);
-        if (expectedVisit === undefined) {
-            warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
-        }
-
+        if (expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         // Check if visit ID is set
-        if (this.props.expectedVisit === null || typeof this.props.expectedVisit === undefined) {
-            warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
-        }
+        if (this.props.expectedVisit === null || typeof this.props.expectedVisit === undefined) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        // Check if study is already known by server
+        let newStudy = await isNewStudy( study.getOrthancStudyID() )
+        if ( !newStudy ) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
         return warnings
     }
 

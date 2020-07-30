@@ -34,11 +34,12 @@ export default class IgnoredFilesPanel extends Component {
         },
     ];
 
+    /**
+     * Create rows for table display
+     */
     createRows() {
         let ignoredFileNames = Object.keys(this.props.dataIgnoredFiles)
-
         let rows = []
-
         ignoredFileNames.forEach(ignoredFileName => {
             rows.push( { 
                 key : Math.random(), 

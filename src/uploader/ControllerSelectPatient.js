@@ -21,6 +21,7 @@ import SelectPatient from './SelectPatient'
 import CheckPatient from './render_component/CheckPatient'
 import { updateWarningStudy, setVisitID } from './actions/Studies'
 import { setUsedVisit } from './actions/Visits'
+import { selectStudiesReady } from './actions/DisplayTables'
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
 const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
@@ -79,6 +80,8 @@ class ControllerSelectPatient extends Component {
         if (this.props.multiUpload) {
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
             this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy, true)
+        } else {
+            this.props.selectStudiesReady(this.props.studies[this.props.selectedStudy].studyInstanceUID, true)
         }
         this.setState({isDisabled: true})
         this.props.closeListener()
@@ -184,7 +187,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     updateWarningStudy,
     setUsedVisit,
-    setVisitID
+    setVisitID,
+    selectStudiesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerSelectPatient)

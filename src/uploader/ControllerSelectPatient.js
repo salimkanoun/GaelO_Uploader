@@ -80,6 +80,7 @@ class ControllerSelectPatient extends Component {
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
             this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy, true)
         }
+        this.setState({isDisabled: true})
         this.props.closeListener()
     }
 

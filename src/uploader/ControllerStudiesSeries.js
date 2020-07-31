@@ -34,6 +34,10 @@ class ControllerStudiesSeries extends Component {
       for (const study in this.props.studies) {
         const tempStudy = this.props.studies[study]
         tempStudy.status = this.studyWarningsPassed(study)
+        tempStudy.selectedStudies = false
+        if (this.props.studiesReady.includes(tempStudy.studyInstanceUID)) {
+          tempStudy.selectedStudies = true
+        }
         studies.push({ ...tempStudy })
       }
     }
@@ -143,6 +147,7 @@ const mapStateToProps = state => {
     series: state.Series.series,
     studies: state.Studies.studies,
     seriesReady: state.DisplayTables.seriesReady,
+    studiesReady: state.DisplayTables.studiesReady,
     selectedStudy: state.DisplayTables.selectedStudy,
     selectedSeries: state.DisplayTables.selectedSeries,
     warningsSeries: state.Warnings.warningsSeries

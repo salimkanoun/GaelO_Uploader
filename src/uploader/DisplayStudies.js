@@ -44,7 +44,7 @@ class StudiesTab extends Component {
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedStudies
                 return (
-                    <input disabled={row.status !== 'Valid'} checked={(row.status !== 'Valid') ? false : checked} type='checkbox' onChange={(e) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, e.target.checked) }} />
+                    <input disabled={row.status !== 'Valid'} checked={checked} type='checkbox' onChange={() => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, !checked) }} />
                 )
             }
         },
@@ -130,10 +130,9 @@ class StudiesTab extends Component {
 }
 
 const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected')
-        return 'du studies row-danger'
-    if (row.status === 'Incomplete')
-        return 'du-studies row-warning'
+    if (row.status === 'Rejected') return 'du studies row-danger'
+    if (row.status === 'Incomplete') return 'du-studies row-warning'
+    if (row.status === 'Valid' && row.selectedStudies === true) return 'du-series row-success'    
     return 'du-studies td'
 }
 

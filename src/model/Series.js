@@ -105,7 +105,7 @@ export default class Series {
 		if (this.getNbInstances() < minNbOfInstances) {
 			this.warnings[LESS_THAN_MINIMAL_INSTANCES.key] = LESS_THAN_MINIMAL_INSTANCES;
 		} else {
-			delete this.warnings[LESS_THAN_MINIMAL_INSTANCES]
+			delete this.warnings[LESS_THAN_MINIMAL_INSTANCES.key]
 		}
 	}
 

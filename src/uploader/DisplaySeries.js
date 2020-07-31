@@ -93,12 +93,12 @@ class DisplaySeries extends Component {
                 <Row>
                     <Col xs={12} md={8}>
                         <BootstrapTable
-                            bodyClasses="du-series-tbody"
+                            keyField='seriesInstanceUID'
                             classes="table table-borderless"
+                            bodyClasses="du-series-tbody"
                             headerClasses="du-series th"
                             rowClasses={rowClasses}
                             wrapperClasses="table-responsive"
-                            keyField='seriesInstanceUID'
                             data={this.props.seriesRows}
                             columns={this.columns}
                             selectRow={this.selectRow} />
@@ -116,11 +116,9 @@ class DisplaySeries extends Component {
 }
 
 const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected') {
-        return 'du-series row-danger'
-    } else if (row.status === 'Valid' && row.selectedSeries === true) {
-        return 'du-series row-success'
-    } else return 'du-series td'
+    if (row.status === 'Rejected') return 'du-series row-danger'
+    if (row.status === 'Valid' && row.selectedSeries === true) return 'du-series row-success'
+    return 'du-series td'
 }
 
 

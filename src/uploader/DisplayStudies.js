@@ -113,10 +113,10 @@ class StudiesTab extends Component {
                             bodyClasses="du-studies-tbody"
                             headerClasses="du-studies th"
                             rowClasses={rowClasses}
+                            wrapperClasses="table-responsive"
                             data={this.props.studiesRows}
                             columns={this.columns}
                             selectRow={this.selectRow}
-                            wrapperClasses="table-responsive"
                         />
                         <ControllerSelectPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} />
                     </Col>
@@ -130,7 +130,7 @@ class StudiesTab extends Component {
 }
 
 const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected') return 'du studies row-danger'
+    if (row.status === 'Rejected') return 'du-studies row-danger'
     if (row.status === 'Incomplete') return 'du-studies row-warning'
     if (row.status === 'Valid' && row.selectedStudies === true) return 'du-series row-success'    
     return 'du-studies td'

@@ -33,13 +33,14 @@ class ControllerStudiesSeries extends Component {
       for (const study in this.props.studies) {
         const tempStudy = this.props.studies[study]
         tempStudy.status = this.studyWarningsPassed(study)
-        tempStudy.selectedSeries = false
+        tempStudy.selectedStudies = false
         if (this.props.studiesReady.includes(tempStudy.studyInstanceUID)) {
-          tempStudy.selectedSeries = true
+          tempStudy.selectedStudies = true
         }
         studies.push({ ...tempStudy })
       }
     }
+    console.log(studies)
     return studies
   }
 

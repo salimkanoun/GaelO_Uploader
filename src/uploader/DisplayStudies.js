@@ -132,7 +132,7 @@ class StudiesTab extends Component {
 const rowClasses = (row, rowIndex) => {
     if (row.status === 'Rejected') return 'du-studies row-danger'
     if (row.status === 'Incomplete') return 'du-studies row-warning'
-    if (row.status === 'Valid' && row.selectedStudies === true) return 'du-series row-success'    
+    if (row.status === 'Valid' && row.selectedStudies === true) return 'du-studies row-success'    
     return 'du-studies td'
 }
 

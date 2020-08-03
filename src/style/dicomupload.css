@@ -137,19 +137,16 @@
 	font-weight: bold;
 }
 
-.row-success,
 .row-success {
 	color: #09810f;
 	background-color: #e2ffe1;
 }
 
-.row-danger,
 .row-danger {
 	color: #c40404;
 	background-color: #fff3f3;
 }
 
-.row-warning,
 .row-warning {
 	color: #8f510a;
 	background-color: #ffeacb;

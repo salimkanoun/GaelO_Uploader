@@ -90,18 +90,26 @@
 	border-right: none;
 	border-block-end: none;
 	text-align: inherit;
+	text-align: center;
+	vertical-align: middle;
+	overflow-y: auto;
+}
+
+.du-warnings td,
+.du-warnings th {
+	text-align: left;
 }
 
 .du-studies th,
 .du-series th {
 	color: #956a6a;
 	border-top: 1px solid #dee2e6;
+	overflow: hidden;
 }
 
-.du-studies th:first-child,
 .du-series th:first-child,
-.du-studies td:first-child,
 .du-series td:first-child {
+	width:5px;
 }
 
 .du-studies table,

@@ -38,7 +38,7 @@ class StudiesTab extends Component {
     columns = [
         {
             dataField: 'selectedStudies',
-            text: 'Select',
+            text: '',
             hidden: (!this.props.multiUpload),
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {

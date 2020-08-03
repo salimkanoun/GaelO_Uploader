@@ -32,7 +32,7 @@ class DisplaySeries extends Component {
         },
         {
             dataField: 'selectedSeries',
-            text: 'Select',
+            text: '',
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedSeries

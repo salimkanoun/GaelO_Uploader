@@ -1,6 +1,6 @@
 {
   "name": "gaelo-uploader",
-  "version": "0.2.14",
+  "version": "0.2.16",
   "main": "index.js",
   "proxy": "http://localhost:8080",
   "private": false,

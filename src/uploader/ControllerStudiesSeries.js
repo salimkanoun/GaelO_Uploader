@@ -40,7 +40,6 @@ class ControllerStudiesSeries extends Component {
         studies.push({ ...tempStudy })
       }
     }
-    console.log(studies)
     return studies
   }
 

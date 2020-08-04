@@ -15,6 +15,7 @@ import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
 import Util from '../model/Util'
+import Alert from 'react-bootstrap/Alert'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
@@ -38,6 +39,7 @@ class Uploader extends Component {
         studyLenght : 0,
         ignoredFiles: {},
         showWarning: false,
+        showAlertZipFiles: true
     }
 
     constructor(props) {
@@ -365,6 +367,10 @@ class Uploader extends Component {
                         fileIgnored={Object.keys(this.state.ignoredFiles).length}
                         fileLoaded={this.state.fileLoaded}
                     />
+                    <Alert show={this.state.showAlertZipFiles} variant='info' onClose={() => this.setState({showAlertZipFiles: false})} dismissible>
+                        ZIP files are not optimally supported yet; if you import such files, please make sure
+                        you have enough computer RAM available. Othewise, please unzip the files and batch import them.
+                    </Alert>
                 </div>
                 <div className="mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
                     <ParsingDetails

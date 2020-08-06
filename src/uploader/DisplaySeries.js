@@ -14,11 +14,8 @@
 
 import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
+import { Container, Row, Col } from 'react-bootstrap'
 import DisplayWarning from './DisplayWarning'
-
 import { connect } from 'react-redux';
 import { selectSeriesReady, selectSeries } from './actions/DisplayTables'
 

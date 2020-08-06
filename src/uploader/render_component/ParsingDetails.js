@@ -14,7 +14,6 @@
 
 import React, { Component } from 'react'
 import Badge from 'react-bootstrap/Badge'
-
 import IgnoredFilesPanel from './IgnoredFilesPanel'
 
 export default class ParsingDetails extends Component {

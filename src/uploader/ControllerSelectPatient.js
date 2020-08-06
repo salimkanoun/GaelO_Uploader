@@ -15,8 +15,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
+import { Modal, Button } from 'react-bootstrap'
 import SelectPatient from './SelectPatient'
 import CheckPatient from './render_component/CheckPatient'
 import { updateWarningStudy, setVisitID } from './actions/Studies'

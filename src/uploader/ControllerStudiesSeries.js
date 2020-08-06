@@ -14,9 +14,7 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
 import Row from 'react-bootstrap/Row'
-
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 

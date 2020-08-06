@@ -14,13 +14,9 @@
 
 import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
-import Button from 'react-bootstrap/Button'
+import { Button, Container, Row, Col } from 'react-bootstrap'
 import ControllerSelectPatient from './ControllerSelectPatient'
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
-//Redux
 import { connect } from 'react-redux';
 import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
 

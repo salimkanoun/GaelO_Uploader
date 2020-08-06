@@ -15,8 +15,7 @@
 import React, { Component } from 'react'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Button from 'react-bootstrap/Button'
-import Col from 'react-bootstrap/Col'
-import Row from 'react-bootstrap/Row'
+import { Col, Row } from 'react-bootstrap'
 
 export default class ProgressUpload extends Component {
   render () {

@@ -133,6 +133,15 @@
 	background-color: #e7f0f8;
 }
 
+.series-table-options {
+	padding-right: 15px;
+	padding-left: 5px;
+}
+
+.options {
+	padding: 10px;
+}
+
 .row-clicked {
 	font-weight: bold;
 }

@@ -21,55 +21,63 @@ import { selectSeriesReady, selectSeries } from './actions/DisplayTables'
 
 class DisplaySeries extends Component {
 
-    columns = [
-        {
-            dataField: 'seriesInstanceUID',
-            isDummyField: true,
-            hidden: true,
-        },
-        {
-            dataField: 'selectedSeries',
-            text: '',
-            formatExtraData: this,
-            formatter: (cell, row, rowIndex, formatExtraData) => {
-                let checked = row.selectedSeries
-                return (
-                    <input disabled={row.status === 'Rejected'} checked={checked} type='checkbox' onChange={() => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked) }} />
-                )
-            }
-        },
-        {
-            dataField: 'status',
-            text: 'Status',
-            editable: false
-        },
-        {
-            dataField: 'seriesDescription',
-            text: 'Description',
-            editable: false,
-            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
-        },
-        {
-            dataField: 'modality',
-            text: 'Modality',
-            editable: false
-        },
-        {
-            dataField: 'seriesNumber',
-            text: 'Number #',
-            editable: false
-        },
-        {
-            dataField: 'seriesDate',
-            text: 'Date',
-            editable: false
-        },
-        {
-            dataField: 'numberOfInstances',
-            text: 'Nb of Instances',
-            editable: false
-        },
-    ];
+    state = {
+        hiddenCells: [false, false, false, false, false],
+        columns: [
+            {
+                dataField: 'seriesInstanceUID',
+                isDummyField: true,
+                hidden: true,
+            },
+            {
+                dataField: 'selectedSeries',
+                text: '',
+                formatExtraData: this,
+                formatter: (cell, row, rowIndex, formatExtraData) => {
+                    let checked = row.selectedSeries
+                    return (
+                        <input disabled={row.status === 'Rejected'} checked={checked} type='checkbox' onChange={() => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked) }} />
+                    )
+                }
+            },
+            {
+                dataField: 'status',
+                text: 'Status',
+                editable: false
+            },
+            {
+                dataField: 'seriesDescription',
+                text: 'Description',
+                editable: false,
+                style: { whiteSpace: 'normal', wordWrap: 'break-word' },
+                hidden: false
+            },
+            {
+                dataField: 'modality',
+                text: 'Modality',
+                editable: false,
+                hidden: false
+            },
+            {
+                dataField: 'seriesNumber',
+                text: 'Number #',
+                editable: false,
+                hidden: false
+            },
+            {
+                dataField: 'seriesDate',
+                text: 'Date',
+                editable: false,
+                hidden: false
+            },
+            {
+                dataField: 'numberOfInstances',
+                text: 'Nb of Instances',
+                editable: false,
+                hidden: false
+            },
+        ]
+    }
 
     selectRow = {
         mode: 'radio',
@@ -83,10 +91,27 @@ class DisplaySeries extends Component {
         }
     }
 
+    updateHiddenColumns = (newState, index) => {
+        let newArray = this.state.columns
+        let newObj = newArray[index]
+        newObj.hidden = newState
+        newArray[index] = newObj
+        console.log(newArray)
+        this.setState({ columns: newArray })
+    }
+
     render() {
         return (
             <Container fluid>
                 <span className="title">Series</span>
+                <div className='options'>
+                    <span className='du-series'>Hide columns:  </span>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 3) }} /><label class='series-table-options'>Description</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 4) }} /><label class='series-table-options'>Modality</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 5) }} /><label class='series-table-options'>Number #</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 6) }} /><label class='series-table-options'>Date</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 7) }} /><label class='series-table-options'>Nb of instances</label>
+                </div>
                 <Row>
                     <Col xs={12} md={8}>
                         <BootstrapTable
@@ -97,7 +122,7 @@ class DisplaySeries extends Component {
                             rowClasses={rowClasses}
                             wrapperClasses="table-responsive"
                             data={this.props.seriesRows}
-                            columns={this.columns}
+                            columns={this.state.columns}
                             selectRow={this.selectRow} />
                     </Col>
                     <Col xs={6} md={4}>

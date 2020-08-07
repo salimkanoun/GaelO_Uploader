@@ -13,7 +13,7 @@
  */
 
 import React, { Component } from 'react'
-import { Modal, Badge } from 'react-bootstrap/Modal'
+import { Modal, Badge } from 'react-bootstrap'
 import BootstrapTable from 'react-bootstrap-table-next';
 
 export default class IgnoredFilesPanel extends Component {

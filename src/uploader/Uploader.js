@@ -70,6 +70,7 @@ class Uploader extends Component {
         this.uppy.on('upload-error', (file, error, response) => {
             console.log('error with file:', file.id)
             console.log('error message:', error)
+            toast.error(`Error with file: ${file.id}. Error message: ${error}`)
         })
 
     }

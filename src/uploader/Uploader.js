@@ -334,12 +334,19 @@ class Uploader extends Component {
 
             let uploader = new DicomMultiStudyUploader(this.uppy)
             uploader.addStudyToUpload(idVisit, filesToUpload)
-            uploader.on('upload-progress', (studyNumber, zipProgress, uploadProgress) => {
+            uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
                 this.setState({
                     studyLength : studyUIDArray.length,
                     studyProgress : studyNumber,
-                    uploadProgress: uploadProgress,
                     zipProgress: zipProgress
+                })
+
+            })
+            uploader.on('batch-upload-progress', (studyNumber, uploadProgress) => {
+                this.setState({
+                    studyLength : studyUIDArray.length,
+                    studyProgress : studyNumber,
+                    uploadProgress: uploadProgress
                 })
 
             })

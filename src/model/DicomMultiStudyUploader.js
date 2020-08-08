@@ -25,10 +25,16 @@ export default class DicomMultiStudyUploader extends EventEmitter {
             }
             
         })
-        uploader.on('batch-progress', (zipProgress, uploadProgress)=>{
-            this.emit('upload-progress', this.studyNumber, zipProgress , uploadProgress)
+        uploader.on('batch-zip-progress', (zipProgress) => {
+            this.emit('batch-zip-progress', this.studyNumber, zipProgress)
             
         })
+
+        uploader.on('batch-upload-progress', (uploadProgress) => {
+            this.emit('batch-upload-progress', this.studyNumber, uploadProgress)
+
+        })
+
         uploader.startUpload()
 
     }

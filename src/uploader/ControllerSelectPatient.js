@@ -101,7 +101,10 @@ class ControllerSelectPatient extends Component {
 
             //Find expected visit
             let expectedStudy
+            
+            console.log(idVisit)
             this.props.visits.forEach(visit => {
+                console.log(visit.idVisit)
                 if (visit.idVisit === idVisit) expectedStudy = visit
             })
             expectedStudy.patientFirstName = expectedStudy.firstName

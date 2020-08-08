@@ -106,11 +106,11 @@ class DisplaySeries extends Component {
                 <span className="title">Series</span>
                 <div className='options'>
                     <span className='du-series'>Hide columns:  </span>
-                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 3) }} /><label class='series-table-options'>Description</label>
-                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 4) }} /><label class='series-table-options'>Modality</label>
-                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 5) }} /><label class='series-table-options'>Number #</label>
-                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 6) }} /><label class='series-table-options'>Date</label>
-                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 7) }} /><label class='series-table-options'>Nb of instances</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 3) }} /><label className='series-table-options'>Description</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 4) }} /><label className='series-table-options'>Modality</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 5) }} /><label className='series-table-options'>Number #</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 6) }} /><label className='series-table-options'>Date</label>
+                    <input type='checkbox' onChange={(event) => { this.updateHiddenColumns(event.target.checked, 7) }} /><label className='series-table-options'>Nb of instances</label>
                 </div>
                 <Row>
                     <Col xs={12} md={8}>

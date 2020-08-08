@@ -58,7 +58,7 @@ class Uploader extends Component {
         })
 
         this.uppy.use(Tus, {
-            endpoint: 'tus', // use your tus endpoint here
+            endpoint: '/tus', // use your tus endpoint here
             resume: true,
             autoRetry: true,
             chunkSize: 500000,
@@ -350,10 +350,11 @@ class Uploader extends Component {
                 })
 
             })
-            uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles) => {
+            uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded) => {
                 console.log('Batch Finished')
                 this.config.callbackOnUploadComplete()
-                validateUpload(idVisit, timeStamp, numberOfFiles, studyOrthancID)
+                //SK modif ici pour renvoyer tableaux d'ID a recupérer dans le back
+                validateUpload(idVisit, sucessIDsUploaded, numberOfFiles, studyOrthancID)
                 this.config.callbackOnValidationSent()
             })
 

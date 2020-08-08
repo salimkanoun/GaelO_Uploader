@@ -4,9 +4,9 @@ const EventEmitter = require('events').EventEmitter;
 
 export default class DicomBatchUploader extends EventEmitter {
 
-    zipProgress=0
     progressionZipArray = []
     progressionUploadArray = []
+    sucessIDsUploaded= []
 
     constructor (uppy, idVisit, files) {
         super()
@@ -22,6 +22,8 @@ export default class DicomBatchUploader extends EventEmitter {
         })
 
         this.uppy.on('upload-success', async (file, response) => {
+            this.sucessIDsUploaded.push(response['uploadURL'])
+            console.log(response)
             this.currentBatchUpload = ++this.currentBatchUpload
             this.emitBatchUploadDoneIfTerminated()
             await this.batchesIterator.next()
@@ -42,7 +44,7 @@ export default class DicomBatchUploader extends EventEmitter {
 
     emitBatchUploadDoneIfTerminated(){
         if(this.zipProgress>=100 && this.uploadProgress >= 100) {
-            this.emit('batch-upload-done', this.timeStamp, this.files.length)
+            this.emit('batch-upload-done', this.timeStamp, this.files.length, this.sucessIDsUploaded)
         }
     }
 
@@ -58,9 +60,9 @@ export default class DicomBatchUploader extends EventEmitter {
         })
 
         uploadProgress = Math.round( Math.min(uploadProgress , 100) )
-
-        this.emit('batch-upload-progress', uploadProgress )
         this.uploadProgress=uploadProgress
+        this.emit('batch-upload-progress', uploadProgress )
+        
     }
 
     async startUpload(){

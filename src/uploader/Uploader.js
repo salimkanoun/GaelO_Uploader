@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
 import {toast} from 'react-toastify'
+import JSZip from 'jszip'
 
 import Model from '../model/Model'
 import DicomFile from '../model/DicomFile'
@@ -29,6 +30,7 @@ class Uploader extends Component {
     state = {
         isFilesLoaded: false,
         isParsingFiles: false,
+        isUnzipping : false,
         isUploadStarted: false,
         fileParsed: 0,
         fileLoaded: 0,
@@ -37,7 +39,7 @@ class Uploader extends Component {
         studyProgress : 0,
         studyLenght : 0,
         ignoredFiles: {},
-        showWarning: false,
+        showWarning: false
     }
 
     constructor(props) {
@@ -56,11 +58,10 @@ class Uploader extends Component {
         })
 
         this.uppy.use(Tus, {
-            endpoint: 'tus', // use your tus endpoint here
+            endpoint: '/tus', // use your tus endpoint here
             resume: true,
             autoRetry: true,
-            chunkSize: 500000,
-            limit: 3,
+            chunkSize: 2000000,
             headers: {},
             retryDelays: [0, 1000, 3000, 5000]
         })
@@ -68,6 +69,7 @@ class Uploader extends Component {
         this.uppy.on('upload-error', (file, error, response) => {
             console.log('error with file:', file.id)
             console.log('error message:', error)
+            toast.error(`Error with file: ${file.id}. Error message: ${error}`)
         })
 
     }
@@ -101,10 +103,17 @@ class Uploader extends Component {
      */
     addFile(files) {
 
+        if(files.length === 1 && files[0].type === 'application/zip' ){
+            this.readAsZipFile(files[0])
+            return
+        }
+
         if(this.state.fileParsed ===0){
             //At first drop notify user started action
             this.config.callbackOnStartAction()
         }
+
+
 
         //Add number of files to be parsed to the previous number (incremental parsing)
         this.setState((previousState) => {
@@ -190,28 +199,55 @@ class Uploader extends Component {
 
     }
 
-    /**
-     * Check series to add warnings
-     */
-    //SK ici c'est un peu le bordel
-    //Au final peut etre rafraichir tout le redux quitte a perdre les actions faites
-    //si on ajoute de nouveaux fichiers
-    async checkSeriesAndUpdateRedux() {
-        //Check series to send warning
-        //SK ICI A AMELIORER NE TESTER QUE LES NOUVELLE SERIES DEPUIS LE PARSE
-        let studies = this.uploadModel.getStudiesArray()
-        for (let study of studies) {
-            let series = study.getSeriesArray()
-            for (let serieInstance of series) {
-                //SK Cette methode check peut peut etre s'encapsuler dans series
-                let firstInstance = serieInstance.getArrayInstances()[0]
-                await serieInstance.checkSeries(new DicomFile(firstInstance.getFile()))
+    async readAsZipFile(file) {
+        this.setState({
+            isUnzipping : true
+        })
+		const reader = new FileReader();
+		reader.readAsArrayBuffer(file);
+		reader.onload = () => {
+			// Retrieve file content as Uint8Array
+			const arrayBuffer = reader.result;
+			const byteArray = new Uint8Array(arrayBuffer);
+			
+			JSZip.loadAsync(byteArray).then((zip) => {
+				// Remove the zip file from the loaded files
+				let promises = []
+				for (let elmt in zip.files) {
+					elmt = zip.files[elmt];
+					// Check if it is a file or a directory
+					if (!elmt.dir) {
+						// Decompress file
+						promises.push(
+							elmt.async('blob').then((data) => {
+							let elmtFile = new File([data], elmt.name);
+							//Add full path to match drag and drop upload
+							elmtFile.fullPath=elmt.name
+							return elmtFile
+							})
+						)
+					}
+				}
+				Promise.all(promises).then(elements =>{
+                    this.setState({
+                        isUnzipping : false
+                    })
+					this.addFile(elements)
+				})
+			}).catch((e) => {
+				console.log('error zip' +e )
+			})
+		}
+	}
 
-            }
-        }
+    /**
+     * Check studies/series with warning and populate redux
+     */
+    async checkSeriesAndUpdateRedux() {
 
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
+
             //If not in multiupload mode
             if (!this.state.multiUpload) {
                 //Check studies warnings
@@ -228,13 +264,17 @@ class Uploader extends Component {
                     this.setState({ showWarning: true })
                 }
             }
+
             //Scan every series in Model
-            for (let seriesInstanceUID in this.uploadModel.data[studyInstanceUID].series) {
-                //Add series to Redux
-                this.props.addSeries(this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID])
-                //Add series warnings to Redux
-                this.props.addWarningsSeries(seriesInstanceUID, this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID].getWarnings())
+            let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
+            for (let seriesInstance of series) {
+                await seriesInstance.checkSeries()
+                //Add series to redux
+                this.props.addSeries(seriesInstance)
+                //Add series related warnings to Redux
+                this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
             }
+
         }
     }
 
@@ -289,7 +329,7 @@ class Uploader extends Component {
     /**
      * Upload selected and validated series on click
      */
-    async onUploadClick(e) {
+    async onUploadClick() {
 
         //build array of series object to be uploaded
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
@@ -301,11 +341,11 @@ class Uploader extends Component {
             return seriesObject.studyInstanceUID
         })
         studyUIDArray = Array.from(new Set(studyUIDArray))
-        console.log(studyUIDArray)
+        
         //Filter non selected studyUID
         studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
 
-        if(studyUIDArray.length ===0 ) {
+        if(studyUIDArray.length === 0 ) {
             toast.error('No Selected Series to Upload')
             return
         }
@@ -331,19 +371,26 @@ class Uploader extends Component {
 
             let uploader = new DicomMultiStudyUploader(this.uppy)
             uploader.addStudyToUpload(idVisit, filesToUpload)
-            uploader.on('upload-progress', (studyNumber, zipProgress, uploadProgress) => {
+            uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
                 this.setState({
                     studyLength : studyUIDArray.length,
                     studyProgress : studyNumber,
-                    uploadProgress: uploadProgress,
                     zipProgress: zipProgress
                 })
 
             })
-            uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles) => {
+            uploader.on('batch-upload-progress', (studyNumber, uploadProgress) => {
+                this.setState({
+                    studyLength : studyUIDArray.length,
+                    studyProgress : studyNumber,
+                    uploadProgress: uploadProgress
+                })
+
+            })
+            uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded) => {
                 console.log('Batch Finished')
                 this.config.callbackOnUploadComplete()
-                validateUpload(idVisit, timeStamp, numberOfFiles, studyOrthancID)
+                validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
                 this.config.callbackOnValidationSent()
             })
 
@@ -359,6 +406,7 @@ class Uploader extends Component {
                 <div>
                     <DicomDropZone
                         addFile={this.addFile}
+                        isUnzipping = {this.state.isUnzipping}
                         isParsingFiles={this.state.isParsingFiles}
                         isUploadStarted={this.state.isUploadStarted}
                         fileParsed={this.state.fileParsed}

@@ -32,6 +32,16 @@ export default class DicomDropZone extends Component {
             isdragging : false
         })
     }
+
+    getTextMessage(){
+        if(this.props.isParsingFiles ){
+            return 'Parsing '+( Math.round(( (this.props.fileParsed+this.props.fileIgnored) / this.props.fileLoaded) *100) )+'%' 
+        }else if(this.props.isUnzipping){
+            return 'Unzipping'
+        }else{
+            return 'Drag\'n drop Dicom files here, or click to select folder'
+        }
+    }
     
     render(){
         return (
@@ -40,7 +50,7 @@ export default class DicomDropZone extends Component {
                     <section>
                         <div className={this.getClasses()} {...getRootProps()}>
                             <input directory="" webkitdirectory="" {...getInputProps()} />
-                        <p> {this.props.isParsingFiles ? 'Parsing '+( Math.round(( (this.props.fileParsed+this.props.fileIgnored) / this.props.fileLoaded) *100) )+'%' : 'Drag\'n drop Dicom files here, or click to select folder'}</p>
+                        <p> {this.getTextMessage()}</p>
                         </div>
                     </section>
                 )}

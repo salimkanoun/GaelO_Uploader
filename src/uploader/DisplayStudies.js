@@ -14,13 +14,9 @@
 
 import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
-import Button from 'react-bootstrap/Button'
+import { Button, Container, Row, Col } from 'react-bootstrap'
 import ControllerSelectPatient from './ControllerSelectPatient'
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
 import DisplayWarning from './DisplayWarning'
-//Redux
 import { connect } from 'react-redux';
 import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
 
@@ -38,13 +34,13 @@ class StudiesTab extends Component {
     columns = [
         {
             dataField: 'selectedStudies',
-            text: 'Select',
+            text: '',
             hidden: (!this.props.multiUpload),
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 let checked = row.selectedStudies
                 return (
-                    <input disabled={row.status !== 'Valid'} checked={(row.status !== 'Valid') ? false : checked} type='checkbox' onChange={(e) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, e.target.checked) }} />
+                    <input disabled={row.status !== 'Valid'} checked={checked} type='checkbox' onChange={() => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, !checked) }} />
                 )
             }
         },
@@ -113,10 +109,10 @@ class StudiesTab extends Component {
                             bodyClasses="du-studies-tbody"
                             headerClasses="du-studies th"
                             rowClasses={rowClasses}
+                            wrapperClasses="table-responsive"
                             data={this.props.studiesRows}
                             columns={this.columns}
                             selectRow={this.selectRow}
-                            wrapperClasses="table-responsive"
                         />
                         <ControllerSelectPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} />
                     </Col>
@@ -130,10 +126,9 @@ class StudiesTab extends Component {
 }
 
 const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected')
-        return 'du studies row-danger'
-    if (row.status === 'Incomplete')
-        return 'du-studies row-warning'
+    if (row.status === 'Rejected') return 'du-studies row-danger'
+    if (row.status === 'Incomplete') return 'du-studies row-warning'
+    if (row.status === 'Valid' && row.selectedStudies === true) return 'du-studies row-success'    
     return 'du-studies td'
 }
 

@@ -61,8 +61,7 @@ class Uploader extends Component {
             endpoint: '/tus', // use your tus endpoint here
             resume: true,
             autoRetry: true,
-            chunkSize: 500000,
-            limit: 3,
+            chunkSize: 2000000,
             headers: {},
             retryDelays: [0, 1000, 3000, 5000]
         })

@@ -89,7 +89,7 @@ export default class DicomBatchUploader extends EventEmitter {
     makeBatch(index){
         let cummulativeSize = 0
         let batch = []
-        while( cummulativeSize < 15000000 && index < this.files.length ){
+        while( cummulativeSize < ( 100 * Math.pow(10, 6) ) && index < this.files.length ){
             cummulativeSize = cummulativeSize + this.files[index].size
             batch.push(this.files[index])
             index = ++index

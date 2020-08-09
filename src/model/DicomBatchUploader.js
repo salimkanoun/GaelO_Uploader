@@ -22,8 +22,9 @@ export default class DicomBatchUploader extends EventEmitter {
         })
 
         this.uppy.on('upload-success', async (file, response) => {
-            this.sucessIDsUploaded.push(response['uploadURL'])
-            console.log(response)
+            let fileTusId = response['uploadURL'].split('/').pop()
+            console.log(fileTusId)
+            this.sucessIDsUploaded.push(fileTusId)
             this.currentBatchUpload = ++this.currentBatchUpload
             this.emitBatchUploadDoneIfTerminated()
             await this.batchesIterator.next()

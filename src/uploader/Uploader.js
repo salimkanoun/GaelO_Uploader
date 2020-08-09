@@ -193,27 +193,13 @@ class Uploader extends Component {
     }
 
     /**
-     * Check series to add warnings
+     * Check studies/series with warning and populate redux
      */
-    //SK ici c'est un peu le bordel
-    //Au final peut etre rafraichir tout le redux quitte a perdre les actions faites
-    //si on ajoute de nouveaux fichiers
     async checkSeriesAndUpdateRedux() {
-        //Check series to send warning
-        //SK ICI A AMELIORER NE TESTER QUE LES NOUVELLE SERIES DEPUIS LE PARSE
-        let studies = this.uploadModel.getStudiesArray()
-        for (let study of studies) {
-            let series = study.getSeriesArray()
-            for (let serieInstance of series) {
-                //SK Cette methode check peut peut etre s'encapsuler dans series
-                let firstInstance = serieInstance.getArrayInstances()[0]
-                await serieInstance.checkSeries(new DicomFile(firstInstance.getFile()))
-
-            }
-        }
 
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
+
             //If not in multiupload mode
             if (!this.state.multiUpload) {
                 //Check studies warnings
@@ -230,13 +216,17 @@ class Uploader extends Component {
                     this.setState({ showWarning: true })
                 }
             }
+
             //Scan every series in Model
-            for (let seriesInstanceUID in this.uploadModel.data[studyInstanceUID].series) {
-                //Add series to Redux
-                this.props.addSeries(this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID])
-                //Add series warnings to Redux
-                this.props.addWarningsSeries(seriesInstanceUID, this.uploadModel.data[studyInstanceUID].series[seriesInstanceUID].getWarnings())
+            let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
+            for (let seriesInstance of series) {
+                await seriesInstance.checkSeries()
+                //Add series to redux
+                this.props.addSeries(seriesInstance)
+                //Add series related warnings to Redux
+                this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
             }
+
         }
     }
 
@@ -291,7 +281,7 @@ class Uploader extends Component {
     /**
      * Upload selected and validated series on click
      */
-    async onUploadClick(e) {
+    async onUploadClick() {
 
         //build array of series object to be uploaded
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
@@ -303,11 +293,11 @@ class Uploader extends Component {
             return seriesObject.studyInstanceUID
         })
         studyUIDArray = Array.from(new Set(studyUIDArray))
-        console.log(studyUIDArray)
+        
         //Filter non selected studyUID
         studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
 
-        if(studyUIDArray.length ===0 ) {
+        if(studyUIDArray.length === 0 ) {
             toast.error('No Selected Series to Upload')
             return
         }
@@ -334,6 +324,7 @@ class Uploader extends Component {
             let uploader = new DicomMultiStudyUploader(this.uppy)
             uploader.addStudyToUpload(idVisit, filesToUpload)
             uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
+                console.log('zipProgress'+zipProgress)
                 this.setState({
                     studyLength : studyUIDArray.length,
                     studyProgress : studyNumber,
@@ -351,9 +342,9 @@ class Uploader extends Component {
             })
             uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded) => {
                 console.log('Batch Finished')
+                console.log(sucessIDsUploaded)
                 this.config.callbackOnUploadComplete()
-                //SK modif ici pour renvoyer tableaux d'ID a recupérer dans le back
-                validateUpload(idVisit, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+                validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
                 this.config.callbackOnValidationSent()
             })
 

@@ -41,12 +41,13 @@ export function isNewStudy(originalOrthancID) {
  * @param {int} totalFiles
  * @param {string} originalOrthancStudyID
  */
-export function validateUpload(idVisit, timeStamp, totalFiles, originalOrthancStudyID) {
+export function validateUpload(idVisit, timeStamp, sucessIDsUploaded, totalFiles, originalOrthancStudyID) {
   const formData = new FormData()
   formData.append('id_visit', idVisit)
   formData.append('timeStamp', timeStamp)
   formData.append('totalDicomFiles', totalFiles)
   formData.append('originalOrthancStudyID', originalOrthancStudyID)
+  formData.append('sucessIDsUploaded', JSON.stringify(sucessIDsUploaded))
 
   return fetch('/scripts/validate_dicom_upload_tus.php', {
     method: 'POST',
@@ -61,6 +62,7 @@ export function validateUpload(idVisit, timeStamp, totalFiles, originalOrthancSt
   }).catch((error) => {
     console.warn(error)
   })
+
 }
 
 /**

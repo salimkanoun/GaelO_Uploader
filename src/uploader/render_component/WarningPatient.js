@@ -18,11 +18,9 @@ import Alert from 'react-bootstrap/Alert'
 export default class WarningPatient extends Component {
   render () {
     return (
-      <>
-        <Alert variant='warning' show={this.props.show} dismissible onClose={this.props.closeListener}>
-          Please, check/select the patient. The imported patient informations do not correspond with the expected ones.
-        </Alert>
-      </>
+      <Alert variant='warning' show={this.props.show} dismissible onClose={this.props.closeListener}>
+        Please, check/select the patient. The imported patient informations do not correspond with the expected ones.
+      </Alert>
     )
   }
 }

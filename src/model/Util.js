@@ -97,8 +97,8 @@ export default class Util {
   /**
    * Search for an object in an Array of Objects
    * using the key of wanted object
-   * @param {Array} array 
-   * @param {*} objectKey 
+   * @param {Array} array
+   * @param {*} objectKey
    * @param {*} key
    */
   static arrayIncludesObject (array, objectKey, key) {

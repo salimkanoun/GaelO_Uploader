@@ -1,7 +1,7 @@
 /**
  * Retrieve possible import from backend API
  */
-export function getPossibleImport() {
+export function getPossibleImport () {
   return fetch('/scripts/get_possible_import.php')
     .then((answer) => {
       if (!answer.ok) { throw answer }
@@ -15,7 +15,7 @@ export function getPossibleImport() {
 /**
  * Check if study does not already exist in backend
  */
-export function isNewStudy(originalOrthancID) {
+export function isNewStudy (originalOrthancID) {
   const formData = new FormData()
   formData.append('originalOrthancID', originalOrthancID)
 
@@ -27,10 +27,10 @@ export function isNewStudy(originalOrthancID) {
     body: formData
 
   }).then((answer) => {
-      if (!answer.ok) { throw answer }
-      return (answer.json())
+    if (!answer.ok) { throw answer }
+    return (answer.json())
   }).catch((error) => {
-      console.warn(error)
+    console.warn(error)
   })
 }
 
@@ -41,7 +41,7 @@ export function isNewStudy(originalOrthancID) {
  * @param {int} totalFiles
  * @param {string} originalOrthancStudyID
  */
-export function validateUpload(idVisit, timeStamp, sucessIDsUploaded, totalFiles, originalOrthancStudyID) {
+export function validateUpload (idVisit, timeStamp, sucessIDsUploaded, totalFiles, originalOrthancStudyID) {
   const formData = new FormData()
   formData.append('id_visit', idVisit)
   formData.append('timeStamp', timeStamp)
@@ -62,13 +62,12 @@ export function validateUpload(idVisit, timeStamp, sucessIDsUploaded, totalFiles
   }).catch((error) => {
     console.warn(error)
   })
-
 }
 
 /**
  * Registering GaelO, only for dev purpose
  */
-export function logIn() {
+export function logIn () {
   const formData = new FormData()
   formData.append('username', process.env.REACT_APP_GAELO_LOGIN)
   formData.append('mdp', process.env.REACT_APP_GAELO_PASSWORD)
@@ -94,7 +93,7 @@ export function logIn() {
 /**
  * Registering a study only for dev
  */
-export function registerStudy() {
+export function registerStudy () {
   const formData = new FormData()
   formData.append('etude', process.env.REACT_APP_GAELO_STUDY)
   formData.append('role', 'Investigator')

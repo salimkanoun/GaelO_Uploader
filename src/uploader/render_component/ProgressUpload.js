@@ -21,6 +21,7 @@ export default class ProgressUpload extends Component {
   render () {
     let uploadedFraction = 0
     let zippedFraction = 0
+
     if (this.props.zipPercent !== 0) {
       const total = this.props.zipPercent
       const uploadFractionOfZipped = this.props.uploadPercent / this.props.zipPercent
@@ -31,20 +32,18 @@ export default class ProgressUpload extends Component {
     const style = this.props.multiUpload ? {} : { height: '100%' }
 
     return (
-      <>
-        <Row>
-          <Col md='auto'>
-            <Button variant='primary' onClick={this.props.onUploadClick}> Upload </Button>
-          </Col>
-          <Col>
-            {this.props.multiUpload ? <ProgressBar variant='success' now={(this.props.studyProgress / this.props.studyLength) * 100} max={100} label={'Study ' + this.props.studyProgress + '/' + this.props.studyLength} /> : null}
-            <ProgressBar style={style}>
-              <ProgressBar striped animated variant='success' now={uploadedFraction} label={`Upload ${this.props.uploadPercent}%`}  max={100} key={1} />
-              <ProgressBar variant='info' now={zippedFraction} label='Zip' max={100} key={2} />
-            </ProgressBar>
-          </Col>
-        </Row>
-      </>
+      <Row>
+        <Col md='auto'>
+          <Button variant='primary' onClick={this.props.onUploadClick}> Upload </Button>
+        </Col>
+        <Col>
+          {this.props.multiUpload ? <ProgressBar variant='success' now={(this.props.studyProgress / this.props.studyLength) * 100} max={100} label={'Study ' + this.props.studyProgress + '/' + this.props.studyLength} /> : null}
+          <ProgressBar style={style}>
+            <ProgressBar striped animated variant='success' now={uploadedFraction} label={`Upload ${this.props.uploadPercent}%`} max={100} key={1} />
+            <ProgressBar variant='info' now={zippedFraction} label='Zip' max={100} key={2} />
+          </ProgressBar>
+        </Col>
+      </Row>
     )
   }
 }

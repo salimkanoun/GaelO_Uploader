@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
 import {toast} from 'react-toastify'
+import JSZip from 'jszip'
 
 import Model from '../model/Model'
 import DicomFile from '../model/DicomFile'
@@ -15,7 +16,6 @@ import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
 import Util from '../model/Util'
-import Alert from 'react-bootstrap/Alert'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
@@ -30,6 +30,7 @@ class Uploader extends Component {
     state = {
         isFilesLoaded: false,
         isParsingFiles: false,
+        isUnzipping : false,
         isUploadStarted: false,
         fileParsed: 0,
         fileLoaded: 0,
@@ -38,8 +39,7 @@ class Uploader extends Component {
         studyProgress : 0,
         studyLenght : 0,
         ignoredFiles: {},
-        showWarning: false,
-        showAlertZipFiles: true
+        showWarning: false
     }
 
     constructor(props) {
@@ -103,10 +103,17 @@ class Uploader extends Component {
      */
     addFile(files) {
 
+        if(files.length === 1 && files[0].type === 'application/zip' ){
+            this.readAsZipFile(files[0])
+            return
+        }
+
         if(this.state.fileParsed ===0){
             //At first drop notify user started action
             this.config.callbackOnStartAction()
         }
+
+
 
         //Add number of files to be parsed to the previous number (incremental parsing)
         this.setState((previousState) => {
@@ -191,6 +198,47 @@ class Uploader extends Component {
         }
 
     }
+
+    async readAsZipFile(file) {
+        this.setState({
+            isUnzipping : true
+        })
+		const reader = new FileReader();
+		reader.readAsArrayBuffer(file);
+		reader.onload = () => {
+			// Retrieve file content as Uint8Array
+			const arrayBuffer = reader.result;
+			const byteArray = new Uint8Array(arrayBuffer);
+			
+			JSZip.loadAsync(byteArray).then((zip) => {
+				// Remove the zip file from the loaded files
+				let promises = []
+				for (let elmt in zip.files) {
+					elmt = zip.files[elmt];
+					// Check if it is a file or a directory
+					if (!elmt.dir) {
+						// Decompress file
+						promises.push(
+							elmt.async('blob').then((data) => {
+							let elmtFile = new File([data], elmt.name);
+							//Add full path to match drag and drop upload
+							elmtFile.fullPath=elmt.name
+							return elmtFile
+							})
+						)
+					}
+				}
+				Promise.all(promises).then(elements =>{
+                    this.setState({
+                        isUnzipping : false
+                    })
+					this.addFile(elements)
+				})
+			}).catch((e) => {
+				console.log('error zip' +e )
+			})
+		}
+	}
 
     /**
      * Check studies/series with warning and populate redux
@@ -358,16 +406,13 @@ class Uploader extends Component {
                 <div>
                     <DicomDropZone
                         addFile={this.addFile}
+                        isUnzipping = {this.state.isUnzipping}
                         isParsingFiles={this.state.isParsingFiles}
                         isUploadStarted={this.state.isUploadStarted}
                         fileParsed={this.state.fileParsed}
                         fileIgnored={Object.keys(this.state.ignoredFiles).length}
                         fileLoaded={this.state.fileLoaded}
                     />
-                    <Alert show={this.state.showAlertZipFiles} variant='info' onClose={() => this.setState({showAlertZipFiles: false})} dismissible>
-                        ZIP files are not optimally supported yet; if you import such files, please make sure
-                        you have enough computer RAM available. Othewise, please unzip the files and batch import them.
-                    </Alert>
                 </div>
                 <div className="mb-3" hidden={!this.state.isParsingFiles && !this.state.isFilesLoaded}>
                     <ParsingDetails

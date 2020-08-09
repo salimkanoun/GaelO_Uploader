@@ -324,7 +324,6 @@ class Uploader extends Component {
             let uploader = new DicomMultiStudyUploader(this.uppy)
             uploader.addStudyToUpload(idVisit, filesToUpload)
             uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
-                console.log('zipProgress'+zipProgress)
                 this.setState({
                     studyLength : studyUIDArray.length,
                     studyProgress : studyNumber,
@@ -342,7 +341,6 @@ class Uploader extends Component {
             })
             uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded) => {
                 console.log('Batch Finished')
-                console.log(sucessIDsUploaded)
                 this.config.callbackOnUploadComplete()
                 validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
                 this.config.callbackOnValidationSent()

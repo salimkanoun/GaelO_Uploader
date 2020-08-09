@@ -12,7 +12,6 @@ export default class DicomMultiStudyUploader extends EventEmitter {
 
     addStudyToUpload(idVisit, fileArray){
         this.visitsToUpload[idVisit] = fileArray
-        console.log(this.visitsToUpload)
     }
 
     uploadNextStudy(){

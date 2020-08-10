@@ -113,7 +113,7 @@ class ControllerStudiesSeries extends Component {
     return (
       <>
         <Row>
-          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} checkStudyReady={(studyID) => this.studyWarningsPassed(studyID)}/>
+          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} checkStudyReady={(studyID) => {this.studyWarningsPassed(studyID)}}/>
         </Row>
         <Row>
           <DisplaySeries seriesRows={this.buildSeriesRows()} />

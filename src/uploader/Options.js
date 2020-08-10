@@ -44,12 +44,21 @@ export default class Options extends Component {
     }
 
     componentDidMount() {
-        let zipIntensity = parseInt(localStorage.getItem('zipIntensity'))
-        let batchUploadSize = parseInt(localStorage.getItem('batchUploadSize'))
-        this.setState({
-            zipIntensity : zipIntensity,
-            batchUploadSize : batchUploadSize
-        })
+
+        if(localStorage.getItem('zipIntensity') !== null){
+
+            let zipIntensity = parseInt(localStorage.getItem('zipIntensity'))
+            let batchUploadSize = parseInt(localStorage.getItem('batchUploadSize'))
+            this.setState({
+                zipIntensity : zipIntensity,
+                batchUploadSize : batchUploadSize
+            })
+
+        }else{
+            localStorage.setItem('zipIntensity', 3)
+            localStorage.setItem('batchUploadSize', 200)
+        }
+        
     }
 
     render() {

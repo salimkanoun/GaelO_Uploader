@@ -38,7 +38,7 @@ export default class Options extends Component {
     render() {
         return (
             <>
-                <OverlayTrigger trigger="click" placement="right" overlay={
+                <OverlayTrigger rootClose trigger="click" placement="right" overlay={
                     <Popover className='popover' id="popover-basic">
                         <Popover.Title as="h3">Options</Popover.Title>
                         <Popover.Content>

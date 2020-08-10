@@ -107,8 +107,8 @@ class ControllerSelectPatient extends Component {
                 if (visit.idVisit === idVisit) expectedStudy = visit
             })
 
-            expectedStudy.patientFirstName = expectedStudy.patientFirstName.toUpperCase()
-            expectedStudy.patientLastName = expectedStudy.patientLastName.toUpperCase()
+            expectedStudy.patientFirstName = expectedStudy.patientFirstName === undefined ? '' : expectedStudy.patientFirstName.toUpperCase()
+            expectedStudy.patientLastName = expectedStudy.patientLastName === undefined ? '' : expectedStudy.patientLastName.toUpperCase()
 
             for (let i in labels) {
                 rows.push({

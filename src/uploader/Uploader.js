@@ -63,6 +63,7 @@ class Uploader extends Component {
             resume: true,
             autoRetry: true,
             chunkSize: 2000000,
+            limit : 10,
             headers: {},
             retryDelays: [0, 1000, 3000, 5000]
         })

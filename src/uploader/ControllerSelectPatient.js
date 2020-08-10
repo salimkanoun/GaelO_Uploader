@@ -80,7 +80,7 @@ class ControllerSelectPatient extends Component {
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
             this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy, true)
         } else {
-            this.props.selectStudiesReady(this.props.studies[this.props.selectedStudy].studyInstanceUID, true)
+            if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') this.props.selectStudiesReady(this.props.studies[this.props.selectedStudy].studyInstanceUID, true)
         }
         this.setState({isDisabled: true})
         this.props.closeListener()
@@ -102,7 +102,6 @@ class ControllerSelectPatient extends Component {
             //Find expected visit
             let expectedStudy
             
-            console.log(idVisit)
             this.props.visits.forEach(visit => {
                 console.log(visit.idVisit)
                 if (visit.idVisit === idVisit) expectedStudy = visit

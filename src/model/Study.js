@@ -60,35 +60,35 @@ export default class Study {
     }
 
     getPatientName() {
-        return (this.patientFirstName + this.patientLastName)
+        return (this.getPatientFirstName() + this.getPatientLastName())
     }
 
     getObjectPatientName(){
-        return {givenName: this.patientFirstName, familyName: this.patientLastName}
+        return {givenName: this.getPatientFirstName(), familyName: this.getPatientLastName()}
     }
 
     getPatientFirstName() {
-        return this.patientFirstName
+        return (this.patientFirstName === undefined) ? '' : this.patientFirstName.toUpperCase()
     }
 
     getPatientLastName() {
-        return this.patientLastName
+        return (this.patientLastName === undefined) ? '' : this.patientLastName.toUpperCase()
     }
 
     getStudyInstanceUID() {
-        return this.studyInstanceUID
+        return (this.studyInstanceUID === undefined) ? '' : this.studyInstanceUID
     }
 
     getStudyID() {
-        return this.studyID
+        return (this.studyID === undefined) ? '' : this.studyID
     }
 
     getStudyDate() {
-        return this.studyDate
+        return (this.studyDate === undefined) ? '' : this.studyDate
     }
 
     getAcquisitionDate() {
-        return this.acquisitionDate
+        return (this.acquisitionDate === undefined) ? '' : this.acquisitionDate
     }
 
     getDate(rawDate) {
@@ -100,19 +100,19 @@ export default class Study {
     }
 
     getStudyDescription() {
-        return this.studyDescription
+        return (this.studyDescription === undefined) ? '' : this.studyDescription
     }
 
     getPatientBirthDate() {
-        return this.patientBirthDate
+        return (this.patientBirthDate === undefined) ? '' : this.patientBirthDate
     }
 
     getPatientSex() {
-        return this.patientSex
+        return (this.patientSex === undefined) ? '' : this.patientSex.toUpperCase()
     }
 
     getPatientID() {
-        return this.patientID
+        return (this.patientID === undefined) ? '' : this.patientID
     }
 
     //SK Pour envoyer au back pour savoir si etude connue ou pas et au moment du post processing

@@ -66,6 +66,11 @@
 	border: 5px solid rgba(175, 54, 82, 0.8);
 }
 
+.optionCog {
+	padding: 0.25rem 0.5rem ;
+	margin-left: 1rem;
+}
+
 /* # IGNORED PANEL */
 .du-ignored-files-modal td,
 .du-ignored-files-modal th {

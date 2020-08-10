@@ -114,7 +114,7 @@ class StudiesTab extends Component {
                             columns={this.columns}
                             selectRow={this.selectRow}
                         />
-                        <ControllerSelectPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} />
+                        <ControllerSelectPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} checkStudyReady={(studyID) => this.props.checkStudyReady(studyID)}/>
                     </Col>
                     <Col xs={6} md={4}>
                         <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload}/>

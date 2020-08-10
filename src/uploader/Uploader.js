@@ -15,6 +15,7 @@ import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
 import WarningPatient from './render_component/WarningPatient'
+import Options from './Options'
 import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
@@ -420,6 +421,7 @@ class Uploader extends Component {
                         fileParsed={this.state.fileParsed}
                         dataIgnoredFiles={this.state.ignoredFiles}
                     />
+                    <Options />
                 </div>
                 <div hidden={!this.state.isFilesLoaded}>
                     <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />

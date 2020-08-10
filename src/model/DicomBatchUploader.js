@@ -14,6 +14,9 @@ export default class DicomBatchUploader extends EventEmitter {
         this.files = files
         this.idVisit = idVisit
         this.timeStamp = Date.now()
+        this.zipIntensity = localStorage.getItem('zipIntensity') === null ? 100 : parseInt(localStorage.getItem('zipIntensity'))
+        this.batchUploadSize = localStorage.getItem('batchUploadSize') === null ? 3 : parseInt(localStorage.getItem('batchUploadSize'))
+        
         this.buildBatches()
 
         this.uppy.on('upload-progress', (file, progress) => {
@@ -89,7 +92,7 @@ export default class DicomBatchUploader extends EventEmitter {
     makeBatch(index){
         let cummulativeSize = 0
         let batch = []
-        while( cummulativeSize < ( 100 * Math.pow(10, 6) ) && index < this.files.length ){
+        while( cummulativeSize < ( this.batchUploadSize * Math.pow(10, 6) ) && index < this.files.length ){
             cummulativeSize = cummulativeSize + this.files[index].size
             batch.push(this.files[index])
             index = ++index
@@ -150,7 +153,7 @@ export default class DicomBatchUploader extends EventEmitter {
                 type: "uint8array",
                 compression: "DEFLATE",
                 compressionOptions: {
-                    level: 3,
+                    level: this.zipIntensity,
                     streamFiles: true
                 }
             }

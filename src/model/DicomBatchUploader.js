@@ -14,11 +14,11 @@ export default class DicomBatchUploader extends EventEmitter {
         this.files = files
         this.idVisit = idVisit
         this.timeStamp = Date.now()
+        this.zipIntensity = localStorage.getItem('zipIntensity') === null ? 100 : parseInt(localStorage.getItem('zipIntensity'))
+        this.batchUploadSize = localStorage.getItem('batchUploadSize') === null ? 3 : parseInt(localStorage.getItem('batchUploadSize'))
+        
         this.buildBatches()
 
-        this.zipIntensity = parseInt(localStorage.getItem('zipIntensity')) === undefined ? 100 : parseInt(localStorage.getItem('zipIntensity'))
-        this.batchUploadSize = parseInt(localStorage.getItem('batchUploadSize')) === undefined ? 3 : parseInt(localStorage.getItem('batchUploadSize'))
-        
         this.uppy.on('upload-progress', (file, progress) => {
             this.progressionUploadArray[file.id] = (progress.bytesUploaded/progress.bytesTotal)
             this.emitUploadProgress()

@@ -107,8 +107,8 @@ class ControllerSelectPatient extends Component {
                 console.log(visit.idVisit)
                 if (visit.idVisit === idVisit) expectedStudy = visit
             })
-            expectedStudy.patientFirstName = expectedStudy.firstName
-            expectedStudy.patientLastName = expectedStudy.lastName
+            expectedStudy.patientFirstName = expectedStudy.firstName.toUpperCase()
+            expectedStudy.patientLastName = expectedStudy.lastName.toUpperCase()
 
             for (let i in labels) {
                 rows.push({

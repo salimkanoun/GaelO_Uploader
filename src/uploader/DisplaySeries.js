@@ -33,6 +33,7 @@ class DisplaySeries extends Component {
                 formatExtraData: this,
                 formatter: (cell, row, rowIndex, formatExtraData) => {
                     let checked = row.selectedSeries
+                    if (row.status === 'Known study') return <> </>
                     return (
                         <input disabled={row.status === 'Rejected'} checked={checked} type='checkbox' onChange={() => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked) }} />
                     )

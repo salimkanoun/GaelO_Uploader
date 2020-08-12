@@ -15,7 +15,7 @@
 import React, { Component } from 'react'
 import { Popover, OverlayTrigger, Button } from 'react-bootstrap'
 import { Slider, Typography } from '@material-ui/core';
-import { ReactComponent as OptionCog } from '../style/images/optionCog.svg'
+import { OptionCog } from '../style/images/optionCog.svg'
 export default class Options extends Component {
 
     state = {
@@ -99,7 +99,9 @@ export default class Options extends Component {
                         </Popover.Content>
                     </Popover>
                 }>
-                    <Button variant="secondary" className='optionCog'><OptionCog/></Button>
+                    <Button variant="secondary" className='optionCog'> 
+                        <OptionCog/> 
+                    </Button>
                 </OverlayTrigger>
             </>
         )

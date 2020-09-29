@@ -38,7 +38,7 @@ class Uploader extends Component {
         zipProgress: 0,
         uploadProgress: 0,
         studyProgress : 0,
-        studyLenght : 0,
+        studyLength : 1,
         ignoredFiles: {},
         showWarning: false
     }
@@ -69,8 +69,6 @@ class Uploader extends Component {
         })
 
         this.uppy.on('upload-error', (file, error, response) => {
-            console.log('error with file:', file.id)
-            console.log('error message:', error)
             toast.error(`Error with file: ${file.id}. Error message: ${error}`)
         })
 
@@ -351,6 +349,9 @@ class Uploader extends Component {
             toast.error('No Selected Series to Upload')
             return
         }
+
+        let uploader = new DicomMultiStudyUploader(this.uppy)
+
         //group series by studyUID
         for (let studyInstanceUID of studyUIDArray) {
 
@@ -371,35 +372,39 @@ class Uploader extends Component {
                 filesToUpload.push(...fileArray)
             })
 
-            let uploader = new DicomMultiStudyUploader(this.uppy)
-            uploader.addStudyToUpload(idVisit, filesToUpload)
-            uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
-                this.setState({
-                    studyLength : studyUIDArray.length,
-                    studyProgress : studyNumber,
-                    zipProgress: zipProgress
-                })
-
-            })
-            uploader.on('batch-upload-progress', (studyNumber, uploadProgress) => {
-                this.setState({
-                    studyLength : studyUIDArray.length,
-                    studyProgress : studyNumber,
-                    uploadProgress: uploadProgress
-                })
-
-            })
-            uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded) => {
-                console.log('Batch Finished')
-                this.config.callbackOnUploadComplete()
-                validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
-                this.config.callbackOnValidationSent()
-            })
-
-            uploader.startUpload()
-            this.setState({ isUploadStarted: true })
-
+            uploader.addStudyToUpload(idVisit, filesToUpload, studyOrthancID)
+           
         }
+
+
+
+        uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
+            this.setState({
+                studyLength : studyUIDArray.length,
+                studyProgress : studyNumber,
+                zipProgress: zipProgress
+            })
+
+        })
+        
+        uploader.on('batch-upload-progress', (studyNumber, uploadProgress) => {
+            this.setState({
+                studyLength : studyUIDArray.length,
+                studyProgress : studyNumber,
+                uploadProgress: uploadProgress
+            })
+
+        })
+
+        uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
+            console.log('Batch Finished')
+            this.config.callbackOnUploadComplete()
+            validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+            this.config.callbackOnValidationSent()
+        })
+
+        uploader.startUpload()
+        this.setState({ isUploadStarted: true })
     }
 
     render() {
@@ -427,7 +432,7 @@ class Uploader extends Component {
                 <div hidden={!this.state.isFilesLoaded}>
                     <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
                     <ControllerStudiesSeries multiUpload={this.config.multiUpload} selectedSeries={this.props.selectedSeries} />
-                    <ProgressUpload multiUpload={this.config.multiUpload} studyProgress={this.state.studyProgress} studyLength={this.state.studyLenght} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} />
+                    <ProgressUpload multiUpload={this.config.multiUpload} studyProgress={this.state.studyProgress} studyLength={this.state.studyLength} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} isUploadStarted={this.state.isUploadStarted} />
                 </div>
             </Fragment>
         )

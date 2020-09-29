@@ -16,8 +16,7 @@ export default class DicomBatchUploader extends EventEmitter {
         this.timeStamp = Date.now()
         this.zipIntensity = localStorage.getItem('zipIntensity') === null ? 100 : parseInt(localStorage.getItem('zipIntensity'))
         this.batchUploadSize = localStorage.getItem('batchUploadSize') === null ? 3 : parseInt(localStorage.getItem('batchUploadSize'))
-        console.log(this.zipIntensity)
-        console.log(this.batchUploadSize)
+
         this.buildBatches()
 
         this.uppy.on('upload-progress', (file, progress) => {
@@ -162,6 +161,7 @@ export default class DicomBatchUploader extends EventEmitter {
             this.progressionZipArray[index] = progress.percent
             this.emitZipProgress()
         })
+
         let zipBlob = new Blob([uintarray], { type: 'application/zip' });
         return zipBlob
 

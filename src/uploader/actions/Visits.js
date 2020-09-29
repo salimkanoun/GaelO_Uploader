@@ -14,7 +14,7 @@ export function addVisit (visitObject) {
 
 /**
  * Update Redux passed visit status
- * @param {String} idVisit
+ * @param {Integer} idVisit
  * @param {String} studyID
  * @param {Boolean} isUsed new status of visit
  */

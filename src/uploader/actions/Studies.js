@@ -39,7 +39,7 @@ export function updateWarningStudy (warningToUpdate, studyInstanceUID) {
  * MULTIUPLOAD mode function only
  * Set idVisit to the passed study awaiting check
  * @param {String} studyInstanceUID
- * @param {String} idVisit
+ * @param {Integer} idVisit
  */
 export function setVisitID (studyInstanceUID, idVisit) {
   return {

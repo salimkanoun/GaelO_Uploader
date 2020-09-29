@@ -88,7 +88,7 @@ export default class Series {
 			}
 			if (this.modality === 'PT') {
 				if ((dicomFile._getDicomTag('00101030')) === undefined) {
-					this.warnings[MISSING_TAG_00101030.key] = MISSING_TAG_00101031;
+					this.warnings[MISSING_TAG_00101030.key] = MISSING_TAG_00101030;
 				}
 				if ((dicomFile._getDicomTag('00080031')) === undefined && (dicomFile._getDicomTag('00080032')) === undefined) {
 					this.warnings[MISSING_TAG_00101031.key] = MISSING_TAG_00101031;
@@ -113,6 +113,7 @@ export default class Series {
 	}
 
 	getWarnings() {
+		console.log(this.warnings)
 		return this.warnings
 	}
 

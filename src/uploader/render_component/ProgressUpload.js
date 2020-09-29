@@ -26,7 +26,7 @@ export default class ProgressUpload extends Component {
           <Button variant='primary' onClick={this.props.onUploadClick} disabled={this.props.isUploadStarted}> Upload </Button>
         </Col>
         <Col>
-            {this.props.multiUpload ? <ProgressBar variant='success' now={(this.props.studyProgress / this.props.studyLength) * 100} max={100} label={'Study ' + this.props.studyProgress + '/' + this.props.studyLength} /> : null}
+            {this.props.multiUpload ? <ProgressBar variant='success' now={this.props.studyProgress} max={this.props.studyLength} label={'Study ' + this.props.studyProgress + '/' + this.props.studyLength} /> : null}
             <ProgressBar variant='info' now={this.props.zipPercent} label='Zip' max={100} />
             <ProgressBar className="mb-3" striped animated variant='success' now={this.props.uploadPercent} label={`Upload ${this.props.uploadPercent}%`} max={100} />
         </Col>

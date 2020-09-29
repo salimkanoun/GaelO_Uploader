@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import BootstrapTable from 'react-bootstrap-table-next'
-
 import { connect } from 'react-redux';
 import { updateWarningSeries } from './actions/Warnings'
 import { updateWarningStudy } from './actions/Studies'
@@ -33,10 +32,14 @@ class DisplayWarning extends Component {
             hidden: true
         },
         {
+            dataField: 'ignorable',
+            hidden: true
+        },
+        {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => (
-                <ButtonIgnore hidden={(row.key === 'NOT_EXPECTED_VISIT' && !row.dismissed)}
+                <ButtonIgnore hidden={row.ignorable === false || (row.key === 'NOT_EXPECTED_VISIT' && !row.dismissed)}
                     warning={this.getWarningStatus(row)}
                     onClick={() => {
                         if (this.props.type === 'series')

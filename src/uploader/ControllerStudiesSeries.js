@@ -14,13 +14,9 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
 import Row from 'react-bootstrap/Row'
-
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
-import { selectSeriesReady } from './actions/DisplayTables'
-
 class ControllerStudiesSeries extends Component {
   /* STUDIES TABLE CONTROLLER */
 
@@ -28,12 +24,16 @@ class ControllerStudiesSeries extends Component {
    * Fetch studies from Redux State to display in table
    * @return {Object}
    */
-  buildStudiesRows () {
+  buildStudiesRows() {
     const studies = []
     if (Object.keys(this.props.studies).length > 0) {
       for (const study in this.props.studies) {
         const tempStudy = this.props.studies[study]
         tempStudy.status = this.studyWarningsPassed(study)
+        tempStudy.selectedStudies = false
+        if (this.props.studiesReady.includes(tempStudy.studyInstanceUID)) {
+          tempStudy.selectedStudies = true
+        }
         studies.push({ ...tempStudy })
       }
     }
@@ -45,8 +45,13 @@ class ControllerStudiesSeries extends Component {
    * @param {Object} study
    * @return {Boolean}
    */
-  studyWarningsPassed (study) {
+  studyWarningsPassed(study) {
     let studyStatus = 'Valid'
+
+    if (this.props.studies[study].warnings !== undefined && this.props.studies[study].warnings['ALREADY_KNOWN_STUDY'] !== undefined) {
+      studyStatus = 'Already Known'
+      return studyStatus
+    }
     // Check for warnings in study
     for (const warning in this.props.studies[study].warnings) {
       if (!this.props.studies[study].warnings[warning].dismissed) {
@@ -74,13 +79,14 @@ class ControllerStudiesSeries extends Component {
    * in order to build table
    * @return {Array}
    */
-  buildSeriesRows () {
+  buildSeriesRows() {
     if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
       const seriesArray = []
       const seriesToDisplay = Object.keys(this.props.studies[this.props.selectedStudy].series)
       seriesToDisplay.forEach((series) => {
         const seriesToPush = this.props.series[series]
-        seriesToPush.status = this.seriesWarningsPassed(series) ? 'Valid' : 'Rejected'
+        if (this.props.studies[this.props.selectedStudy].warnings['ALREADY_KNOWN_STUDY'] !== undefined) seriesToPush.status = 'Known study'
+        else seriesToPush.status = this.seriesWarningsPassed(series) ? 'Valid' : 'Rejected'
         seriesToPush.selectedSeries = false
         if (this.props.seriesReady.includes(seriesToPush.seriesInstanceUID)) {
           seriesToPush.selectedSeries = true
@@ -99,7 +105,7 @@ class ControllerStudiesSeries extends Component {
    * @param {Object} series
    * @return {Boolean}
    */
-  seriesWarningsPassed (series) {
+  seriesWarningsPassed(series) {
     for (const warning in this.props.warningsSeries[series]) {
       if (!this.props.warningsSeries[series][warning].dismissed) {
         return false
@@ -108,11 +114,11 @@ class ControllerStudiesSeries extends Component {
     return true
   }
 
-  render () {
+  render() {
     return (
       <>
         <Row>
-          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} />
+          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} checkStudyReady={(studyID) => { this.studyWarningsPassed(studyID) }} />
         </Row>
         <Row>
           <DisplaySeries seriesRows={this.buildSeriesRows()} />
@@ -127,6 +133,7 @@ const mapStateToProps = state => {
     series: state.Series.series,
     studies: state.Studies.studies,
     seriesReady: state.DisplayTables.seriesReady,
+    studiesReady: state.DisplayTables.studiesReady,
     selectedStudy: state.DisplayTables.selectedStudy,
     selectedSeries: state.DisplayTables.selectedSeries,
     warningsSeries: state.Warnings.warningsSeries
@@ -134,7 +141,6 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-  selectSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

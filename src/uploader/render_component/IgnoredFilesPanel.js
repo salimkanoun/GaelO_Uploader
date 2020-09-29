@@ -13,9 +13,8 @@
  */
 
 import React, { Component } from 'react'
-import Modal from 'react-bootstrap/Modal'
+import { Modal, Badge } from 'react-bootstrap'
 import BootstrapTable from 'react-bootstrap-table-next';
-import Badge from 'react-bootstrap/Badge'
 
 export default class IgnoredFilesPanel extends Component {
 
@@ -34,11 +33,12 @@ export default class IgnoredFilesPanel extends Component {
         },
     ];
 
+    /**
+     * Create rows for table display
+     */
     createRows() {
         let ignoredFileNames = Object.keys(this.props.dataIgnoredFiles)
-
         let rows = []
-
         ignoredFileNames.forEach(ignoredFileName => {
             rows.push( { 
                 key : Math.random(), 

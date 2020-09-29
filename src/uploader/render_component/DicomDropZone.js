@@ -11,6 +11,7 @@ export default class DicomDropZone extends Component {
         super(props)
         this.dragEnter = this.dragEnter.bind(this)
         this.dragLeave = this.dragLeave.bind(this)
+        this.onDrop = this.onDrop.bind(this)
     }
 
     getClasses(){
@@ -32,15 +33,30 @@ export default class DicomDropZone extends Component {
             isdragging : false
         })
     }
+
+    onDrop(acceptedFiles){
+        this.dragLeave()
+        this.props.addFile(acceptedFiles)
+    }
+
+    getTextMessage(){
+        if(this.props.isParsingFiles ){
+            return 'Parsing '+( Math.round(( (this.props.fileParsed+this.props.fileIgnored) / this.props.fileLoaded) *100) )+'%' 
+        }else if(this.props.isUnzipping){
+            return 'Unzipping'
+        }else{
+            return 'Drag\'n drop Dicom files here, or click to select folder'
+        }
+    }
     
     render(){
         return (
-            <Dropzone onDragEnter={this.dragEnter} onDragLeave={this.dragLeave} onDrop={acceptedFiles => this.props.addFile(acceptedFiles)} >
+            <Dropzone onDragEnter={this.dragEnter} onDragLeave={this.dragLeave} onDrop={this.onDrop} >
                 {({ getRootProps, getInputProps }) => (
                     <section>
                         <div className={this.getClasses()} {...getRootProps()}>
                             <input directory="" webkitdirectory="" {...getInputProps()} />
-                        <p> {this.props.isParsingFiles ? 'Parsing '+( Math.round(( (this.props.fileParsed+this.props.fileIgnored) / this.props.fileLoaded) *100) )+'%' : 'Drag\'n drop Dicom files here, or click to select folder'}</p>
+                        <p> {this.getTextMessage()}</p>
                         </div>
                     </section>
                 )}

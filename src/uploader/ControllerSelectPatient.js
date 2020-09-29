@@ -15,23 +15,22 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
-import BootstrapTable from 'react-bootstrap-table-next';
+import { Modal, Button } from 'react-bootstrap'
 import SelectPatient from './SelectPatient'
-import ButtonIgnore from './render_component/ButtonIgnore'
+import CheckPatient from './render_component/CheckPatient'
 import { updateWarningStudy, setVisitID } from './actions/Studies'
 import { setUsedVisit } from './actions/Visits'
+import { selectStudiesReady } from './actions/DisplayTables'
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
 const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
 
-class CheckPatient extends Component {
+class ControllerSelectPatient extends Component {
 
     state = {
         rows: [], //Table rows to display
         isDisabled: true, //Status of 'validate' button
-        selectedVisit: undefined //ID of selected visit when in multiUpload
+        selectedVisit: undefined, //ID of selected visit when in multiUpload
     }
 
     constructor(props) {
@@ -51,38 +50,12 @@ class CheckPatient extends Component {
         }
     }
 
-    columns = [
-        {
-            dataField: 'rowName',
-            text: '',
-        },
-        {
-            dataField: 'expectedStudy',
-            text: 'Expected',
-        },
-        {
-            dataField: 'currentStudy',
-            text: 'Current',
-        },
-        {
-            dataField: 'ignoreButton',
-            text: '',
-            formatter: (cell, row, rowIndex, extraData) => ((row.ignoredStatus !== null) ?
-                <ButtonIgnore row={row} onClick={this.onClick} warning={row.ignoredStatus} /> : null)
-        },
-        {
-            dataField: 'ignoredStatus',
-            text: '',
-            hidden: true
-        },
-    ]
-
     /**
      * Change ignored state of thisRow
      * If all rows have been ignored, enable validation button
      * @param {Object} thisRow 
      */
-    onClick(thisRow) {
+    onClick = thisRow => {
         let newRows = this.state.rows.map((row) => {
             let row2 = { ...row }
             if (row2.rowName === thisRow.rowName) row2.ignoredStatus = !row.ignoredStatus
@@ -106,7 +79,10 @@ class CheckPatient extends Component {
         if (this.props.multiUpload) {
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
             this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy, true)
+        } else {
+            if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') this.props.selectStudiesReady(this.props.studies[this.props.selectedStudy].studyInstanceUID, true)
         }
+        this.setState({isDisabled: true})
         this.props.closeListener()
     }
 
@@ -125,11 +101,14 @@ class CheckPatient extends Component {
 
             //Find expected visit
             let expectedStudy
+            
             this.props.visits.forEach(visit => {
+                console.log(visit.idVisit)
                 if (visit.idVisit === idVisit) expectedStudy = visit
             })
-            expectedStudy.patientFirstName = expectedStudy.firstName
-            expectedStudy.patientLastName = expectedStudy.lastName
+
+            expectedStudy.patientFirstName = expectedStudy.patientFirstName === undefined ? '' : expectedStudy.patientFirstName.toUpperCase()
+            expectedStudy.patientLastName = expectedStudy.patientLastName === undefined ? '' : expectedStudy.patientLastName.toUpperCase()
 
             for (let i in labels) {
                 rows.push({
@@ -140,7 +119,18 @@ class CheckPatient extends Component {
                 })
             }
             return rows
-        } else return []
+        } else {
+            let rows = []
+            for (let i in labels) {
+                rows.push({
+                    rowName: labels[i],
+                    expectedStudy: '',
+                    currentStudy: '',
+                    ignoredStatus: ''
+                })
+            }
+            return rows
+        }
     }
 
     /**
@@ -174,22 +164,9 @@ class CheckPatient extends Component {
                         {this.props.multiUpload ? 'Select Patient' : 'Check Patient'}
                     </Modal.Title>
                 </Modal.Header>
-                <Modal.Body hidden={!this.props.multiUpload} className="modal-body du-patient">
-                    <SelectPatient studyInstanceUID={this.props.selectedStudy} generateRows={this.generateRows} />
-                </Modal.Body>
-                <Modal.Body className="modal-body">
-                    <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p>
-                    <BootstrapTable
-                        keyField='rowName'
-                        classes="table table-borderless"
-                        bodyClasses="du-studies-tbody"
-                        headerClasses="du-studies th"
-                        rowClasses={rowClasses}
-                        data={this.state.rows}
-                        columns={this.columns}
-                        selectRow={this.selectRow}
-                    />
-                    <p>If you want to force the upload you may have to ignore all the warnings.</p>
+                <Modal.Body className="modal-body du-patient">
+                    <SelectPatient hidden={!this.props.multiUpload} studyInstanceUID={this.props.selectedStudy} generateRows={this.generateRows} />
+                    <CheckPatient onClick={this.onClick} rows={this.state.rows} multiUpload={this.props.multiUpload}/>
                 </Modal.Body>
                 <Modal.Footer className="modal-footer">
                     <Button type="button" onClick={this.validateCheckPatient} className="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>
@@ -200,20 +177,6 @@ class CheckPatient extends Component {
         )
     }
 }
-
-const rowClasses = (row, rowIndex) => {
-    if (row.ignoredStatus === false) {
-        return 'du-studies row-danger'
-    } else if (row.ignoredStatus === null) {
-        return 'du-studies row-success'
-    }
-    return 'du-studies td'
-}
-
-//SK tout l'access a ce reducer devrait se faire dans un composant 'select patient'
-//voir un 'select patient controlleur' qui repererait si on est en unique ou multiple
-//qui afficherai un select si multiple et qui recupererai les click en callback de checkpatient
-//check patient deviendrai un composant de renderer
 
 const mapStateToProps = state => {
     return {
@@ -226,7 +189,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     updateWarningStudy,
     setUsedVisit,
-    setVisitID
+    setVisitID,
+    selectStudiesReady
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CheckPatient)
+export default connect(mapStateToProps, mapDispatchToProps)(ControllerSelectPatient)

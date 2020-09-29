@@ -13,6 +13,7 @@
  */
 
 import { MISSING_TAG_00080060, MISSING_TAG_00080022, MISSING_TAG_00101030, MISSING_TAG_00101031, MISSING_TAG_00181074, MISSING_TAG_00181072, MISSING_TAG_00181075, LESS_THAN_MINIMAL_INSTANCES } from './Warning'
+import DicomFile from './DicomFile'
 
 const minNbOfInstances = 30
 
@@ -74,7 +75,9 @@ export default class Series {
 		return nbConsideredWarnings > 0;
 	}
 
-	async checkSeries(dicomFile) {
+	async checkSeries() {
+		let firstInstance = this.getArrayInstances()[0]
+		let dicomFile = new DicomFile(firstInstance.getFile())
 		await dicomFile.readDicomFile()
 		// Check missing tags
 		if ((dicomFile.getModality()) === undefined) {
@@ -85,7 +88,7 @@ export default class Series {
 			}
 			if (this.modality === 'PT') {
 				if ((dicomFile._getDicomTag('00101030')) === undefined) {
-					this.warnings[MISSING_TAG_00101030.key] = MISSING_TAG_00101031;
+					this.warnings[MISSING_TAG_00101030.key] = MISSING_TAG_00101030;
 				}
 				if ((dicomFile._getDicomTag('00080031')) === undefined && (dicomFile._getDicomTag('00080032')) === undefined) {
 					this.warnings[MISSING_TAG_00101031.key] = MISSING_TAG_00101031;
@@ -105,11 +108,12 @@ export default class Series {
 		if (this.getNbInstances() < minNbOfInstances) {
 			this.warnings[LESS_THAN_MINIMAL_INSTANCES.key] = LESS_THAN_MINIMAL_INSTANCES;
 		} else {
-			delete this.warnings[LESS_THAN_MINIMAL_INSTANCES]
+			delete this.warnings[LESS_THAN_MINIMAL_INSTANCES.key]
 		}
 	}
 
 	getWarnings() {
+		console.log(this.warnings)
 		return this.warnings
 	}
 

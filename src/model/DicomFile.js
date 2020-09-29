@@ -288,7 +288,7 @@ export default class DicomFile {
   }
 
   getFilePath() {
-    let res = this.fileObject.fullPath;
+    let res = this.fileObject.path;
     if (res === undefined) {
       // Uploaded by folder selection,
       //doesn't have a full path but has a webkitrelativepath

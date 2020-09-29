@@ -14,65 +14,63 @@
 
 import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
+import { Container, Row, Col } from 'react-bootstrap'
 import DisplayWarning from './DisplayWarning'
-
 import { connect } from 'react-redux';
 import { selectSeriesReady, selectSeries } from './actions/DisplayTables'
 
 class DisplaySeries extends Component {
 
     columns = [
-        {
-            dataField: 'seriesInstanceUID',
-            isDummyField: true,
-            hidden: true,
-        },
-        {
-            dataField: 'selectedSeries',
-            text: 'Select',
-            formatExtraData: this,
-            formatter: (cell, row, rowIndex, formatExtraData) => {
-                let checked = row.selectedSeries
-                return (
-                    <input disabled={row.status === 'Rejected'} checked={checked} type="checkbox" onChange={() => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked) }} />
-                )
-            }
-        },
-        {
-            dataField: 'status',
-            text: 'Status',
-            editable: false
-        },
-        {
-            dataField: 'seriesDescription',
-            text: 'Description',
-            editable: false,
-            style: { whiteSpace: 'normal', wordWrap: 'break-word' }
-        },
-        {
-            dataField: 'modality',
-            text: 'Modality',
-            editable: false
-        },
-        {
-            dataField: 'seriesNumber',
-            text: 'Number #',
-            editable: false
-        },
-        {
-            dataField: 'seriesDate',
-            text: 'Date',
-            editable: false
-        },
-        {
-            dataField: 'numberOfInstances',
-            text: 'Nb of Instances',
-            editable: false
-        },
-    ];
+            {
+                dataField: 'seriesInstanceUID',
+                isDummyField: true,
+                hidden: true,
+            },
+            {
+                dataField: 'selectedSeries',
+                text: '',
+                formatExtraData: this,
+                formatter: (cell, row, rowIndex, formatExtraData) => {
+                    let checked = row.selectedSeries
+                    if (row.status === 'Known study') return <> </>
+                    return (
+                        <input disabled={row.status === 'Rejected'} checked={checked} type='checkbox' onChange={() => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked) }} />
+                    )
+                }
+            },
+            {
+                dataField: 'status',
+                text: 'Status',
+                editable: false
+            },
+            {
+                dataField: 'seriesDescription',
+                text: 'Description',
+                editable: false,
+                style: { whiteSpace: 'normal', wordWrap: 'break-word' },
+            },
+            {
+                dataField: 'modality',
+                text: 'Modality',
+                editable: false,
+            },
+            {
+                dataField: 'seriesNumber',
+                text: 'Number #',
+                editable: false,
+            },
+            {
+                dataField: 'seriesDate',
+                text: 'Date',
+                editable: false,
+            },
+            {
+                dataField: 'numberOfInstances',
+                text: 'Nb of Instances',
+                editable: false,
+            },
+        ]
 
     selectRow = {
         mode: 'radio',
@@ -86,6 +84,8 @@ class DisplaySeries extends Component {
         }
     }
 
+
+
     render() {
         return (
             <Container fluid>
@@ -93,12 +93,12 @@ class DisplaySeries extends Component {
                 <Row>
                     <Col xs={12} md={8}>
                         <BootstrapTable
-                            bodyClasses="du-series-tbody"
+                            keyField='seriesInstanceUID'
                             classes="table table-borderless"
+                            bodyClasses="du-series-tbody"
                             headerClasses="du-series th"
                             rowClasses={rowClasses}
                             wrapperClasses="table-responsive"
-                            keyField='seriesInstanceUID'
                             data={this.props.seriesRows}
                             columns={this.columns}
                             selectRow={this.selectRow} />
@@ -116,11 +116,9 @@ class DisplaySeries extends Component {
 }
 
 const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected') {
-        return 'du-series row-danger'
-    } else if (row.status === 'Valid' && row.selectedSeries === true) {
-        return 'du-series row-success'
-    } else return 'du-series td'
+    if (row.status === 'Rejected') return 'du-series row-danger'
+    if (row.status === 'Valid' && row.selectedSeries === true) return 'du-series row-success'
+    return 'du-series td'
 }
 
 

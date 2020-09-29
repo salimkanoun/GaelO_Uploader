@@ -16,7 +16,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
-
+import Util from '../model/Util'
 class SelectPatient extends Component {
 
     state = {
@@ -37,7 +37,7 @@ class SelectPatient extends Component {
         let visitTypeArray = []
         this.props.visits.forEach(visit => {
             let thisVisitType = visit.visitType
-            if (!visitTypeArray.includes(thisVisitType)) visitTypeArray.push({ value: thisVisitType, label: thisVisitType })
+            if (!Util.arrayIncludesObject(visitTypeArray, 'value', thisVisitType)) visitTypeArray.push({ value: thisVisitType, label: thisVisitType })
         })
         return visitTypeArray
     }
@@ -51,7 +51,7 @@ class SelectPatient extends Component {
         let finalDisplay = []
         this.props.visits.forEach((visit) => {
             if (this.state.selectedType !== undefined && visit.visitType === this.state.selectedType.value) {
-                finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={(id) => this.selectPatient(visit.idVisit)} disabled={visit.isUsed}>{visit.numeroPatient}</ListGroup.Item>)
+                finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={() => this.selectPatient(visit.idVisit)} disabled={visit.isUsed}>{visit.numeroPatient}</ListGroup.Item>)
             }
         })
         return finalDisplay
@@ -75,6 +75,7 @@ class SelectPatient extends Component {
     }
 
     render() {
+        if (this.props.hidden) return (<> </>)
         return (
             <>
                 <span className='du-patp-label'>Select Visit Type</span>
@@ -84,7 +85,7 @@ class SelectPatient extends Component {
                     {this.displayPatients(this.state.selectedType)}
                 </ListGroup>
                 <span className='du-patp-label'>Comparison</span>
-                <p>Please check if the selected patient and the imported patient informations are matching:</p>
+                <p>We let you check if the selected patient and the imported patient informations are matching:</p>
             </>
         )
     }

@@ -4,8 +4,9 @@ const EventEmitter = require('events').EventEmitter;
 
 export default class DicomBatchUploader extends EventEmitter {
 
-    uploadProgress=0
-    zipProgress=0
+    progressionZipArray = []
+    progressionUploadArray = []
+    sucessIDsUploaded= []
 
     constructor (uppy, idVisit, files) {
         super()
@@ -13,24 +14,59 @@ export default class DicomBatchUploader extends EventEmitter {
         this.files = files
         this.idVisit = idVisit
         this.timeStamp = Date.now()
+        this.zipIntensity = localStorage.getItem('zipIntensity') === null ? 100 : parseInt(localStorage.getItem('zipIntensity'))
+        this.batchUploadSize = localStorage.getItem('batchUploadSize') === null ? 3 : parseInt(localStorage.getItem('batchUploadSize'))
+
         this.buildBatches()
 
+        this.uppy.on('upload-progress', (file, progress) => {
+            this.progressionUploadArray[file.id] = (progress.bytesUploaded/progress.bytesTotal)
+            this.emitUploadProgress()
+        })
+
         this.uppy.on('upload-success', async (file, response) => {
+            let fileTusId = response['uploadURL'].split('/').pop()
+            console.log(fileTusId)
+            this.sucessIDsUploaded.push(fileTusId)
             this.currentBatchUpload = ++this.currentBatchUpload
-            let fractionUploaded = ( this.currentBatchUpload * this.batchValue)
-            this.uploadProgress = Math.min(fractionUploaded , 100)
-            this.emitProgress()
+            this.emitBatchUploadDoneIfTerminated()
             await this.batchesIterator.next()
         })
 
     }
 
-    emitProgress(){
-        this.emit('batch-progress', Math.round(this.zipProgress), Math.round(this.uploadProgress) )
-        if(this.zipProgress>=100 && this.uploadProgress >= 100) {
-            this.emit('batch-upload-done', this.timeStamp, this.files.length)
-        }
+    emitZipProgress(){
+        let zipProgress = 0
+        this.progressionZipArray.forEach(percent =>{
+            zipProgress += (this.batchValue * percent)/100
+        })
+        zipProgress = Math.round( Math.min( zipProgress  , 100) )
+        this.zipProgress=zipProgress
+        this.emit('batch-zip-progress', zipProgress )
+        
+    }
 
+    emitBatchUploadDoneIfTerminated(){
+        if(this.zipProgress>=100 && this.uploadProgress >= 100) {
+            this.emit('batch-upload-done', this.timeStamp, this.files.length, this.sucessIDsUploaded)
+        }
+    }
+
+    /**
+     * Calculate upload progression by summing each file progression fration,
+     * and emit upload and zip progression,
+     * if job ended (zip+upload) emit batch upload done message
+     */
+    emitUploadProgress(){
+        let uploadProgress = 0;
+        Object.keys(this.progressionUploadArray).forEach(fileID =>{
+            uploadProgress += this.progressionUploadArray[fileID] * this.batchValue
+        })
+
+        uploadProgress = Math.round( Math.min(uploadProgress , 100) )
+        this.uploadProgress=uploadProgress
+        this.emit('batch-upload-progress', uploadProgress )
+        
     }
 
     async startUpload(){
@@ -56,7 +92,7 @@ export default class DicomBatchUploader extends EventEmitter {
     makeBatch(index){
         let cummulativeSize = 0
         let batch = []
-        while( cummulativeSize < 15000000 && index < this.files.length ){
+        while( cummulativeSize < ( this.batchUploadSize * Math.pow(10, 6) ) && index < this.files.length ){
             cummulativeSize = cummulativeSize + this.files[index].size
             batch.push(this.files[index])
             index = ++index
@@ -117,17 +153,15 @@ export default class DicomBatchUploader extends EventEmitter {
                 type: "uint8array",
                 compression: "DEFLATE",
                 compressionOptions: {
-                    level: 3,
+                    level: this.zipIntensity,
                     streamFiles: true
                 }
             }
         , (progress)=>{ 
-            let fractionZipped = (index-1) * this.batchValue
-            let currentZipProgress = (this.batchValue * progress.percent)/100
-            this.zipProgress = Math.min( (fractionZipped + currentZipProgress)  , 100)
-            this.emitProgress()
-           
+            this.progressionZipArray[index] = progress.percent
+            this.emitZipProgress()
         })
+
         let zipBlob = new Blob([uintarray], { type: 'application/zip' });
         return zipBlob
 

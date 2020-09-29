@@ -27,12 +27,15 @@ export default function DisplayTablesReducer (state = initialState, action) {
       let studiesReady
       if (action.payload.isSelect) {
         // If select add SeriesInstanceUID to selectedSeries
-        studiesReady = [...state.studiesReady, action.payload.studiesInstanceUID]
+        // Distinct cases for uniqueUpload mode purpose
+        if (state.studiesReady === undefined) studiesReady = [action.payload.studiesInstanceUID]
+        else if (!state.studiesReady.includes(action.payload.studiesInstanceUID)) studiesReady = [...state.studiesReady, action.payload.studiesInstanceUID]
+        else studiesReady = [...state.studiesReady]
       } else if (!action.payload.isSelect) {
         // If not remove SeriesInstanceUID from selected Series Array
-        studiesReady = state.studiesReady.filter(thisRowID => thisRowID !== action.payload.studiesInstanceUID)
+        if (state.studiesReady !== undefined) studiesReady = state.studiesReady.filter(thisRowID => thisRowID !== action.payload.studiesInstanceUID)
+        else studiesReady = [...state.studiesReady]
       }
-      console.log(studiesReady)
       return {
         ...state,
         studiesReady: studiesReady

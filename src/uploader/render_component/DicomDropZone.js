@@ -11,6 +11,7 @@ export default class DicomDropZone extends Component {
         super(props)
         this.dragEnter = this.dragEnter.bind(this)
         this.dragLeave = this.dragLeave.bind(this)
+        this.onDrop = this.onDrop.bind(this)
     }
 
     getClasses(){
@@ -33,6 +34,11 @@ export default class DicomDropZone extends Component {
         })
     }
 
+    onDrop(acceptedFiles){
+        this.dragLeave()
+        this.props.addFile(acceptedFiles)
+    }
+
     getTextMessage(){
         if(this.props.isParsingFiles ){
             return 'Parsing '+( Math.round(( (this.props.fileParsed+this.props.fileIgnored) / this.props.fileLoaded) *100) )+'%' 
@@ -45,7 +51,7 @@ export default class DicomDropZone extends Component {
     
     render(){
         return (
-            <Dropzone onDragEnter={this.dragEnter} onDragLeave={this.dragLeave} onDrop={acceptedFiles => this.props.addFile(acceptedFiles)} >
+            <Dropzone onDragEnter={this.dragEnter} onDragLeave={this.dragLeave} onDrop={this.onDrop} >
                 {({ getRootProps, getInputProps }) => (
                     <section>
                         <div className={this.getClasses()} {...getRootProps()}>

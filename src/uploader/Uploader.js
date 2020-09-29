@@ -372,12 +372,8 @@ class Uploader extends Component {
                 filesToUpload.push(...fileArray)
             })
 
-            
             uploader.addStudyToUpload(idVisit, filesToUpload, studyOrthancID)
-        
-
            
-
         }
 
 

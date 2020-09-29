@@ -25,6 +25,9 @@ export default class DicomMultiStudyUploader extends EventEmitter {
                 this.emit('upload-finished', this.currentVisitID, timeStamp, numberOfFiles, sucessIDsUploaded, orthancStudyID)
             }else{
                 this.uploadNextStudy()
+                this.emit('batch-upload-progress', this.studyNumber, 0)
+                this.emit('batch-zip-progress', this.studyNumber, 0)
+                
             }
             
         })

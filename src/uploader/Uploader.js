@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
-import {toast} from 'react-toastify'
+import { toast } from 'react-toastify'
 import JSZip from 'jszip'
 
 import Model from '../model/Model'
@@ -24,6 +24,8 @@ import { addStudy, addWarningsStudy, setVisitID } from './actions/Studies'
 import { addSeries } from './actions/Series'
 import { addWarningsSeries } from './actions/Warnings'
 import { addVisit } from './actions/Visits'
+import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
+import { selectSeriesReady } from './actions/DisplayTables'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
@@ -31,8 +33,8 @@ class Uploader extends Component {
     state = {
         isFilesLoaded: false,
         isParsingFiles: false,
-        isUnzipping : false,
-        isUploadStarted: false,
+        isUnzipping: false,
+        isUploading: false,
         fileParsed: 0,
         fileLoaded: 0,
         zipProgress: 0,
@@ -63,7 +65,7 @@ class Uploader extends Component {
             resume: true,
             autoRetry: true,
             chunkSize: 2000000,
-            limit : 10,
+            limit: 10,
             headers: {},
             retryDelays: [0, 1000, 3000, 5000]
         })
@@ -103,12 +105,12 @@ class Uploader extends Component {
      */
     addFile(files) {
 
-        if(files.length === 1 && files[0].type === 'application/zip' ){
+        if (files.length === 1 && files[0].type === 'application/zip') {
             this.readAsZipFile(files[0])
             return
         }
 
-        if(this.state.fileParsed ===0){
+        if (this.state.fileParsed === 0) {
             //At first drop notify user started action
             this.config.callbackOnStartAction()
         }
@@ -201,44 +203,44 @@ class Uploader extends Component {
 
     async readAsZipFile(file) {
         this.setState({
-            isUnzipping : true
+            isUnzipping: true
         })
-		const reader = new FileReader();
-		reader.readAsArrayBuffer(file);
-		reader.onload = () => {
-			// Retrieve file content as Uint8Array
-			const arrayBuffer = reader.result;
-			const byteArray = new Uint8Array(arrayBuffer);
-			
-			JSZip.loadAsync(byteArray).then((zip) => {
-				// Remove the zip file from the loaded files
-				let promises = []
-				for (let elmt in zip.files) {
-					elmt = zip.files[elmt];
-					// Check if it is a file or a directory
-					if (!elmt.dir) {
-						// Decompress file
-						promises.push(
-							elmt.async('blob').then((data) => {
-							let elmtFile = new File([data], elmt.name);
-							//Add full path to match drag and drop upload
-							elmtFile.fullPath=elmt.name
-							return elmtFile
-							})
-						)
-					}
-				}
-				Promise.all(promises).then(elements =>{
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = () => {
+            // Retrieve file content as Uint8Array
+            const arrayBuffer = reader.result;
+            const byteArray = new Uint8Array(arrayBuffer);
+
+            JSZip.loadAsync(byteArray).then((zip) => {
+                // Remove the zip file from the loaded files
+                let promises = []
+                for (let elmt in zip.files) {
+                    elmt = zip.files[elmt];
+                    // Check if it is a file or a directory
+                    if (!elmt.dir) {
+                        // Decompress file
+                        promises.push(
+                            elmt.async('blob').then((data) => {
+                                let elmtFile = new File([data], elmt.name);
+                                //Add full path to match drag and drop upload
+                                elmtFile.fullPath = elmt.name
+                                return elmtFile
+                            })
+                        )
+                    }
+                }
+                Promise.all(promises).then(elements => {
                     this.setState({
-                        isUnzipping : false
+                        isUnzipping: false
                     })
-					this.addFile(elements)
-				})
-			}).catch((e) => {
-				console.log('error zip' +e )
-			})
-		}
-	}
+                    this.addFile(elements)
+                })
+            }).catch((e) => {
+                console.log('error zip' + e)
+            })
+        }
+    }
 
     /**
      * Check studies/series with warning and populate redux
@@ -254,7 +256,7 @@ class Uploader extends Component {
                 let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
                 let studyToAdd = this.uploadModel.data[studyInstanceUID]
                 studyToAdd['idVisit'] = undefined
-                if(!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
+                if (!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
                 //Add study to Redux
                 this.props.addStudy(studyToAdd)
                 //Add study warnings to Redux
@@ -262,6 +264,8 @@ class Uploader extends Component {
                 //If study has warnings, trigger a warning message
                 if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
                     this.setState({ showWarning: true })
+                } else {
+                    this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
                 }
             }
 
@@ -273,9 +277,14 @@ class Uploader extends Component {
                 this.props.addSeries(seriesInstance)
                 //Add series related warnings to Redux
                 this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
+                //Automatically add to Redux seriesReady if contains no warnings
+                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmpty(seriesInstance.getWarnings())) 
             }
 
         }
+
+        //if (Object.keys(this.uploadModel.data)[1] === undefined) this.props.selectStudy(Object.keys(this.uploadModel.data)[0])
+
     }
 
     async checkStudy(study) {
@@ -286,8 +295,8 @@ class Uploader extends Component {
         // Check if visit ID is set
         if (this.props.expectedVisit === null || typeof this.props.expectedVisit === undefined) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         // Check if study is already known by server
-        let newStudy = await isNewStudy( study.getOrthancStudyID() )
-        if ( !newStudy ) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
+        let newStudy = await isNewStudy(study.getOrthancStudyID())
+        if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
         return warnings
     }
 
@@ -341,11 +350,11 @@ class Uploader extends Component {
             return seriesObject.studyInstanceUID
         })
         studyUIDArray = Array.from(new Set(studyUIDArray))
-        
+
         //Filter non selected studyUID
         studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
 
-        if(studyUIDArray.length === 0 ) {
+        if (studyUIDArray.length === 0) {
             toast.error('No Selected Series to Upload')
             return
         }
@@ -355,7 +364,7 @@ class Uploader extends Component {
         //group series by studyUID
         for (let studyInstanceUID of studyUIDArray) {
 
-            let idVisit = this.props.studies[studyInstanceUID].idVisit 
+            let idVisit = this.props.studies[studyInstanceUID].idVisit
 
             let seriesInstanceUID = seriesObjectArrays.filter((seriesObject) => {
                 return (seriesObject.studyInstanceUID === studyInstanceUID)
@@ -376,8 +385,6 @@ class Uploader extends Component {
            
         }
 
-
-
         uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
             this.setState({
                 studyLength : studyUIDArray.length,
@@ -396,15 +403,20 @@ class Uploader extends Component {
 
         })
 
-        uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
-            console.log('Batch Finished')
-            this.config.callbackOnUploadComplete()
+        uploader.on('study-upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
+            console.log('sutdy upload Finished')
             validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
-            this.config.callbackOnValidationSent()
+        })
+
+
+        uploader.on('upload-finished', () => {
+            console.log('full upload Finished')
+            //this.setState({ isUploading: false })
+            this.config.callbackOnUploadComplete()
         })
 
         uploader.startUpload()
-        this.setState({ isUploadStarted: true })
+        this.setState({ isUploading: true })
     }
 
     render() {
@@ -413,9 +425,9 @@ class Uploader extends Component {
                 <div>
                     <DicomDropZone
                         addFile={this.addFile}
-                        isUnzipping = {this.state.isUnzipping}
+                        isUnzipping={this.state.isUnzipping}
                         isParsingFiles={this.state.isParsingFiles}
-                        isUploadStarted={this.state.isUploadStarted}
+                        isUploading={this.state.isUploading}
                         fileParsed={this.state.fileParsed}
                         fileIgnored={Object.keys(this.state.ignoredFiles).length}
                         fileLoaded={this.state.fileLoaded}
@@ -431,8 +443,18 @@ class Uploader extends Component {
                 </div>
                 <div hidden={!this.state.isFilesLoaded}>
                     <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
-                    <ControllerStudiesSeries multiUpload={this.config.multiUpload} selectedSeries={this.props.selectedSeries} />
-                    <ProgressUpload multiUpload={this.config.multiUpload} studyProgress={this.state.studyProgress} studyLength={this.state.studyLength} onUploadClick={this.onUploadClick} zipPercent={this.state.zipProgress} uploadPercent={this.state.uploadProgress} isUploadStarted={this.state.isUploadStarted} />
+                    <ControllerStudiesSeries
+                        isUploading={this.state.isUploading}
+                        multiUpload={this.config.multiUpload}
+                        selectedSeries={this.props.selectedSeries} />
+                    <ProgressUpload
+                        isUploading={this.state.isUploading}
+                        multiUpload={this.config.multiUpload}
+                        studyProgress={this.state.studyProgress}
+                        studyLength={this.state.studyLength}
+                        onUploadClick={this.onUploadClick}
+                        zipPercent={this.state.zipProgress}
+                        uploadPercent={this.state.uploadProgress} />
                 </div>
             </Fragment>
         )
@@ -457,7 +479,10 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
-    setVisitID
+    setVisitID,
+    selectStudy,
+    selectStudiesReady,
+    selectSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

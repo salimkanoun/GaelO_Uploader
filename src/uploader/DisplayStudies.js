@@ -94,7 +94,7 @@ class StudiesTab extends Component {
             this.props.selectStudy(row.studyInstanceUID)
         }
     };
-
+    
     /**
      * Toggle modal 'CheckPatient' of given row 
      */

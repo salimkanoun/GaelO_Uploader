@@ -88,13 +88,13 @@ class StudiesTab extends Component {
     selectRow = {
         mode: 'radio',
         clickToSelect: true,
-        hideSelectColumn: true,
+        hideSelectColumn: false,
         classes: "row-clicked",
         onSelect: (row) => {
             this.props.selectStudy(row.studyInstanceUID)
         }
     };
-
+    
     /**
      * Toggle modal 'CheckPatient' of given row 
      */

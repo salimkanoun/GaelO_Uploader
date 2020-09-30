@@ -24,6 +24,8 @@ import { addStudy, addWarningsStudy, setVisitID } from './actions/Studies'
 import { addSeries } from './actions/Series'
 import { addWarningsSeries } from './actions/Warnings'
 import { addVisit } from './actions/Visits'
+import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
+import { selectSeriesReady } from './actions/DisplayTables'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
@@ -262,6 +264,8 @@ class Uploader extends Component {
                 //If study has warnings, trigger a warning message
                 if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
                     this.setState({ showWarning: true })
+                } else {
+                    this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
                 }
             }
 
@@ -273,9 +277,14 @@ class Uploader extends Component {
                 this.props.addSeries(seriesInstance)
                 //Add series related warnings to Redux
                 this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
+                //Automatically add to Redux seriesReady if contains no warnings
+                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmpty(seriesInstance.getWarnings())) 
             }
 
         }
+
+        //if (Object.keys(this.uploadModel.data)[1] === undefined) this.props.selectStudy(Object.keys(this.uploadModel.data)[0])
+
     }
 
     async checkStudy(study) {
@@ -396,6 +405,7 @@ class Uploader extends Component {
 
         uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
             console.log('Batch Finished')
+            //this.setState({ isUploading: false })
             this.config.callbackOnUploadComplete()
             validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
             this.config.callbackOnValidationSent()
@@ -464,7 +474,10 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
-    setVisitID
+    setVisitID,
+    selectStudy,
+    selectStudiesReady,
+    selectSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

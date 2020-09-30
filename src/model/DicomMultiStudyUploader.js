@@ -10,32 +10,42 @@ export default class DicomMultiStudyUploader extends EventEmitter {
         this.uppy  = uppy
     }
 
-    addStudyToUpload(idVisit, fileArray){
-        this.visitsToUpload[idVisit] = fileArray
+    addStudyToUpload(idVisit, fileArray, orthancStudyID){
+        this.visitsToUpload[idVisit] = {}
+        this.visitsToUpload[idVisit]['files'] = fileArray
+        this.visitsToUpload[idVisit]['orthancStudyID'] = orthancStudyID
     }
 
-    uploadNextStudy(){
-        let uploader = this.uploadIterator.next().value
-        uploader.on('batch-upload-done', (timeStamp, numberOfFiles, sucessIDsUploaded)=>{
+    registerListener(){
+        this.uploader.on('batch-upload-done', (timeStamp, numberOfFiles, sucessIDsUploaded)=>{
+            this.uploader.removeAllListeners()
+
             if(this.studyNumber === Object.keys(this.visitsToUpload).length ){
-                this.emit('upload-finished', this.currentVisitID, timeStamp, numberOfFiles, sucessIDsUploaded)
+                let orthancStudyID = this.visitsToUpload[this.currentVisitID]['orthancStudyID'];
+                this.emit('upload-finished', this.currentVisitID, timeStamp, numberOfFiles, sucessIDsUploaded, orthancStudyID)
             }else{
                 this.uploadNextStudy()
+                this.emit('batch-upload-progress', this.studyNumber, 0)
+                this.emit('batch-zip-progress', this.studyNumber, 0)
+                
             }
             
         })
-        uploader.on('batch-zip-progress', (zipProgress) => {
+
+        this.uploader.on('batch-zip-progress', (zipProgress) => {
             this.emit('batch-zip-progress', this.studyNumber, zipProgress)
-            
         })
 
-        uploader.on('batch-upload-progress', (uploadProgress) => {
+        this.uploader.on('batch-upload-progress', (uploadProgress) => {
             this.emit('batch-upload-progress', this.studyNumber, uploadProgress)
 
         })
+    }
 
-        uploader.startUpload()
-
+    uploadNextStudy(){
+        this.uploader = this.uploadIterator.next().value
+        this.registerListener()
+        this.uploader.startUpload()
     }
 
     startUpload(){
@@ -48,7 +58,7 @@ export default class DicomMultiStudyUploader extends EventEmitter {
         for(let visitID of Object.keys(this.visitsToUpload)){
             this.studyNumber = ++this.studyNumber
             this.currentVisitID = visitID
-            let uploader = new DicomBatchUploader(this.uppy, visitID, this.visitsToUpload[visitID])
+            let uploader = new DicomBatchUploader(this.uppy, visitID, this.visitsToUpload[visitID]['files'])
             yield uploader
 
         }

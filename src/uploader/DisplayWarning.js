@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { updateWarningSeries } from './actions/Warnings'
 import { updateWarningStudy } from './actions/Studies'
 import { setUsedVisit } from './actions/Visits'
-import { selectStudiesReady } from './actions/DisplayTables'
+import { selectStudiesReady, selectSeriesReady } from './actions/DisplayTables'
 import ButtonIgnore from './render_component/ButtonIgnore'
 
 class DisplayWarning extends Component {
@@ -42,9 +42,11 @@ class DisplayWarning extends Component {
                 <ButtonIgnore hidden={row.ignorable === false || (row.key === 'NOT_EXPECTED_VISIT' && !row.dismissed)}
                     warning={this.getWarningStatus(row)}
                     onClick={() => {
-                        if (this.props.type === 'series')
+                        if (this.props.type === 'series') {
                             this.props.updateWarningSeries(row, row.seriesInstanceUID)
-                        else if (this.props.type === 'study') {
+                            if (this.props.series[row.seriesInstanceUID].status === 'Valid') this.props.selectSeriesReady(row.seriesInstanceUID, false) 
+                            else this.props.selectSeriesReady(row.seriesInstanceUID, true) 
+                        } else if (this.props.type === 'study') {
                             if (this.props.multiUpload) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
                             this.props.selectStudiesReady(row.studyInstanceUID, false)
@@ -124,6 +126,7 @@ const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
         studies: state.Studies.studies,
+        series: state.Series.series,
         studiesReady: state.DisplayTables.studiesReady,
         warningsSeries: state.Warnings.warningsSeries
     }
@@ -133,6 +136,7 @@ const mapDispatchToProps = {
     updateWarningStudy,
     setUsedVisit,
     selectStudiesReady,
+    selectSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplayWarning)

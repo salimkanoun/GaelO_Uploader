@@ -140,6 +140,7 @@ export default class DicomBatchUploader extends EventEmitter {
     async zipFiles(files, index){
 
         let jszip = new JSZip();
+
         for (let file of files){
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
@@ -163,6 +164,7 @@ export default class DicomBatchUploader extends EventEmitter {
         })
 
         let zipBlob = new Blob([uintarray], { type: 'application/zip' });
+
         return zipBlob
 
     }

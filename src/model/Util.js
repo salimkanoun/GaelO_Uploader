@@ -107,4 +107,18 @@ export default class Util {
     }
     return false
   }
+
+  /**
+   * Check if an object is empty
+   * @param {*} obj 
+   */
+  static isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+  }
 }
+
+

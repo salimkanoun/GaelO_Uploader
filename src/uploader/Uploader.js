@@ -386,8 +386,6 @@ class Uploader extends Component {
         }
 
         uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
-            console.log(studyNumber)
-            console.log(zipProgress)
             this.setState({
                 studyLength : studyUIDArray.length,
                 studyProgress : studyNumber,
@@ -450,6 +448,7 @@ class Uploader extends Component {
                         multiUpload={this.config.multiUpload}
                         selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload
+                        isUploading={this.state.isUploading}
                         multiUpload={this.config.multiUpload}
                         studyProgress={this.state.studyProgress}
                         studyLength={this.state.studyLength}

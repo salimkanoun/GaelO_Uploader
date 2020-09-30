@@ -113,7 +113,6 @@ export default class Series {
 	}
 
 	getWarnings() {
-		console.log(this.warnings)
 		return this.warnings
 	}
 

@@ -21,13 +21,13 @@ export default class DicomMultiStudyUploader extends EventEmitter {
             this.uploader.removeAllListeners()
 
             if(this.studyNumber === Object.keys(this.visitsToUpload).length ){
-                let orthancStudyID = this.visitsToUpload[this.currentVisitID]['orthancStudyID'];
-                this.emit('upload-finished', this.currentVisitID, timeStamp, numberOfFiles, sucessIDsUploaded, orthancStudyID)
+                this.emit('upload-finished')
             }else{
-                this.uploadNextStudy()
+                let orthancStudyID = this.visitsToUpload[this.currentVisitID]['orthancStudyID'];
+                this.emit('study-upload-finished', this.currentVisitID, timeStamp, numberOfFiles, sucessIDsUploaded, orthancStudyID)
                 this.emit('batch-upload-progress', this.studyNumber, 0)
                 this.emit('batch-zip-progress', this.studyNumber, 0)
-                
+                this.uploadNextStudy()
             }
             
         })

@@ -386,6 +386,8 @@ class Uploader extends Component {
         }
 
         uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
+            console.log(studyNumber)
+            console.log(zipProgress)
             this.setState({
                 studyLength : studyUIDArray.length,
                 studyProgress : studyNumber,
@@ -403,12 +405,16 @@ class Uploader extends Component {
 
         })
 
-        uploader.on('upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
-            console.log('Batch Finished')
+        uploader.on('study-upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
+            console.log('sutdy upload Finished')
+            validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+        })
+
+
+        uploader.on('upload-finished', () => {
+            console.log('full upload Finished')
             //this.setState({ isUploading: false })
             this.config.callbackOnUploadComplete()
-            validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
-            this.config.callbackOnValidationSent()
         })
 
         uploader.startUpload()
@@ -446,7 +452,7 @@ class Uploader extends Component {
                     <ProgressUpload
                         multiUpload={this.config.multiUpload}
                         studyProgress={this.state.studyProgress}
-                        studyLength={this.state.studyLenght}
+                        studyLength={this.state.studyLength}
                         onUploadClick={this.onUploadClick}
                         zipPercent={this.state.zipProgress}
                         uploadPercent={this.state.uploadProgress} />

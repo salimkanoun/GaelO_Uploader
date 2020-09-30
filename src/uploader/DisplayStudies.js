@@ -88,7 +88,7 @@ class StudiesTab extends Component {
     selectRow = {
         mode: 'radio',
         clickToSelect: true,
-        hideSelectColumn: false,
+        hideSelectColumn: true,
         classes: "row-clicked",
         onSelect: (row) => {
             this.props.selectStudy(row.studyInstanceUID)

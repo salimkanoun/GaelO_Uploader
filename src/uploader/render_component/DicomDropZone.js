@@ -17,7 +17,7 @@ export default class DicomDropZone extends Component {
         let classArray = ['dropzone']
         if (this.props.isParsingFiles) classArray.push('dz-parsing')
         if (this.state.isdragging) classArray.push('dz-hover')
-        if (this.props.isUploadStarted) classArray.push('dz-deactivated')
+        if (this.props.isUploading) classArray.push('dz-deactivated')
         return classArray.join(' ')
     }
 

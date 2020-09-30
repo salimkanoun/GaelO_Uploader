@@ -116,14 +116,14 @@ class ControllerStudiesSeries extends Component {
 
   render() {
     return (
-      <>
+      <div disabled={this.props.isUploading}>
         <Row>
           <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} checkStudyReady={(studyID) => { this.studyWarningsPassed(studyID) }} />
         </Row>
         <Row>
           <DisplaySeries seriesRows={this.buildSeriesRows()} />
         </Row>
-      </>
+      </div>
     )
   }
 }

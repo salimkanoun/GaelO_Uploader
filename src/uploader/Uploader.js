@@ -76,10 +76,8 @@ class Uploader extends Component {
 
     async componentDidMount() {
         if (this.config.developerMode) {
-            let answer = await logIn()
-            console.log(answer)
-            answer = await registerStudy()
-            console.log(answer)
+            await logIn()
+            await registerStudy()
         }
 
         let answer = await getPossibleImport()

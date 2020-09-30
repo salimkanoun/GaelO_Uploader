@@ -71,7 +71,7 @@ export function logIn () {
   const formData = new FormData()
   formData.append('username', process.env.REACT_APP_GAELO_LOGIN)
   formData.append('mdp', process.env.REACT_APP_GAELO_PASSWORD)
-  formData.append('formSent', '1')
+  formData.append('formSent', process.env.REACT_APP_GAELO_VISITID)
 
   return fetch('/index.php', {
     method: 'POST',

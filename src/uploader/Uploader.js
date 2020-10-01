@@ -144,8 +144,6 @@ class Uploader extends Component {
      */
     async read(file) {
         try {
-            this.uploadModel = new Model()
-
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
 
@@ -280,9 +278,7 @@ class Uploader extends Component {
             }
 
         }
-
-        //if (Object.keys(this.uploadModel.data)[1] === undefined) this.props.selectStudy(Object.keys(this.uploadModel.data)[0])
-
+       
     }
 
     async checkStudy(study) {

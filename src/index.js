@@ -10,7 +10,7 @@ console.log(process.env)
 const config = {
   // Declare default config
   developerMode: true,
-  multiUpload: false,
+  multiUpload: true,
   minNbOfInstances: 30,
   idVisit: parseInt(process.env.REACT_APP_GAELO_VISITID),
   callbackOnStartAction: () => {},

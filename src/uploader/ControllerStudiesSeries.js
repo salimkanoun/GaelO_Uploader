@@ -59,16 +59,17 @@ class ControllerStudiesSeries extends Component {
         return studyStatus
       }
     }
+    let hasAWarningDismissed = false
     // Check for warnings in series
     for (const series in this.props.series) {
       if (Object.keys(this.props.studies[study].series).includes(series)) {
         for (const warning in this.props.warningsSeries[series]) {
-          if (!this.props.warningsSeries[series][warning].dismissed) {
-            studyStatus = 'Incomplete'
-          }
+          if (this.props.warningsSeries[series][warning].dismissed) hasAWarningDismissed = true
+          else studyStatus = 'Incomplete'
         }
       }
     }
+    if (hasAWarningDismissed) studyStatus = 'Valid'
     return studyStatus
   }
 

@@ -144,8 +144,6 @@ class Uploader extends Component {
      */
     async read(file) {
         try {
-            this.uploadModel = new Model()
-
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
 
@@ -249,25 +247,23 @@ class Uploader extends Component {
 
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
-
-            //If not in multiupload mode
-            if (!this.state.multiUpload) {
-                //Check studies warnings
-                let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
-                let studyToAdd = this.uploadModel.data[studyInstanceUID]
-                studyToAdd['idVisit'] = undefined
-                if (!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
-                //Add study to Redux
-                this.props.addStudy(studyToAdd)
-                //Add study warnings to Redux
-                this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
-                //If study has warnings, trigger a warning message
-                if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
-                    this.setState({ showWarning: true })
-                } else {
-                    this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
-                }
+            
+            //Check studies warnings
+            let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
+            let studyToAdd = this.uploadModel.data[studyInstanceUID]
+            studyToAdd['idVisit'] = undefined
+            if (!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
+            //Add study to Redux
+            this.props.addStudy(studyToAdd)
+            //Add study warnings to Redux
+            this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
+            //If study has warnings, trigger a warning message
+            if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
+                this.setState({ showWarning: true })
+            } else {
+                this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
             }
+            
 
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
@@ -282,9 +278,7 @@ class Uploader extends Component {
             }
 
         }
-
-        //if (Object.keys(this.uploadModel.data)[1] === undefined) this.props.selectStudy(Object.keys(this.uploadModel.data)[0])
-
+       
     }
 
     async checkStudy(study) {

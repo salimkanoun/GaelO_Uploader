@@ -244,23 +244,21 @@ class Uploader extends Component {
      * Check studies/series with warning and populate redux
      */
     async checkSeriesAndUpdateRedux() {
-
+        this.props.selectStudy(undefined)
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
-            if (this.props.selectedStudy !== studyInstanceUID) {
-                //Check studies warnings
-                let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
-                let studyToAdd = this.uploadModel.data[studyInstanceUID]
-                studyToAdd['idVisit'] = undefined
-                if (!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
-                //Add study to Redux
-                this.props.addStudy(studyToAdd)
-                //Add study warnings to Redux
-                this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
-                //If study has warnings, trigger a warning message
-                if (this.uploadModel.data[studyInstanceUID].warnings !== {}) this.setState({ showWarning: true })
-                else this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
-            }
+            //Check studies warnings
+            let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
+            let studyToAdd = this.uploadModel.data[studyInstanceUID]
+            studyToAdd['idVisit'] = undefined
+            if (!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
+            //Add study to Redux
+            this.props.addStudy(studyToAdd)
+            //Add study warnings to Redux
+            this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
+            //If study has warnings, trigger a warning message
+            if (this.uploadModel.data[studyInstanceUID].warnings !== {}) this.setState({ showWarning: true })
+            else this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
             for (let seriesInstance of series) {
@@ -458,7 +456,6 @@ const mapStateToProps = state => {
         studies: state.Studies.studies,
         series: state.Series.series,
         selectedSeries: state.DisplayTables.selectedSeries,
-        selectedStudy: state.DisplayTables.selectedStudy,
         seriesReady: state.DisplayTables.seriesReady,
         studiesReady: state.DisplayTables.studiesReady,
         warningsSeries: state.Warnings.warningsSeries,

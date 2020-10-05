@@ -45,7 +45,7 @@ class ControllerSelectPatient extends Component {
      * @param {*} prevState 
      */
     componentDidUpdate(prevState) {
-        if (prevState.selectedStudy !== this.props.selectedStudy || prevState.show !== this.props.show) {
+        if ((prevState.selectedStudy !== this.props.selectedStudy && this.props.selectedStudy !== undefined) || prevState.show !== this.props.show) {
             this.setState({ rows: this.buildRows() })
         }
     }
@@ -82,7 +82,7 @@ class ControllerSelectPatient extends Component {
         } else {
             if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') this.props.selectStudiesReady(this.props.studies[this.props.selectedStudy].studyInstanceUID, true)
         }
-        this.setState({isDisabled: true})
+        this.setState({ isDisabled: true })
         this.props.closeListener()
     }
 
@@ -101,7 +101,7 @@ class ControllerSelectPatient extends Component {
 
             //Find expected visit
             let expectedStudy
-            
+
             this.props.visits.forEach(visit => {
                 console.log(visit.idVisit)
                 if (visit.idVisit === idVisit) expectedStudy = visit
@@ -166,7 +166,7 @@ class ControllerSelectPatient extends Component {
                 </Modal.Header>
                 <Modal.Body className="modal-body du-patient">
                     <SelectPatient hidden={!this.props.multiUpload} studyInstanceUID={this.props.selectedStudy} generateRows={this.generateRows} />
-                    <CheckPatient onClick={this.onClick} rows={this.state.rows} multiUpload={this.props.multiUpload}/>
+                    <CheckPatient onClick={this.onClick} rows={this.state.rows} multiUpload={this.props.multiUpload} />
                 </Modal.Body>
                 <Modal.Footer className="modal-footer">
                     <Button type="button" onClick={this.validateCheckPatient} className="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>

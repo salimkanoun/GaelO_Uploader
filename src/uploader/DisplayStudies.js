@@ -89,7 +89,6 @@ class StudiesTab extends Component {
         mode: 'radio',
         clickToSelect: true,
         hideSelectColumn: true,
-        classes: "row-clicked",
         onSelect: (row) => {
             this.props.selectStudy(row.studyInstanceUID)
         }
@@ -100,6 +99,23 @@ class StudiesTab extends Component {
      */
     toggleCheckPatient() {
         this.setState((state) => { return { isToggled: !state.isToggled } })
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.selectedStudy !== this.props.selectedStudy) {
+            console.log('here')
+            this.render()
+        }
+    }
+
+    rowClasses = (row, rowIndex) => {
+        let className = ''
+        if (row.status === 'Rejected') className = 'du-studies row-danger'
+        else if (row.status === 'Incomplete' || row.status === 'Already Known') className = 'du-studies row-warning'
+        else if (row.status === 'Valid' && row.selectedStudies === true) className = 'du-studies row-success'
+        else className = 'du-studies td'
+        if (row.studyInstanceUID === this.props.selectedStudy) className = className + ' row-clicked'
+        return className
     }
 
     render() {
@@ -113,7 +129,7 @@ class StudiesTab extends Component {
                             classes="table table-borderless"
                             bodyClasses="du-studies-tbody"
                             headerClasses="du-studies th"
-                            rowClasses={rowClasses}
+                            rowClasses={this.rowClasses}
                             wrapperClasses="table-responsive"
                             data={this.props.studiesRows}
                             columns={this.columns}
@@ -128,13 +144,6 @@ class StudiesTab extends Component {
             </Container>
         )
     }
-}
-
-const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected') return 'du-studies row-danger'
-    if (row.status === 'Incomplete' || row.status === 'Already Known') return 'du-studies row-warning'
-    if (row.status === 'Valid' && row.selectedStudies === true) return 'du-studies row-success'
-    return 'du-studies td'
 }
 
 const mapStateToProps = state => {

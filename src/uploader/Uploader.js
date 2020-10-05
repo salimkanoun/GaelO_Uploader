@@ -39,8 +39,8 @@ class Uploader extends Component {
         fileLoaded: 0,
         zipProgress: 0,
         uploadProgress: 0,
-        studyProgress : 0,
-        studyLength : 1,
+        studyProgress: 0,
+        studyLength: 1,
         ignoredFiles: {},
         showWarning: false
     }
@@ -244,10 +244,9 @@ class Uploader extends Component {
      * Check studies/series with warning and populate redux
      */
     async checkSeriesAndUpdateRedux() {
-
+        this.props.selectStudy(undefined)
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
-            
             //Check studies warnings
             let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
             let studyToAdd = this.uploadModel.data[studyInstanceUID]
@@ -258,13 +257,8 @@ class Uploader extends Component {
             //Add study warnings to Redux
             this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
             //If study has warnings, trigger a warning message
-            if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
-                this.setState({ showWarning: true })
-            } else {
-                this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
-            }
-            
-
+            if (this.uploadModel.data[studyInstanceUID].warnings !== {}) this.setState({ showWarning: true })
+            else this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
             for (let seriesInstance of series) {
@@ -274,11 +268,11 @@ class Uploader extends Component {
                 //Add series related warnings to Redux
                 this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
                 //Automatically add to Redux seriesReady if contains no warnings
-                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmpty(seriesInstance.getWarnings())) 
+                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmpty(seriesInstance.getWarnings()))
             }
 
         }
-       
+
     }
 
     async checkStudy(study) {
@@ -287,7 +281,7 @@ class Uploader extends Component {
         let expectedVisit = this.findExpectedVisit(study);
         if (expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         // Check if visit ID is set
-        if (this.props.expectedVisit === null || typeof this.props.expectedVisit === undefined) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        if (this.props.expectedVisit === null || this.props.expectedVisit === undefined) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         // Check if study is already known by server
         let newStudy = await isNewStudy(study.getOrthancStudyID())
         if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
@@ -376,22 +370,22 @@ class Uploader extends Component {
             })
 
             uploader.addStudyToUpload(idVisit, filesToUpload, studyOrthancID)
-           
+
         }
 
         uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
             this.setState({
-                studyLength : studyUIDArray.length,
-                studyProgress : studyNumber,
+                studyLength: studyUIDArray.length,
+                studyProgress: studyNumber,
                 zipProgress: zipProgress
             })
 
         })
-        
+
         uploader.on('batch-upload-progress', (studyNumber, uploadProgress) => {
             this.setState({
-                studyLength : studyUIDArray.length,
-                studyProgress : studyNumber,
+                studyLength: studyUIDArray.length,
+                studyProgress: studyNumber,
                 uploadProgress: uploadProgress
             })
 

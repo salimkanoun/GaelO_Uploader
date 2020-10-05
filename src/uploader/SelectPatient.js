@@ -20,8 +20,7 @@ import Util from '../model/Util'
 class SelectPatient extends Component {
 
     state = {
-        selectedType: undefined, //Selected visit type
-        selectedVisit: undefined //Selected visit ID
+        selectedVisitType: undefined, //Selected visit type
     }
 
     constructor(props) {
@@ -50,7 +49,7 @@ class SelectPatient extends Component {
     displayPatients() {
         let finalDisplay = []
         this.props.visits.forEach((visit) => {
-            if (this.state.selectedType !== undefined && visit.visitType === this.state.selectedType.value) {
+            if (this.state.selectedVisitType !== undefined && visit.visitType === this.state.selectedVisitType.value) {
                 finalDisplay.push(<ListGroup.Item key={visit.idVisit} action onClick={() => this.selectPatient(visit.idVisit)} disabled={visit.isUsed}>{visit.numeroPatient}</ListGroup.Item>)
             }
         })
@@ -58,20 +57,20 @@ class SelectPatient extends Component {
     }
 
     /**
-     * Update selectedType state of visit
-     * @param {String} selectedType 
+     * Update selectedVisitType state of visit
+     * @param {String} selectedVisitType 
      */
-    selectType = selectedType => {
-        this.setState({ selectedType });
-    }    
-    
+    selectType = selectedVisitType => {
+        this.setState({ selectedVisitType });
+    }
+
     /**
      * Update selectedVisit state and call parent function
      * to generate rows to check
      * @param {String} selectedVisit 
      */
-    selectPatient (selectedVisit) {
-        this.setState({ selectedVisit }, () => this.props.generateRows(selectedVisit))
+    selectPatient(selectedVisit) {
+        this.props.generateRows(selectedVisit)
     }
 
     render() {
@@ -82,7 +81,7 @@ class SelectPatient extends Component {
                 <Select options={this.fetchVisitTypes()} onChange={this.selectType} />
                 <span className='du-patp-label'>Select Patient</span>
                 <ListGroup variant='flush'>
-                    {this.displayPatients(this.state.selectedType)}
+                    {this.displayPatients(this.state.selectedVisitType)}
                 </ListGroup>
                 <span className='du-patp-label'>Comparison</span>
                 <p>We let you check if the selected patient and the imported patient informations are matching:</p>

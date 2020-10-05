@@ -68,27 +68,27 @@ export default class Study {
     }
 
     getPatientFirstName() {
-        return (this.patientFirstName === undefined) ? '' : this.patientFirstName.toUpperCase()
+        return (this.patientFirstName === undefined || this.patientFirstName === null) ? '' : this.patientFirstName.toUpperCase()
     }
 
     getPatientLastName() {
-        return (this.patientLastName === undefined) ? '' : this.patientLastName.toUpperCase()
+        return (this.patientLastName === undefined || this.patientLastName === null) ? '' : this.patientLastName.toUpperCase()
     }
 
     getStudyInstanceUID() {
-        return (this.studyInstanceUID === undefined) ? '' : this.studyInstanceUID
+        return (this.studyInstanceUID === undefined || this.studyInstanceUID === null) ? '' : this.studyInstanceUID
     }
 
     getStudyID() {
-        return (this.studyID === undefined) ? '' : this.studyID
+        return (this.studyID === undefined || this.studyID === null) ? '' : this.studyID
     }
 
     getStudyDate() {
-        return (this.studyDate === undefined) ? '' : this.studyDate
+        return (this.studyDate === undefined || this.studyDate === null) ? '' : this.studyDate
     }
 
     getAcquisitionDate() {
-        return (this.acquisitionDate === undefined) ? '' : this.acquisitionDate
+        return (this.acquisitionDate === undefined || this.acquisitionDate === null) ? '' : this.acquisitionDate
     }
 
     getDate(rawDate) {
@@ -100,22 +100,21 @@ export default class Study {
     }
 
     getStudyDescription() {
-        return (this.studyDescription === undefined) ? '' : this.studyDescription
+        return (this.studyDescription === undefined || this.studyDescription === null) ? '' : this.studyDescription
     }
 
     getPatientBirthDate() {
-        return (this.patientBirthDate === undefined) ? '' : this.patientBirthDate
+        return (this.patientBirthDate === undefined || this.patientBirthDate === null) ? '' : this.patientBirthDate
     }
 
     getPatientSex() {
-        return (this.patientSex === undefined) ? '' : this.patientSex.toUpperCase()
+        return (this.patientSex === undefined || this.patientSex === null) ? '' : this.patientSex.toUpperCase()
     }
 
     getPatientID() {
-        return (this.patientID === undefined) ? '' : this.patientID
+        return (this.patientID === undefined || this.patientID === null) ? '' : this.patientID
     }
 
-    //SK Pour envoyer au back pour savoir si etude connue ou pas et au moment du post processing
     getOrthancStudyID() {
         let hash = SHA1(this.patientID + '|' + this.studyInstanceUID).toString()
         return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`

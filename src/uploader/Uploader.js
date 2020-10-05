@@ -39,8 +39,8 @@ class Uploader extends Component {
         fileLoaded: 0,
         zipProgress: 0,
         uploadProgress: 0,
-        studyProgress : 0,
-        studyLength : 1,
+        studyProgress: 0,
+        studyLength: 1,
         ignoredFiles: {},
         showWarning: false
     }
@@ -247,24 +247,20 @@ class Uploader extends Component {
 
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
-            
-            //Check studies warnings
-            let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
-            let studyToAdd = this.uploadModel.data[studyInstanceUID]
-            studyToAdd['idVisit'] = undefined
-            if (!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
-            //Add study to Redux
-            this.props.addStudy(studyToAdd)
-            //Add study warnings to Redux
-            this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
-            //If study has warnings, trigger a warning message
-            if (this.uploadModel.data[studyInstanceUID].warnings !== {}) {
-                this.setState({ showWarning: true })
-            } else {
-                this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
+            if (this.props.selectedStudy !== studyInstanceUID) {
+                //Check studies warnings
+                let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
+                let studyToAdd = this.uploadModel.data[studyInstanceUID]
+                studyToAdd['idVisit'] = undefined
+                if (!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
+                //Add study to Redux
+                this.props.addStudy(studyToAdd)
+                //Add study warnings to Redux
+                this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
+                //If study has warnings, trigger a warning message
+                if (this.uploadModel.data[studyInstanceUID].warnings !== {}) this.setState({ showWarning: true })
+                else this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
             }
-            
-
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
             for (let seriesInstance of series) {
@@ -274,11 +270,11 @@ class Uploader extends Component {
                 //Add series related warnings to Redux
                 this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
                 //Automatically add to Redux seriesReady if contains no warnings
-                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmpty(seriesInstance.getWarnings())) 
+                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmpty(seriesInstance.getWarnings()))
             }
 
         }
-       
+
     }
 
     async checkStudy(study) {
@@ -376,22 +372,22 @@ class Uploader extends Component {
             })
 
             uploader.addStudyToUpload(idVisit, filesToUpload, studyOrthancID)
-           
+
         }
 
         uploader.on('batch-zip-progress', (studyNumber, zipProgress) => {
             this.setState({
-                studyLength : studyUIDArray.length,
-                studyProgress : studyNumber,
+                studyLength: studyUIDArray.length,
+                studyProgress: studyNumber,
                 zipProgress: zipProgress
             })
 
         })
-        
+
         uploader.on('batch-upload-progress', (studyNumber, uploadProgress) => {
             this.setState({
-                studyLength : studyUIDArray.length,
-                studyProgress : studyNumber,
+                studyLength: studyUIDArray.length,
+                studyProgress: studyNumber,
                 uploadProgress: uploadProgress
             })
 
@@ -462,6 +458,7 @@ const mapStateToProps = state => {
         studies: state.Studies.studies,
         series: state.Series.series,
         selectedSeries: state.DisplayTables.selectedSeries,
+        selectedStudy: state.DisplayTables.selectedStudy,
         seriesReady: state.DisplayTables.seriesReady,
         studiesReady: state.DisplayTables.studiesReady,
         warningsSeries: state.Warnings.warningsSeries,

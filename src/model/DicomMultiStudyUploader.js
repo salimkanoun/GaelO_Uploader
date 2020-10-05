@@ -57,7 +57,7 @@ export default class DicomMultiStudyUploader extends EventEmitter {
     buildNextUploader = function* () {
         this.studyNumber = 0
         for (let visitID of Object.keys(this.visitsToUpload)) {
-            this.studyNumber = ++this.studyNumber
+            ++this.studyNumber
             this.currentVisitID = visitID
             let uploader = new DicomBatchUploader(this.uppy, visitID, this.visitsToUpload[visitID]['files'])
             yield uploader

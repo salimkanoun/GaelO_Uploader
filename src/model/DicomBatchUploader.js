@@ -28,7 +28,7 @@ export default class DicomBatchUploader extends EventEmitter {
             let fileTusId = response['uploadURL'].split('/').pop()
             console.log(fileTusId)
             this.sucessIDsUploaded.push(fileTusId)
-            this.currentBatchUpload = ++this.currentBatchUpload
+            ++this.currentBatchUpload
             this.emitBatchUploadDoneIfTerminated()
             await this.batchesIterator.next()
         })

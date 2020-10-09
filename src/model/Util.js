@@ -17,6 +17,7 @@ export default class Util {
 	 * Format date for display
 	 */
   static fDate (date) {
+    
     if (date === undefined) {
       return ''
     }

@@ -20,10 +20,10 @@ import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
-import { addStudy, addWarningsStudy, setVisitID } from './actions/Studies'
+import { addStudy, addWarningsStudy } from './actions/Studies'
 import { addSeries } from './actions/Series'
 import { addWarningsSeries } from './actions/Warnings'
-import { addVisit } from './actions/Visits'
+import { addVisit, setUsedVisit } from './actions/Visits'
 import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
 import { selectSeriesReady } from './actions/DisplayTables'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
@@ -114,8 +114,6 @@ class Uploader extends Component {
             //At first drop notify user started action
             this.config.callbackOnStartAction()
         }
-
-
 
         //Add number of files to be parsed to the previous number (incremental parsing)
         this.setState((previousState) => {
@@ -245,6 +243,7 @@ class Uploader extends Component {
      */
     async checkSeriesAndUpdateRedux() {
         this.props.selectStudy(undefined)
+        this.resetVisits()
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
             //Check studies warnings
@@ -314,6 +313,16 @@ class Uploader extends Component {
             }
         };
         return undefined;
+    }
+
+    /**
+     * Reset visit status on adding additional DICOMs
+     */
+    resetVisits() {
+        for(let visit in this.props.visits) {
+            let thisVisit = this.props.visits[visit]
+            this.props.setUsedVisit(thisVisit.idVisit, thisVisit.studyID, false)
+        }
     }
 
     /** 
@@ -467,7 +476,7 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
-    setVisitID,
+    setUsedVisit,
     selectStudy,
     selectStudiesReady,
     selectSeriesReady

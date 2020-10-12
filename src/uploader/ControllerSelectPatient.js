@@ -75,6 +75,7 @@ class ControllerSelectPatient extends Component {
      */
     validateCheckPatient = () => {
         this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
+        this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'], this.props.selectedStudy)
         //If multiUpload mode on, set idVisit to the study and forbid its use for another study 
         if (this.props.multiUpload) {
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)

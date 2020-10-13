@@ -47,8 +47,9 @@ class DisplayWarning extends Component {
                             if (this.props.series[row.seriesInstanceUID].status === 'Valid') this.props.selectSeriesReady(row.seriesInstanceUID, false) 
                             else this.props.selectSeriesReady(row.seriesInstanceUID, true) 
                         } else if (this.props.type === 'study') {
-                            if (this.props.multiUpload) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
+                            if (this.props.multiUpload) {} this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
+                            if (row.key === 'NOT_EXPECTED_VISIT') this.props.updateWarningStudy(this.props.studies[row.studyInstanceUID].warnings['NULL_VISIT_ID'], row.studyInstanceUID)
                             this.props.selectStudiesReady(row.studyInstanceUID, false)
                         }
                     }}/>

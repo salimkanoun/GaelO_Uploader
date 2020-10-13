@@ -20,7 +20,7 @@ import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
-import { addStudy, addWarningsStudy } from './actions/Studies'
+import { addStudy, addWarningsStudy, updateWarningStudy } from './actions/Studies'
 import { addSeries } from './actions/Series'
 import { addWarningsSeries } from './actions/Warnings'
 import { addVisit, setUsedVisit } from './actions/Visits'
@@ -267,7 +267,7 @@ class Uploader extends Component {
                 //Add series related warnings to Redux
                 this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
                 //Automatically add to Redux seriesReady if contains no warnings
-                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmpty(seriesInstance.getWarnings()))
+                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmptyObject(seriesInstance.getWarnings()))
             }
 
         }
@@ -280,7 +280,7 @@ class Uploader extends Component {
         let expectedVisit = this.findExpectedVisit(study);
         if (expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         // Check if visit ID is set
-        if (this.props.expectedVisit === null || this.props.expectedVisit === undefined) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        if (expectedVisit === undefined || expectedVisit.idVisit === null) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         // Check if study is already known by server
         let newStudy = await isNewStudy(study.getOrthancStudyID())
         if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
@@ -298,6 +298,7 @@ class Uploader extends Component {
 
         thisPatient.birthDate = studyObject.getPatientBirthDate();
         thisPatient.sex = studyObject.patientSex;
+        thisPatient.acquisitionDate = studyObject.getAcquisitionDate()
 
         if (thisPatient.birthDate === undefined || thisPatient.sex === undefined) {
             return undefined;
@@ -305,11 +306,12 @@ class Uploader extends Component {
 
         // Linear search through expected visits list
         for (let visit of this.props.visits) {
-            if (visit.firstName.trim().toUpperCase().charAt(0) === thisPatient.givenName.trim().toUpperCase().charAt(0)
-                && visit.lastName.trim().toUpperCase().charAt(0) === thisPatient.familyName.trim().toUpperCase().charAt(0)
-                && visit.sex.trim().toUpperCase().charAt(0) === thisPatient.sex.trim().toUpperCase().charAt(0)
-                && Util.isProbablyEqualDates(visit.birthDate, thisPatient.birthDate)) {
-                return visit;
+            if (Util.areEqualFields(visit.firstName.trim().charAt(0), thisPatient.givenName.trim().charAt(0))
+                && Util.areEqualFields(visit.lastName.trim().charAt(0), thisPatient.familyName.trim().charAt(0))
+                && Util.areEqualFields(visit.patientSex.trim().charAt(0), thisPatient.sex.trim().charAt(0))
+                && Util.isProbablyEqualDates(visit.patientDOB, Util.formatRawDate(thisPatient.birthDate))
+                && Util.isProbablyEqualDates(visit.acquisitionDate, Util.formatRawDate(thisPatient.acquisitionDate))) {
+                    return visit;
             }
         };
         return undefined;
@@ -476,6 +478,7 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
+    updateWarningStudy,
     setUsedVisit,
     selectStudy,
     selectStudiesReady,

@@ -14,10 +14,12 @@
 
 export default class Util {
   /**
-	 * Format date for display
-	 */
-  static fDate (date) {
-    
+   * Format date for display
+   * @param {Date} date
+   * @return {Date}
+   */
+  static fDate(date) {
+
     if (date === undefined) {
       return ''
     }
@@ -57,10 +59,41 @@ export default class Util {
   }
 
   /**
-	 * Check equality of two uncomplete dates
-	 * (with missing informations such as month or day)
-	 */
-  static isProbablyEqualDates (d1, d2) {
+   * Check if given date is already in MM-DD-YYYY format
+   * @param {Date} date
+   * @return {Boolean} 
+   */
+  static isCorrectlyFormattedDate(date) {
+    let month = date.split('-')[0]
+    let day = date.split('-')[1]
+    let year = date.split('-')[2]
+    if (month.length === 2 && day.length === 2 && year.length === 4) return true
+  }
+
+  /**
+   * Format DICOM dates to English format
+   * @param {Date} rawDate 
+   * @return {Boolean}
+   */
+  static formatRawDate(rawDate) {
+    if (Util.isCorrectlyFormattedDate(rawDate)) return rawDate
+    if (rawDate != null) {
+      return (rawDate.substring(6, 8) + '-' + rawDate.substring(4, 6) + '-' + rawDate.substring(0, 4))
+    } else {
+      return null
+    }
+  }
+
+  /**
+   * Check equality of two dates that may be uncomplete
+   * (with missing informations such as month or day)
+   * @param {Date} d1
+   * @param {Date} d2
+   * @return {Boolean}
+   */
+  static isProbablyEqualDates(d1, d2) {
+    if (d1 === d2) return true
+
     d1 = Util.fDate(d1)
     d2 = Util.fDate(d2)
 
@@ -86,9 +119,12 @@ export default class Util {
   }
 
   /**
-	 * Format string to a specified length string
-	 */
-  static intToString (integer, digits) {
+   * Format string to a specified length string
+   * @param {Integer} integer
+   * @param {Integer} digits
+   * @return {String}
+   */
+  static intToString(integer, digits) {
     while (integer.toString().length < digits) {
       integer = '0' + integer
     }
@@ -101,8 +137,9 @@ export default class Util {
    * @param {Array} array
    * @param {*} objectKey
    * @param {*} key
+   * @return {Boolean}
    */
-  static arrayIncludesObject (array, objectKey, key) {
+  static arrayIncludesObject(array, objectKey, key) {
     for (const i in array) {
       if (array[i][objectKey] === key) return true
     }
@@ -111,14 +148,30 @@ export default class Util {
 
   /**
    * Check if an object is empty
-   * @param {*} obj 
+   * @param {Object} obj 
+   * @return {Boolean}
    */
-  static isEmpty(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-            return false;
+  static isEmptyObject(obj) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key))
+        return false;
     }
     return true;
+  }
+
+  /**
+   * Figure if two fields are equals
+   * If one string is empty, strings are considered equal
+   * @param {String} str1 
+   * @param {String} str2
+   * @return {Boolean} 
+   */
+  static areEqualFields(str1, str2) {
+    str1 = str1.toUpperCase()
+    str2 = str2.toUpperCase()
+    if (str1 === undefined || str2 === undefined || str1 === '' || str2 === '') return true
+    if (str1.localeCompare(str2) === 0) return true
+    return false 
   }
 }
 

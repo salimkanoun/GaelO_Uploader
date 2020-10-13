@@ -28,9 +28,9 @@ export default class Study {
         this.patientID = patientID
         this.patientFirstName = patientFirstName
         this.patientLastName = patientLastName
-        this.patientBirthDate = this.getDate(patientBirthDate)
+        this.patientBirthDate = patientBirthDate
         this.patientSex = patientSex
-        this.acquisitionDate = this.getDate(acquisitionDate)
+        this.acquisitionDate = acquisitionDate
         this.patientName = patientFirstName + ' ' + patientLastName
     }
 
@@ -89,14 +89,6 @@ export default class Study {
 
     getAcquisitionDate() {
         return (this.acquisitionDate === undefined || this.acquisitionDate === null) ? '' : this.acquisitionDate
-    }
-
-    getDate(rawDate) {
-        if (rawDate != null) {
-            return (rawDate.substring(0, 4) + '-' + rawDate.substring(4, 6) + '-' + rawDate.substring(6, 8))
-        } else {
-            return null
-        }
     }
 
     getStudyDescription() {

@@ -24,19 +24,11 @@ export default class Series {
 	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality, studyInstanceUID) {
 		this.seriesInstanceUID = seriesInstanceUID
 		this.seriesNumber = seriesNumber
-		this.seriesDate = this.getDate(seriesDate)
+		this.seriesDate = seriesDate
 		this.seriesDescription = seriesDescription
 		this.modality = modality
 		this.studyInstanceUID = studyInstanceUID
 		this.warnings = {};
-	}
-
-	getDate(rawDate) {
-		if (rawDate != null) {
-			return (rawDate.substring(0, 4) + '-' + rawDate.substring(4, 6) + '-' + rawDate.substring(6, 8))
-		} else {
-			return null
-		}
 	}
 
 	addInstance(instanceObject) {

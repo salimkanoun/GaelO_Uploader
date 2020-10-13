@@ -14,7 +14,7 @@ export const NOT_EXPECTED_VISIT = {
 
 export const NULL_VISIT_ID = {
   key: 'NULL_VISIT_ID',
-  content: 'You should check/select the patient.',
+  content: 'You should check/select the patient. Null Visit ID.',
   ignorable: false,
   dismissed: false
 }

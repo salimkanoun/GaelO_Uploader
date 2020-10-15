@@ -96,7 +96,6 @@ class ControllerSelectPatient extends Component {
         if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined && uploadDataReady) {
             let rows = []
             let currentStudy = this.props.studies[this.props.selectedStudy]
-
             //Extract only first letter of patient first and last names
             currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
             currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
@@ -106,14 +105,23 @@ class ControllerSelectPatient extends Component {
             currentStudy.patientBirthDate = Util.formatRawDate(currentStudy.patientBirthDate)
 
             //Find expected visit
-            let expectedStudy
+            //Initialise all fields to null in case no expected study is found
+
+            let expectedStudy = {
+                patientDOB: null,
+                patientFirstName: null,
+                patientLastName: null,
+                patientSex: null,
+                acquisitionDate: null
+            }
+
             this.props.visits.forEach(visit => {
                 if (visit.idVisit === idVisit) expectedStudy = visit
             })
 
             //Format data for table
-            expectedStudy.patientFirstName = expectedStudy.firstName === undefined ? '' : expectedStudy.firstName.toUpperCase()
-            expectedStudy.patientLastName = expectedStudy.lastName === undefined ? '' : expectedStudy.lastName.toUpperCase()
+            expectedStudy.patientFirstName = expectedStudy.firstName === undefined || expectedStudy.firstName === null ? '' : expectedStudy.firstName.toUpperCase()
+            expectedStudy.patientLastName = expectedStudy.lastName === undefined || expectedStudy.lastName === null ? '' : expectedStudy.lastName.toUpperCase()
             expectedStudy.patientBirthDate = expectedStudy.patientDOB
 
             for (let i in labels) {
@@ -150,7 +158,6 @@ class ControllerSelectPatient extends Component {
         this.setState(() => ({ rows: this.buildRows(true, selectedVisit) }), () => {
             let disableValidateButton = false
             for (let row in this.state.rows) {
-                console.log(this.state.rows[row])
                 if (this.state.rows[row].dismissed !== undefined && !this.state.rows[row].dismissed) disableValidateButton = true
             }
             this.setState({ isDisabled: disableValidateButton })

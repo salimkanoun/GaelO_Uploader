@@ -105,17 +105,10 @@ class ControllerSelectPatient extends Component {
             currentStudy.patientBirthDate = Util.formatRawDate(currentStudy.patientBirthDate)
 
             //Find expected visit
-            //Initialise all fields to null in case no expected study is found
-
-            let expectedStudy = {
-                patientDOB: null,
-                patientFirstName: null,
-                patientLastName: null,
-                patientSex: null,
-                acquisitionDate: null
-            }
+            let expectedStudy
 
             this.props.visits.forEach(visit => {
+                console.log(visit.idVisit)
                 if (visit.idVisit === idVisit) expectedStudy = visit
             })
 

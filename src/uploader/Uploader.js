@@ -277,7 +277,7 @@ class Uploader extends Component {
     async checkStudy(study) {
         let warnings = {}
         // Check if the study corresponds to the visits in wait for series upload
-        let expectedVisit = this.findExpectedVisit(study);
+        let expectedVisit = this.searchPerfectMatchStudy(study);
         if (expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         // Check if visit ID is set
         if (expectedVisit === undefined || expectedVisit.idVisit === null) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
@@ -287,22 +287,12 @@ class Uploader extends Component {
         return warnings
     }
 
-    findExpectedVisit(studyObject) {
-        let thisPatient = studyObject.getObjectPatientName();
-        if (thisPatient.givenName === undefined) {
-            return undefined;
-        }
-        if (thisPatient.familyName === undefined) {
-            return undefined;
-        }
+    searchPerfectMatchStudy(studyObject) {
+        let thisPatient = studyObject.getObjectPatientName()
 
-        thisPatient.birthDate = studyObject.getPatientBirthDate();
+        thisPatient.birthDate = studyObject.getPatientBirthDate()
         thisPatient.sex = studyObject.patientSex;
         thisPatient.acquisitionDate = studyObject.getAcquisitionDate()
-
-        if (thisPatient.birthDate === undefined || thisPatient.sex === undefined) {
-            return undefined;
-        }
 
         // Linear search through expected visits list
         for (let visit of this.props.visits) {

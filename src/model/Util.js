@@ -169,7 +169,7 @@ export default class Util {
   static areEqualFields(str1, str2) {
     str1 = str1.toUpperCase()
     str2 = str2.toUpperCase()
-    if (str1 === undefined || str2 === undefined || str1 === '' || str2 === '') return true
+    if (str1 === undefined || str2 === undefined || str1 === '' || str2 === '' || str1 === null || str2 === null) return true
     if (str1.localeCompare(str2) === 0) return true
     return false 
   }

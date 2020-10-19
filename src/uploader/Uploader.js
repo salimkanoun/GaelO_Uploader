@@ -14,7 +14,6 @@ import DicomDropZone from './render_component/DicomDropZone'
 import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
-import WarningPatient from './render_component/WarningPatient'
 import Options from './Options'
 import Util from '../model/Util'
 
@@ -41,8 +40,7 @@ class Uploader extends Component {
         uploadProgress: 0,
         studyProgress: 0,
         studyLength: 1,
-        ignoredFiles: {},
-        showWarning: false
+        ignoredFiles: {}
     }
 
     constructor(props) {
@@ -50,7 +48,6 @@ class Uploader extends Component {
         this.config = this.props.config
         this.uploadModel = new Model();
         this.addFile = this.addFile.bind(this)
-        this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
 
         this.uppy = Uppy({
@@ -317,13 +314,6 @@ class Uploader extends Component {
         }
     }
 
-    /** 
-     * Trigger hide warning if closed
-     */
-    onHideWarning() {
-        this.setState((state) => { return { showWarning: !state.showWarning } });
-    }
-
     /**
      * Upload selected and validated series on click
      */
@@ -431,7 +421,6 @@ class Uploader extends Component {
                     <Options />
                 </div>
                 <div hidden={!this.state.isFilesLoaded}>
-                    <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
                     <ControllerStudiesSeries
                         isUploading={this.state.isUploading}
                         multiUpload={this.config.multiUpload}

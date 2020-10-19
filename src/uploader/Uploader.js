@@ -14,16 +14,15 @@ import DicomDropZone from './render_component/DicomDropZone'
 import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
-import WarningPatient from './render_component/WarningPatient'
 import Options from './Options'
 import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
-import { addStudy, addWarningsStudy, setVisitID } from './actions/Studies'
+import { addStudy, addWarningsStudy, updateWarningStudy } from './actions/Studies'
 import { addSeries } from './actions/Series'
 import { addWarningsSeries } from './actions/Warnings'
-import { addVisit } from './actions/Visits'
+import { addVisit, setUsedVisit } from './actions/Visits'
 import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
 import { selectSeriesReady } from './actions/DisplayTables'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
@@ -41,8 +40,7 @@ class Uploader extends Component {
         uploadProgress: 0,
         studyProgress: 0,
         studyLength: 1,
-        ignoredFiles: {},
-        showWarning: false
+        ignoredFiles: {}
     }
 
     constructor(props) {
@@ -50,7 +48,6 @@ class Uploader extends Component {
         this.config = this.props.config
         this.uploadModel = new Model();
         this.addFile = this.addFile.bind(this)
-        this.onHideWarning = this.onHideWarning.bind(this)
         this.onUploadClick = this.onUploadClick.bind(this)
 
         this.uppy = Uppy({
@@ -114,8 +111,6 @@ class Uploader extends Component {
             //At first drop notify user started action
             this.config.callbackOnStartAction()
         }
-
-
 
         //Add number of files to be parsed to the previous number (incremental parsing)
         this.setState((previousState) => {
@@ -245,6 +240,7 @@ class Uploader extends Component {
      */
     async checkSeriesAndUpdateRedux() {
         this.props.selectStudy(undefined)
+        this.resetVisits()
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
             //Check studies warnings
@@ -268,7 +264,7 @@ class Uploader extends Component {
                 //Add series related warnings to Redux
                 this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
                 //Automatically add to Redux seriesReady if contains no warnings
-                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmpty(seriesInstance.getWarnings()))
+                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmptyObject(seriesInstance.getWarnings()))
             }
 
         }
@@ -278,49 +274,44 @@ class Uploader extends Component {
     async checkStudy(study) {
         let warnings = {}
         // Check if the study corresponds to the visits in wait for series upload
-        let expectedVisit = this.findExpectedVisit(study);
+        let expectedVisit = this.searchPerfectMatchStudy(study);
         if (expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         // Check if visit ID is set
-        if (this.props.expectedVisit === null || this.props.expectedVisit === undefined) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        if (expectedVisit === undefined || expectedVisit.idVisit === null) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         // Check if study is already known by server
         let newStudy = await isNewStudy(study.getOrthancStudyID())
         if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
         return warnings
     }
 
-    findExpectedVisit(studyObject) {
-        let thisPatient = studyObject.getObjectPatientName();
-        if (thisPatient.givenName === undefined) {
-            return undefined;
-        }
-        if (thisPatient.familyName === undefined) {
-            return undefined;
-        }
+    searchPerfectMatchStudy(studyObject) {
+        let thisPatient = studyObject.getObjectPatientName()
 
-        thisPatient.birthDate = studyObject.getPatientBirthDate();
+        thisPatient.birthDate = studyObject.getPatientBirthDate()
         thisPatient.sex = studyObject.patientSex;
-
-        if (thisPatient.birthDate === undefined || thisPatient.sex === undefined) {
-            return undefined;
-        }
+        thisPatient.acquisitionDate = studyObject.getAcquisitionDate()
 
         // Linear search through expected visits list
         for (let visit of this.props.visits) {
-            if (visit.firstName.trim().toUpperCase().charAt(0) === thisPatient.givenName.trim().toUpperCase().charAt(0)
-                && visit.lastName.trim().toUpperCase().charAt(0) === thisPatient.familyName.trim().toUpperCase().charAt(0)
-                && visit.sex.trim().toUpperCase().charAt(0) === thisPatient.sex.trim().toUpperCase().charAt(0)
-                && Util.isProbablyEqualDates(visit.birthDate, thisPatient.birthDate)) {
-                return visit;
+            if (Util.areEqualFields(visit.firstName.trim().charAt(0), thisPatient.givenName.trim().charAt(0))
+                && Util.areEqualFields(visit.lastName.trim().charAt(0), thisPatient.familyName.trim().charAt(0))
+                && Util.areEqualFields(visit.patientSex.trim().charAt(0), thisPatient.sex.trim().charAt(0))
+                && Util.isProbablyEqualDates(visit.patientDOB, Util.formatRawDate(thisPatient.birthDate))
+                && Util.isProbablyEqualDates(visit.acquisitionDate, Util.formatRawDate(thisPatient.acquisitionDate))) {
+                    return visit;
             }
         };
         return undefined;
     }
 
-    /** 
-     * Trigger hide warning if closed
+    /**
+     * Reset visit status on adding additional DICOMs
      */
-    onHideWarning() {
-        this.setState((state) => { return { showWarning: !state.showWarning } });
+    resetVisits() {
+        for(let visit in this.props.visits) {
+            let thisVisit = this.props.visits[visit]
+            this.props.setUsedVisit(thisVisit.idVisit, thisVisit.studyID, false)
+        }
     }
 
     /**
@@ -430,7 +421,6 @@ class Uploader extends Component {
                     <Options />
                 </div>
                 <div hidden={!this.state.isFilesLoaded}>
-                    <WarningPatient show={this.state.showWarning} closeListener={this.onHideWarning} />
                     <ControllerStudiesSeries
                         isUploading={this.state.isUploading}
                         multiUpload={this.config.multiUpload}
@@ -467,7 +457,8 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
-    setVisitID,
+    updateWarningStudy,
+    setUsedVisit,
     selectStudy,
     selectStudiesReady,
     selectSeriesReady

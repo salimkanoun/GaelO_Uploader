@@ -21,6 +21,7 @@ import CheckPatient from './render_component/CheckPatient'
 import { updateWarningStudy, setVisitID } from './actions/Studies'
 import { setUsedVisit } from './actions/Visits'
 import { selectStudiesReady } from './actions/DisplayTables'
+import Util from '../model/Util'
 
 const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
 const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
@@ -74,7 +75,8 @@ class ControllerSelectPatient extends Component {
      * Dismiss study warning to check patient on user validation
      */
     validateCheckPatient = () => {
-        this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
+        if (this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'] !== undefined) this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
+        if (this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'] !== undefined) this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'], this.props.selectedStudy)
         //If multiUpload mode on, set idVisit to the study and forbid its use for another study 
         if (this.props.multiUpload) {
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
@@ -94,10 +96,13 @@ class ControllerSelectPatient extends Component {
         if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined && uploadDataReady) {
             let rows = []
             let currentStudy = this.props.studies[this.props.selectedStudy]
-
             //Extract only first letter of patient first and last names
             currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
             currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
+
+            //Format DICOM dates
+            currentStudy.acquisitionDate = Util.formatRawDate(currentStudy.acquisitionDate)
+            currentStudy.patientBirthDate = Util.formatRawDate(currentStudy.patientBirthDate)
 
             //Find expected visit
             let expectedStudy
@@ -107,8 +112,10 @@ class ControllerSelectPatient extends Component {
                 if (visit.idVisit === idVisit) expectedStudy = visit
             })
 
-            expectedStudy.patientFirstName = expectedStudy.patientFirstName === undefined ? '' : expectedStudy.patientFirstName.toUpperCase()
-            expectedStudy.patientLastName = expectedStudy.patientLastName === undefined ? '' : expectedStudy.patientLastName.toUpperCase()
+            //Format data for table
+            expectedStudy.patientFirstName = expectedStudy.firstName === undefined || expectedStudy.firstName === null ? '' : expectedStudy.firstName.toUpperCase()
+            expectedStudy.patientLastName = expectedStudy.lastName === undefined || expectedStudy.lastName === null ? '' : expectedStudy.lastName.toUpperCase()
+            expectedStudy.patientBirthDate = expectedStudy.patientDOB
 
             for (let i in labels) {
                 rows.push({
@@ -141,7 +148,13 @@ class ControllerSelectPatient extends Component {
      */
     generateRows = (selectedVisit) => {
         this.setState({ selectedVisit: selectedVisit })
-        this.setState(() => ({ rows: this.buildRows(true, selectedVisit) }))
+        this.setState(() => ({ rows: this.buildRows(true, selectedVisit) }), () => {
+            let disableValidateButton = false
+            for (let row in this.state.rows) {
+                if (this.state.rows[row].dismissed !== undefined && !this.state.rows[row].dismissed) disableValidateButton = true
+            }
+            this.setState({ isDisabled: disableValidateButton })
+        })
     }
 
     /**

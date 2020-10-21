@@ -78,7 +78,7 @@ export default class Util {
   static formatRawDate(rawDate) {
     if (rawDate != null) {
       if (Util.isCorrectlyFormattedDate(rawDate)) return rawDate
-      else return (rawDate.substring(6, 8) + '-' + rawDate.substring(4, 6) + '-' + rawDate.substring(0, 4))
+      else return (rawDate.substring(4, 6) + '-' + rawDate.substring(6, 8) + '-' + rawDate.substring(0, 4))
     } else {
       return null
     }

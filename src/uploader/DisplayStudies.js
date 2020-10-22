@@ -52,7 +52,7 @@ class StudiesTab extends Component {
                 if (this.props.studiesRows[rowIndex].warnings !== undefined) {
                     if (this.props.studiesRows[rowIndex].warnings['ALREADY_KNOWN_STUDY'] !== undefined) return (<></>)
                     if ((this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'].dismissed)
-                    || (this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== !undefined && !this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed)) {
+                    || (this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed)) {
                         return (<Button onClick={() => { this.toggleCheckPatient(); }}>
                             {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
                         </Button>)

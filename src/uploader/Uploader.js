@@ -40,7 +40,8 @@ class Uploader extends Component {
         uploadProgress: 0,
         studyProgress: 0,
         studyLength: 1,
-        ignoredFiles: {}
+        ignoredFiles: {},
+        isCheckDone: false
     }
 
     constructor(props) {
@@ -239,6 +240,7 @@ class Uploader extends Component {
      * Check studies/series with warning and populate redux
      */
     async checkSeriesAndUpdateRedux() {
+        this.setState({isCheckDone: false})
         this.props.selectStudy(undefined)
         this.resetVisits()
         //Scan every study in Model
@@ -265,9 +267,8 @@ class Uploader extends Component {
                 //Automatically add to Redux seriesReady if contains no warnings
                 this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmptyObject(seriesInstance.getWarnings()))
             }
-
         }
-
+        this.setState({isCheckDone: true})
     }
 
     async checkStudy(study) {
@@ -421,6 +422,7 @@ class Uploader extends Component {
                 </div>
                 <div hidden={!this.state.isFilesLoaded}>
                     <ControllerStudiesSeries
+                        isCheckDone={this.state.isCheckDone}
                         isUploading={this.state.isUploading}
                         multiUpload={this.config.multiUpload}
                         selectedSeries={this.props.selectedSeries} />

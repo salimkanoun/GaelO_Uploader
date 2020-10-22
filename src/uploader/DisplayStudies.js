@@ -38,9 +38,8 @@ class StudiesTab extends Component {
             hidden: (!this.props.multiUpload),
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
-                let checked = row.selectedStudies
                 return (
-                    <input disabled={row.status !== 'Valid'} checked={checked} type='checkbox' onChange={() => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, !checked) }} />
+                    <input disabled={row.status !== 'Valid'} type='checkbox'checked={this.props.studiesReady.includes(row.studyInstanceUID)} onChange={(event) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, event.target.checked) }} />
                 )
             }
         },
@@ -149,6 +148,7 @@ class StudiesTab extends Component {
 const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
+        studiesReady: state.DisplayTables.studiesReady
     }
 }
 const mapDispatchToProps = {

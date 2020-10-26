@@ -7,14 +7,14 @@ export const ALREADY_KNOWN_STUDY = {
 
 export const NOT_EXPECTED_VISIT = {
   key: 'NOT_EXPECTED_VISIT',
-  content: 'You should check/select the patient. The imported study informations do not match with the expected ones.',
+  content: 'You should check the patient. The imported study information do not match with the expected ones.',
   ignorable: true,
   dismissed: false
 }
 
 export const NULL_VISIT_ID = {
   key: 'NULL_VISIT_ID',
-  content: 'You should check/select the patient. Null Visit ID.',
+  content: 'You need to select the patient.',
   ignorable: false,
   dismissed: false
 }

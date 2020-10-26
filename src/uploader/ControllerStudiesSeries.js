@@ -18,6 +18,25 @@ import Row from 'react-bootstrap/Row'
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 class ControllerStudiesSeries extends Component {
+
+  state = {
+    studies: [],
+    series: []
+  }
+
+  componentDidUpdate(prevProps) {
+    //Check if DICOMs have been upload OR if warnings have changed OR if studiesReady have changed to update table
+    if ((prevProps.isCheckDone !== this.props.isCheckDone && this.props.isCheckDone) ||
+      (this.props.selectedStudy !== undefined && prevProps.studies[this.props.selectedStudy].idVisit !==
+        this.props.studies[this.props.selectedStudy].idVisit) ||
+        (this.props.studiesReady !== prevProps.studiesReady)) this.buildStudiesRows()
+    //Check if series warnings have change
+    if (prevProps.selectedStudy !== this.props.selectedStudy || prevProps.seriesReady !== this.props.seriesReady) {
+      this.buildSeriesRows()
+      this.buildStudiesRows()
+    }
+  }
+
   /* STUDIES TABLE CONTROLLER */
 
   /**
@@ -30,14 +49,11 @@ class ControllerStudiesSeries extends Component {
       for (const study in this.props.studies) {
         const tempStudy = this.props.studies[study]
         tempStudy.status = this.studyWarningsPassed(study)
-        tempStudy.selectedStudies = false
-        if (this.props.studiesReady.includes(tempStudy.studyInstanceUID)) {
-          tempStudy.selectedStudies = true
-        }
+        tempStudy.selectedStudies = this.props.studiesReady.includes(tempStudy.studyInstanceUID)
         studies.push({ ...tempStudy })
       }
     }
-    return studies
+    this.setState({ studies: studies })
   }
 
   /**
@@ -47,6 +63,7 @@ class ControllerStudiesSeries extends Component {
    */
   studyWarningsPassed(study) {
     let studyStatus = 'Valid'
+    if (Object.entries(this.props.studies[study].warnings).length === 0) return studyStatus
 
     if (this.props.studies[study].warnings !== undefined && this.props.studies[study].warnings['ALREADY_KNOWN_STUDY'] !== undefined) {
       studyStatus = 'Already Known'
@@ -81,8 +98,8 @@ class ControllerStudiesSeries extends Component {
    * @return {Array}
    */
   buildSeriesRows() {
+    const seriesArray = []
     if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
-      const seriesArray = []
       const seriesToDisplay = Object.keys(this.props.studies[this.props.selectedStudy].series)
       seriesToDisplay.forEach((series) => {
         const seriesToPush = this.props.series[series]
@@ -97,8 +114,8 @@ class ControllerStudiesSeries extends Component {
         })
       }
       )
-      return seriesArray
-    } else return []
+    }
+    this.setState({ series: seriesArray })
   }
 
   /**
@@ -119,10 +136,10 @@ class ControllerStudiesSeries extends Component {
     return (
       <div disabled={this.props.isUploading}>
         <Row>
-          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} checkStudyReady={(studyID) => { this.studyWarningsPassed(studyID) }} />
+          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.state.studies} checkStudyReady={(studyID) => { this.studyWarningsPassed(studyID) }} />
         </Row>
         <Row>
-          <DisplaySeries seriesRows={this.buildSeriesRows()} />
+          <DisplaySeries seriesRows={this.state.series} />
         </Row>
       </div>
     )
@@ -141,7 +158,6 @@ const mapStateToProps = state => {
   }
 }
 
-const mapDispatchToProps = {
-}
+const mapDispatchToProps = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

@@ -63,11 +63,7 @@ class ControllerStudiesSeries extends Component {
    */
   studyWarningsPassed(study) {
     let studyStatus = 'Valid'
-    if (Object.entries(this.props.studies[study].warnings).length === 0) {
-      console.log('ici')
-      return studyStatus
-
-    }
+    if (Object.entries(this.props.studies[study].warnings).length === 0) return studyStatus
 
     if (this.props.studies[study].warnings !== undefined && this.props.studies[study].warnings['ALREADY_KNOWN_STUDY'] !== undefined) {
       studyStatus = 'Already Known'
@@ -162,7 +158,6 @@ const mapStateToProps = state => {
   }
 }
 
-const mapDispatchToProps = {
-}
+const mapDispatchToProps = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)

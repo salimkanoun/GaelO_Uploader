@@ -32,10 +32,9 @@ class DisplaySeries extends Component {
                 text: '',
                 formatExtraData: this,
                 formatter: (cell, row, rowIndex, formatExtraData) => {
-                    let checked = row.selectedSeries
                     if (row.status === 'Known study') return <> </>
                     return (
-                        <input disabled={row.status === 'Rejected'} checked={checked} type='checkbox' onChange={() => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, !checked) }} />
+                        <input disabled={row.status === 'Rejected'} checked={this.props.seriesReady.includes(row.seriesInstanceUID)} type='checkbox' onChange={(event) => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, event.target.checked) }} />
                     )
                 }
             },
@@ -125,6 +124,7 @@ const rowClasses = (row, rowIndex) => {
 const mapStateToProps = state => {
     return {
         selectedSeries: state.DisplayTables.selectedSeries,
+        seriesReady: state.DisplayTables.seriesReady
     }
 }
 const mapDispatchToProps = {

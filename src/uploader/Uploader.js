@@ -255,7 +255,8 @@ class Uploader extends Component {
             //Add study warnings to Redux
             this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
             //If study has no warnings, select the valid study
-            if (this.uploadModel.data[studyInstanceUID].warnings === {}) this.props.selectStudiesReady(this.uploadModel.data[studyInstanceUID], true)
+            console.log(this.uploadModel.data[studyInstanceUID].warnings)
+            if (this.uploadModel.data[studyInstanceUID].warnings === undefined && !this.config.multiUpload) this.props.selectStudiesReady(studyInstanceUID, true)
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
             for (let seriesInstance of series) {
@@ -275,9 +276,9 @@ class Uploader extends Component {
         let warnings = {}
         // Check if the study corresponds to the visits in wait for series upload
         let expectedVisit = this.searchPerfectMatchStudy(study);
-        if (expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
+        if (!this.config.multiUpload && expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         // Check if visit ID is set
-        if (expectedVisit === undefined || expectedVisit.idVisit === null) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+        if (this.config.multiUpload && (expectedVisit === undefined || expectedVisit.idVisit === null)) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         // Check if study is already known by server
         let newStudy = await isNewStudy(study.getOrthancStudyID())
         if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
@@ -288,7 +289,7 @@ class Uploader extends Component {
         let thisPatient = studyObject.getObjectPatientName()
 
         thisPatient.birthDate = studyObject.getPatientBirthDate()
-        thisPatient.sex = studyObject.patientSex;
+        thisPatient.sex = studyObject.getPatientSex();
         thisPatient.acquisitionDate = studyObject.getAcquisitionDate()
 
         // Linear search through expected visits list

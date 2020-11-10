@@ -255,8 +255,7 @@ class Uploader extends Component {
             //Add study warnings to Redux
             this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
             //If study has no warnings, select the valid study
-            console.log(this.uploadModel.data[studyInstanceUID].warnings)
-            if (this.uploadModel.data[studyInstanceUID].warnings === undefined && !this.config.multiUpload) this.props.selectStudiesReady(studyInstanceUID, true)
+            if (this.props.studies[studyInstanceUID].warnings === undefined && !this.config.multiUpload) this.props.selectStudiesReady(studyInstanceUID, true)
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
             for (let seriesInstance of series) {

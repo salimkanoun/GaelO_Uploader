@@ -240,7 +240,7 @@ class Uploader extends Component {
      * Check studies/series with warning and populate redux
      */
     async checkSeriesAndUpdateRedux() {
-        this.setState({isCheckDone: false})
+        this.setState({ isCheckDone: false })
         this.props.selectStudy(undefined)
         this.resetVisits()
         //Scan every study in Model
@@ -268,13 +268,15 @@ class Uploader extends Component {
                 this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmptyObject(seriesInstance.getWarnings()))
             }
         }
-        this.setState({isCheckDone: true})
+        this.setState({ isCheckDone: true })
     }
 
     async checkStudy(study) {
         let warnings = {}
         // Check if the study corresponds to the visits in wait for series upload
-        let expectedVisit = this.searchPerfectMatchStudy(study);
+        let expectedVisit = this.searchPerfectMatchStudy(study)
+        //If study is a perfect match, add it to studiesReady in Redux
+        if (expectedVisit !== undefined) this.props.selectStudiesReady(study.studyInstanceUID, true)
         if (!this.config.multiUpload && expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         // Check if visit ID is set
         if (this.config.multiUpload && (expectedVisit === undefined || expectedVisit.idVisit === null)) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
@@ -298,7 +300,7 @@ class Uploader extends Component {
                 && Util.areEqualFields(visit.patientSex.trim().charAt(0), thisPatient.sex.trim().charAt(0))
                 && Util.isProbablyEqualDates(visit.patientDOB, Util.formatRawDate(thisPatient.birthDate))
                 && Util.isProbablyEqualDates(visit.acquisitionDate, Util.formatRawDate(thisPatient.acquisitionDate))) {
-                    return visit;
+                return visit;
             }
         };
         return undefined;
@@ -308,7 +310,7 @@ class Uploader extends Component {
      * Reset visit status on adding additional DICOMs
      */
     resetVisits() {
-        for(let visit in this.props.visits) {
+        for (let visit in this.props.visits) {
             let thisVisit = this.props.visits[visit]
             this.props.setUsedVisit(thisVisit.idVisit, thisVisit.studyID, false)
         }

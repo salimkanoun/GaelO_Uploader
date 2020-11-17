@@ -14,7 +14,8 @@ const config = {
   minNbOfInstances: 30,
   idVisit: parseInt(process.env.REACT_APP_GAELO_VISITID),
   callbackOnStartAction: () => {},
-  callbackOnUploadComplete: () => {}
+  callbackOnUploadComplete: () => {},
+  studyName: 'test'
 }
 
 const container = document.getElementById('root')

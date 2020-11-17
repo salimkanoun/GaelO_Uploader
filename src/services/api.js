@@ -15,20 +15,19 @@ export function getPossibleImport () {
 /**
  * Check if study does not already exist in backend
  */
-export function isNewStudy (originalOrthancID) {
-  const formData = new FormData()
-  formData.append('originalOrthancID', originalOrthancID)
+export function isNewStudy (studyName, originalOrthancID) {
 
-  return fetch('/scripts/is_new_study.php', {
-    method: 'POST',
+  return fetch('/api/studies/'+studyName+'/orthanc-study-id/'+originalOrthancID, {
+    method: 'GET',
     headers: {
       Accept: 'application/json'
-    },
-    body: formData
+    }
 
   }).then((answer) => {
-    if (!answer.ok) { throw answer }
-    return (answer.json())
+    return true
+    if (answer.status === 200 ) return false
+    else if (answer.status === 404) return true
+    else throw answer
   }).catch((error) => {
     console.warn(error)
   })

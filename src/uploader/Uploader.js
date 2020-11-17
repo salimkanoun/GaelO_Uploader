@@ -59,7 +59,7 @@ class Uploader extends Component {
         })
 
         this.uppy.use(Tus, {
-            endpoint: '/tus', // use your tus endpoint here
+            endpoint: '/api/studies/'+this.config.studyName+'/tus', // use your tus endpoint here
             resume: true,
             autoRetry: true,
             chunkSize: 2000000,
@@ -79,19 +79,29 @@ class Uploader extends Component {
             await logIn()
         }
 
-        let answer = {'PET0' : []}
-        console.log(answer)
-        let visitTypes = Object.values(answer)
-        console.log(visitTypes)
+        let answer = {'PET0' : [
+            {"numeroPatient":"13020110501457",
+            "firstName":"N",
+            "lastName":"C",
+            "patientSex":"M",
+            "patientDOB":"10-10-1979",
+            "investigatorName":"MAROUF",
+            "country":"France",
+            "centerNumber":"10501",
+            "acquisitionDate":"10-01-2020",
+            "visitType":"PET0",
+            "idVisit":156}
+            ]
+        }
+
         let visits = []
-        visitTypes.forEach(types => {
-            for (let type in types) {
-                types[type].forEach(visit => {
-                    let visitToPush = visit
-                    visitToPush['isUsed'] = false
-                    visits.push(visitToPush)
-                })
-            }
+        Object.keys(answer).forEach(type => {
+            answer[type].forEach(visit => {
+                let visitToPush = visit
+                visitToPush['isUsed'] = false
+                visits.push(visitToPush)
+            })
+
         })
         this.props.addVisit(visits)
     }
@@ -280,7 +290,7 @@ class Uploader extends Component {
         // Check if visit ID is set
         if (this.config.multiUpload && (expectedVisit === undefined || expectedVisit.idVisit === null)) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         // Check if study is already known by server
-        let newStudy = await isNewStudy(study.getOrthancStudyID())
+        let newStudy = await isNewStudy(this.config.studyName , study.getOrthancStudyID())
         if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
         return warnings
     }

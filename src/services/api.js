@@ -30,7 +30,7 @@ export function isNewStudy (originalOrthancID) {
     if (!answer.ok) { throw answer }
     return (answer.json())
   }).catch((error) => {
-    console.warn(error)
+    throw error
   })
 }
 

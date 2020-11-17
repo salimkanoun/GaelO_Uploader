@@ -77,10 +77,9 @@ class Uploader extends Component {
     async componentDidMount() {
         if (this.config.developerMode) {
             await logIn()
-            await registerStudy()
         }
 
-        let answer = await getPossibleImport()
+        let answer = {'PET0' : []}
         console.log(answer)
         let visitTypes = Object.values(answer)
         console.log(visitTypes)

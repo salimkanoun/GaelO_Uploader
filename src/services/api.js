@@ -68,17 +68,19 @@ export function validateUpload (idVisit, timeStamp, sucessIDsUploaded, totalFile
  * Registering GaelO, only for dev purpose
  */
 export function logIn () {
-  const formData = new FormData()
-  formData.append('username', process.env.REACT_APP_GAELO_LOGIN)
-  formData.append('mdp', process.env.REACT_APP_GAELO_PASSWORD)
-  formData.append('formSent', process.env.REACT_APP_GAELO_VISITID)
 
-  return fetch('/index.php', {
+  let payload = {
+    username : process.env.REACT_APP_GAELO_LOGIN,
+    password : process.env.REACT_APP_GAELO_PASSWORD
+  }
+
+  return fetch('/api/login', {
     method: 'POST',
     headers: {
-      Accept: 'application/json'
+      'Content-Type': 'text/json',
+      Accept: 'text/json'
     },
-    body: formData
+    body: JSON.stringify(payload)
 
   })
     .then((answer) => {
@@ -90,27 +92,4 @@ export function logIn () {
     })
 }
 
-/**
- * Registering a study only for dev
- */
-export function registerStudy () {
-  const formData = new FormData()
-  formData.append('etude', process.env.REACT_APP_GAELO_STUDY)
-  formData.append('role', 'Investigator')
 
-  return fetch('/root_investigator', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json'
-    },
-    body: formData
-
-  })
-    .then((answer) => {
-      if (!answer.ok) { throw answer }
-      return (answer)
-    })
-    .catch((error) => {
-      console.warn(error)
-    })
-}

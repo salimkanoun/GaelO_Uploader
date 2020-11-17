@@ -281,8 +281,23 @@ class Uploader extends Component {
         // Check if visit ID is set
         if (this.config.multiUpload && (expectedVisit === undefined || expectedVisit.idVisit === null)) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
         // Check if study is already known by server
-        let newStudy = await isNewStudy(study.getOrthancStudyID())
-        if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
+        try{
+            let newStudy = await isNewStudy(study.getOrthancStudyID())
+            if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
+        } catch (error){
+            console.warn(error)
+            toast.error("Session expired, please refresh browser",  {
+                position: "bottom-right",
+                autoClose: false,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                }
+            )
+        }
+
         return warnings
     }
 

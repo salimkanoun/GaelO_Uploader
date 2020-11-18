@@ -59,7 +59,7 @@ class Uploader extends Component {
         })
 
         this.uppy.use(Tus, {
-            endpoint: '/api/studies/'+this.config.studyName+'/tus', // use your tus endpoint here
+            endpoint: '/api/tus', // use your tus endpoint here
             resume: true,
             autoRetry: true,
             chunkSize: 2000000,

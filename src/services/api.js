@@ -40,20 +40,19 @@ export function isNewStudy (studyName, originalOrthancID) {
  * @param {int} totalFiles
  * @param {string} originalOrthancStudyID
  */
-export function validateUpload (idVisit, timeStamp, sucessIDsUploaded, totalFiles, originalOrthancStudyID) {
-  const formData = new FormData()
-  formData.append('id_visit', idVisit)
-  formData.append('timeStamp', timeStamp)
-  formData.append('totalDicomFiles', totalFiles)
-  formData.append('originalOrthancStudyID', originalOrthancStudyID)
-  formData.append('sucessIDsUploaded', JSON.stringify(sucessIDsUploaded))
+export function validateUpload (idVisit, sucessIDsUploaded, totalFiles, originalOrthancStudyID) {
+  let payload = {
+    'numberOfInstances' :  totalFiles,
+    'originalOrthancId' : originalOrthancStudyID,
+    'uploadedFileTusId' : JSON.stringify(sucessIDsUploaded)
+  }
 
-  return fetch('/scripts/validate_dicom_upload_tus.php', {
+  return fetch('/api/visits/'+idVisit+'/validate-dicom', {
     method: 'POST',
     headers: {
       Accept: 'application/json'
     },
-    body: formData
+    body: JSON.stringify(payload)
 
   }).then((answer) => {
     if (!answer.ok) { throw answer }

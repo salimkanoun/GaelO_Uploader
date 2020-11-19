@@ -393,9 +393,9 @@ class Uploader extends Component {
 
         })
 
-        uploader.on('study-upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
+        uploader.on('study-upload-finished', (idVisit, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
             console.log('sutdy upload Finished')
-            validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+            validateUpload(idVisit, sucessIDsUploaded, numberOfFiles, studyOrthancID)
         })
 
 

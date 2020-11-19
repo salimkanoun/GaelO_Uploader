@@ -48,7 +48,7 @@ export default class DicomBatchUploader extends EventEmitter {
 
     emitBatchUploadDoneIfTerminated(){
         if(this.zipProgress>=100 && this.uploadProgress >= 100) {
-            this.emit('batch-upload-done', this.timeStamp, this.files.length, this.sucessIDsUploaded)
+            this.emit('batch-upload-done', this.files.length, this.sucessIDsUploaded)
         }
     }
 

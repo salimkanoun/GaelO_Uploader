@@ -17,11 +17,11 @@ export default class DicomMultiStudyUploader extends EventEmitter {
     }
 
     registerListener() {
-        this.uploader.on('batch-upload-done', (timeStamp, numberOfFiles, sucessIDsUploaded) => {
+        this.uploader.on('batch-upload-done', (numberOfFiles, sucessIDsUploaded) => {
             this.uploader.removeAllListeners()
 
             let orthancStudyID = this.visitsToUpload[this.currentVisitID]['orthancStudyID'];
-            this.emit('study-upload-finished', this.currentVisitID, timeStamp, numberOfFiles, sucessIDsUploaded, orthancStudyID)
+            this.emit('study-upload-finished', this.currentVisitID, numberOfFiles, sucessIDsUploaded, orthancStudyID)
 
             if (this.studyNumber === Object.keys(this.visitsToUpload).length) {
                 this.emit('upload-finished')

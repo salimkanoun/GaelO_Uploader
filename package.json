@@ -1,6 +1,6 @@
 {
   "name": "gaelo-uploader",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "index.js",
   "proxy": "http://localhost:8000",
   "private": false,
@@ -63,6 +63,7 @@
     "@svgr/webpack": "^5.4.0",
     "babel-cli": "^6.26.0",
     "babel-loader": "^8.1.0",
+    "ignore-loader": "^0.1.2",
     "react-svg-loader": "^3.0.3",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",

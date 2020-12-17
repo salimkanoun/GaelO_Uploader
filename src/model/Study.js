@@ -108,7 +108,7 @@ export default class Study {
     }
 
     getOrthancStudyID() {
-        let hash = SHA1(this.patientID + '|' + this.studyInstanceUID).toString()
+        let hash = SHA1( this.getPatientID() + '|' + this.getStudyInstanceUID() ).toString()
         return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`
     }
 

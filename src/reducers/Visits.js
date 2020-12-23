@@ -8,14 +8,12 @@ const initialState = {
 
 export default function VisitsReducer (state = initialState, action) {
   switch (action.type) {
+
     case ADD_VISIT:
       // Add visit to reducer
-      const visitObject = action.payload
-      const newVisitArray = []
-      newVisitArray.push(...visitObject)
+      const visitsArray = action.payload
       return {
-        ...state,
-        visits: newVisitArray
+        visits: visitsArray
       }
 
     case SET_USED:
@@ -37,7 +35,6 @@ export default function VisitsReducer (state = initialState, action) {
       thisNewVisit.isUsed = isUsed
       newVisitsArray.push(thisNewVisit)
       return {
-        ...state,
         visits: [...newVisitsArray]
       }
 

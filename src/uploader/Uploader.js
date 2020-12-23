@@ -248,10 +248,21 @@ class Uploader extends Component {
             //Check studies warnings
             let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
             let studyToAdd = this.uploadModel.data[studyInstanceUID]
-            studyToAdd['idVisit'] = undefined
-            if (!this.config.multiUpload) studyToAdd['idVisit'] = this.config.idVisit
+            let idVisit = undefined
+            if (!this.config.multiUpload) idVisit = this.config.idVisit
             //Add study to Redux
-            this.props.addStudy(studyToAdd)
+            this.props.addStudy(
+                idVisit,
+                studyToAdd.getStudyInstanceUID(), 
+                studyToAdd.getPatientFirstName(), 
+                studyToAdd.getPatientLastName(), 
+                studyToAdd.getPatientSex(), 
+                studyToAdd.getPatientID(), 
+                studyToAdd.getAcquisitionDate(), 
+                studyToAdd.getPatientBirthDate(), 
+                studyToAdd.getStudyDescription(),
+                studyToAdd.series
+            )
             //Add study warnings to Redux
             this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
             //If study has no warnings, select the valid study
@@ -302,8 +313,8 @@ class Uploader extends Component {
     }
 
     searchPerfectMatchStudy(studyObject) {
-        let thisPatient = studyObject.getObjectPatientName()
 
+        let thisPatient = studyObject.getObjectPatientName()
         thisPatient.birthDate = studyObject.getPatientBirthDate()
         thisPatient.sex = studyObject.getPatientSex();
         thisPatient.acquisitionDate = studyObject.getAcquisitionDate()
@@ -318,6 +329,7 @@ class Uploader extends Component {
                 return visit;
             }
         };
+
         return undefined;
     }
 

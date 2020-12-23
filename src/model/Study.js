@@ -76,7 +76,10 @@ export default class Study {
     }
 
     getStudyInstanceUID() {
-        return (this.studyInstanceUID === undefined || this.studyInstanceUID === null) ? '' : this.studyInstanceUID
+        if(this.studyInstanceUID == null) {
+            throw new Error('Missing StudyInstanceUID')
+        }
+        else return this.studyInstanceUID
     }
 
     getStudyID() {

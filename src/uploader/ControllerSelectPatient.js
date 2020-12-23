@@ -23,9 +23,6 @@ import { setUsedVisit } from './actions/Visits'
 import { selectStudiesReady } from './actions/DisplayTables'
 import Util from '../model/Util'
 
-const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
-const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
-
 class ControllerSelectPatient extends Component {
 
     state = {
@@ -93,49 +90,103 @@ class ControllerSelectPatient extends Component {
      * @return {Array}
      */
     buildRows(uploadDataReady = !this.props.multiUpload, idVisit = this.props.studies[this.props.selectedStudy].idVisit) {
+        
+        const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
+        const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
+
+        /**
+         * Check correspondance between expected and given data and set rowStatus accordingly
+         * @return {Boolean}
+         */
+        function isCheckPass(expected, current) {
+            if ( expected === '' || expected === current ) {
+                return null
+            } else {
+                return false
+            }
+        }
+        
         if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined && uploadDataReady) {
             let rows = []
+
+
             let currentStudy = this.props.studies[this.props.selectedStudy]
-            //Extract only first letter of patient first and last names
-            currentStudy.patientFirstName = currentStudy.patientFirstName.slice(0, 1)
-            currentStudy.patientLastName = currentStudy.patientLastName.slice(0, 1)
 
-            //Format DICOM dates
-            currentStudy.acquisitionDate = Util.formatRawDate(currentStudy.acquisitionDate)
-            currentStudy.patientBirthDate = Util.formatRawDate(currentStudy.patientBirthDate)
-
+            //Retrive Data from DICOM Model
+            let dicomLastName  = currentStudy.patientLastName.toUpperCase().slice(0, 1)
+            let dicomFirstName  = currentStudy.patientFirstName.toUpperCase().slice(0, 1)
+            let dicomDateOfBirth = Util.formatRawDate(currentStudy.patientBirthDate)
+            let dicomAcquisitionDate = Util.formatRawDate(currentStudy.acquisitionDate)
+            let dicomPatientSex = currentStudy.patientSex
+            
             //Find expected visit
-            let expectedStudy
-
-            this.props.visits.forEach(visit => {
-                console.log(visit.idVisit)
-                if (visit.idVisit === idVisit) expectedStudy = visit
+            let expectedStudy = this.props.visits.filter(visit => {
+                return (visit.idVisit === idVisit)
             })
+            console.log(expectedStudy)
+            console.log(this.props.visits)
+            if(expectedStudy.length !== 1) {
+                throw new Error('Error finding study')
+            }else{
+                expectedStudy  = expectedStudy[0]
+            }
 
-            //Format data for table
-            expectedStudy.patientFirstName = expectedStudy.firstName === undefined || expectedStudy.firstName === null ? '' : expectedStudy.firstName.toUpperCase()
-            expectedStudy.patientLastName = expectedStudy.lastName === undefined || expectedStudy.lastName === null ? '' : expectedStudy.lastName.toUpperCase()
+            //Format visit data for table
+            // double == (not ===) check if undefined or null
+            expectedStudy.patientFirstName = expectedStudy.firstName == null ? '' : expectedStudy.firstName.toUpperCase().slice(0, 1)
+            expectedStudy.patientLastName = expectedStudy.lastName == null ? '' : expectedStudy.lastName.toUpperCase().slice(0, 1)
             expectedStudy.patientBirthDate = expectedStudy.patientDOB
 
-            for (let i in labels) {
-                rows.push({
-                    rowName: labels[i],
-                    expectedStudy: expectedStudy[keys[i]],
-                    currentStudy: currentStudy[keys[i]],
-                    ignoredStatus: this.setRowStatus(expectedStudy[keys[i]], currentStudy[keys[i]])
-                })
-            }
+            rows.push({
+                rowName: 'First Name',
+                expectedStudy: expectedStudy.patientFirstName,
+                currentStudy: dicomFirstName,
+                ignoredStatus: isCheckPass(expectedStudy.patientFirstName, dicomFirstName)
+            })
+
+            rows.push({
+                rowName: 'Last Name',
+                expectedStudy: expectedStudy.patientLastName,
+                currentStudy: dicomLastName,
+                ignoredStatus: isCheckPass(expectedStudy.dicomLastName, dicomLastName)
+            })
+
+            rows.push({
+                rowName: 'Birth Date',
+                expectedStudy: expectedStudy.patientBirthDate,
+                currentStudy: dicomDateOfBirth,
+                ignoredStatus: isCheckPass(expectedStudy.patientBirthDate, dicomDateOfBirth)
+            })
+
+            rows.push({
+                rowName: 'Sex',
+                expectedStudy: expectedStudy.patientSex,
+                currentStudy: dicomPatientSex,
+                ignoredStatus: isCheckPass(expectedStudy.patientSex, dicomPatientSex)
+            })
+
+            rows.push({
+                rowName: 'Acquisition Date',
+                expectedStudy: expectedStudy.acquisitionDate,
+                currentStudy: dicomAcquisitionDate,
+                ignoredStatus: isCheckPass(expectedStudy.acquisitionDate, dicomAcquisitionDate)
+            })
+
             return rows
+
         } else {
+            
             let rows = []
-            for (let i in labels) {
+
+            labels.forEach( (label) =>{
                 rows.push({
-                    rowName: labels[i],
+                    rowName: label,
                     expectedStudy: '',
                     currentStudy: '',
                     ignoredStatus: ''
                 })
-            }
+            })
+
             return rows
         }
     }
@@ -155,18 +206,6 @@ class ControllerSelectPatient extends Component {
             }
             this.setState({ isDisabled: disableValidateButton })
         })
-    }
-
-    /**
-     * Check correspondance between expected and given data and set rowStatus accordingly
-     * @return {Boolean}
-     */
-    setRowStatus(expected, current) {
-        if (expected === undefined || expected === '' || expected === current) {
-            return null
-        } else {
-            return false
-        }
     }
 
     render() {

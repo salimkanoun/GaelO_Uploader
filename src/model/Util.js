@@ -59,29 +59,13 @@ export default class Util {
   }
 
   /**
-   * Check if given date is already in MM-DD-YYYY format
-   * @param {Date} date
-   * @return {Boolean} 
-   */
-  static isCorrectlyFormattedDate(date) {
-    let month = date.split('-')[0]
-    let day = date.split('-')[1]
-    let year = date.split('-')[2]
-    if (month.length === 2 && day.length === 2 && year.length === 4) return true
-  }
-
-  /**
    * Format DICOM dates to English format
    * @param {Date} rawDate 
    * @return {Boolean}
    */
   static formatRawDate(rawDate) {
-    if (rawDate != null) {
-      if (Util.isCorrectlyFormattedDate(rawDate)) return rawDate
+      if(rawDate === '') return rawDate
       else return (rawDate.substring(4, 6) + '-' + rawDate.substring(6, 8) + '-' + rawDate.substring(0, 4))
-    } else {
-      return null
-    }
   }
 
   /**

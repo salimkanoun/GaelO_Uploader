@@ -23,16 +23,11 @@ class SelectPatient extends Component {
         selectedVisitType: undefined, //Selected visit type
     }
 
-    constructor(props) {
-        super(props)
-        this.selectType = this.selectType.bind(this)
-    }
-
     /**
      * Fetch available visit types from Redux
      * @return {Array}
      */
-    fetchVisitTypes() {
+    fetchVisitTypes = () => {
         let visitTypeArray = []
         this.props.visits.forEach(visit => {
             let thisVisitType = visit.visitType
@@ -46,7 +41,7 @@ class SelectPatient extends Component {
      * and create item for each
      * @return {Array}
      */
-    displayPatients() {
+    displayPatients = () => {
         let finalDisplay = []
         this.props.visits.forEach((visit) => {
             if (this.state.selectedVisitType !== undefined && visit.visitType === this.state.selectedVisitType.value) {
@@ -60,7 +55,7 @@ class SelectPatient extends Component {
      * Update selectedVisitType state of visit
      * @param {String} selectedVisitType 
      */
-    selectType = selectedVisitType => {
+    selectType = (selectedVisitType) => {
         this.setState({ selectedVisitType });
     }
 
@@ -69,11 +64,11 @@ class SelectPatient extends Component {
      * to generate rows to check
      * @param {String} selectedVisit 
      */
-    selectPatient(selectedVisit) {
+    selectPatient = (selectedVisit) => {
         this.props.generateRows(selectedVisit)
     }
 
-    render() {
+    render = () => {
         if (this.props.hidden) return (<> </>)
         return (
             <>
@@ -95,6 +90,5 @@ const mapStateToProps = state => {
         visits: state.Visits.visits
     }
 }
-const mapDispatchToProps = {}
 
-export default connect(mapStateToProps, mapDispatchToProps)(SelectPatient)
+export default connect(mapStateToProps, null)(SelectPatient)

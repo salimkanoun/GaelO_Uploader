@@ -42,6 +42,7 @@ export default function StudiesReducer (state = initialState, action) {
 
     case UPDATE_WARNING_STUDY:
       // Update given study warning in reducer
+      console.log(action.payload)
       studyInstanceUID = action.payload.studyInstanceUID
       const studyWarning = action.payload.warningToUpdate.key
       return {

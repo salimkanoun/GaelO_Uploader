@@ -18,9 +18,9 @@ import { connect } from 'react-redux'
 import { Modal, Button } from 'react-bootstrap'
 import SelectPatient from './SelectPatient'
 import CheckPatient from './render_component/CheckPatient'
-import { updateWarningStudy, setVisitID } from './actions/Studies'
-import { setUsedVisit } from './actions/Visits'
-import { selectStudiesReady } from './actions/DisplayTables'
+import { updateWarningStudy, setVisitID } from '../actions/Studies'
+import { setUsedVisit } from '../actions/Visits'
+import { selectStudiesReady } from '../actions/DisplayTables'
 import Util from '../model/Util'
 
 class ControllerSelectPatient extends Component {
@@ -30,19 +30,12 @@ class ControllerSelectPatient extends Component {
         isDisabled: true, //Status of 'validate' button
         selectedVisit: undefined, //ID of selected visit when in multiUpload
     }
-
-    constructor(props) {
-        super(props)
-        this.onClick = this.onClick.bind(this)
-        this.validateCheckPatient = this.validateCheckPatient.bind(this)
-        this.generateRows = this.generateRows.bind(this)
-    }
-
+    
     /**
      * Build table rows on study selection
      * @param {*} prevState 
      */
-    componentDidUpdate(prevState) {
+    componentDidUpdate = (prevState) => {
         if ((prevState.selectedStudy !== this.props.selectedStudy && this.props.selectedStudy !== undefined) || prevState.show !== this.props.show) {
             this.setState({ rows: this.buildRows() })
         }
@@ -53,7 +46,7 @@ class ControllerSelectPatient extends Component {
      * If all rows have been ignored, enable validation button
      * @param {Object} thisRow 
      */
-    onClick = thisRow => {
+    onClick = (thisRow) => {
         let newRows = this.state.rows.map((row) => {
             let row2 = { ...row }
             if (row2.rowName === thisRow.rowName) row2.ignoredStatus = !row.ignoredStatus
@@ -89,11 +82,9 @@ class ControllerSelectPatient extends Component {
      * Check matching of patient information
      * @return {Array}
      */
-    buildRows(uploadDataReady = !this.props.multiUpload, idVisit = this.props.studies[this.props.selectedStudy].idVisit) {
+    buildRows = (uploadDataReady = !this.props.multiUpload, idVisit = this.props.studies[this.props.selectedStudy].idVisit) => {
         
-        const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
-        const keys = ['patientFirstName', 'patientLastName', 'patientBirthDate', 'patientSex', 'acquisitionDate']
-
+        
         /**
          * Check correspondance between expected and given data and set rowStatus accordingly
          * @return {Boolean}
@@ -123,8 +114,7 @@ class ControllerSelectPatient extends Component {
             let expectedStudy = this.props.visits.filter(visit => {
                 return (visit.idVisit === idVisit)
             })
-            console.log(expectedStudy)
-            console.log(this.props.visits)
+
             if(expectedStudy.length !== 1) {
                 throw new Error('Error finding study')
             }else{
@@ -178,6 +168,8 @@ class ControllerSelectPatient extends Component {
             
             let rows = []
 
+            const labels = ['First Name', 'Last Name', 'Birth Date', 'Sex', 'Acquisition Date']
+
             labels.forEach( (label) =>{
                 rows.push({
                     rowName: label,
@@ -208,7 +200,7 @@ class ControllerSelectPatient extends Component {
         })
     }
 
-    render() {
+    render = () => {
         return (
             <Modal show={this.props.show} onHide={this.props.closeListener}>
                 <Modal.Header className="modal-header" closeButton>

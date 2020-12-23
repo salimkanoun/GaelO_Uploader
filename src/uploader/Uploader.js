@@ -19,12 +19,12 @@ import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
-import { addStudy, addWarningsStudy, updateWarningStudy } from './actions/Studies'
-import { addSeries } from './actions/Series'
-import { addWarningsSeries } from './actions/Warnings'
-import { addVisit, setUsedVisit } from './actions/Visits'
-import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
-import { selectSeriesReady } from './actions/DisplayTables'
+import { addStudy, addWarningsStudy } from '../actions/Studies'
+import { addSeries } from '../actions/Series'
+import { addWarningsSeries } from '../actions/Warnings'
+import { addVisit, setUsedVisit } from '../actions/Visits'
+import { selectStudy, selectStudiesReady } from '../actions/DisplayTables'
+import { selectSeriesReady } from '../actions/DisplayTables'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
@@ -487,7 +487,6 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
-    updateWarningStudy,
     setUsedVisit,
     selectStudy,
     selectStudiesReady,

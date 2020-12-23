@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import BootstrapTable from 'react-bootstrap-table-next'
 import { connect } from 'react-redux';
-import { updateWarningSeries } from './actions/Warnings'
-import { updateWarningStudy } from './actions/Studies'
-import { setUsedVisit } from './actions/Visits'
-import { selectStudiesReady, selectSeriesReady } from './actions/DisplayTables'
+import { updateWarningSeries } from '../actions/Warnings'
+import { updateWarningStudy } from '../actions/Studies'
+import { setUsedVisit } from '../actions/Visits'
+import { selectStudiesReady, selectSeriesReady } from '../actions/DisplayTables'
 import ButtonIgnore from './render_component/ButtonIgnore'
 
 class DisplayWarning extends Component {
@@ -49,7 +49,6 @@ class DisplayWarning extends Component {
                         } else if (this.props.type === 'study') {
                             if (this.props.multiUpload) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
-                            if (row.key === 'NOT_EXPECTED_VISIT') this.props.updateWarningStudy(this.props.studies[row.studyInstanceUID].warnings['NULL_VISIT_ID'], row.studyInstanceUID)
                             this.props.selectStudiesReady(row.studyInstanceUID, false)
                         }
                     }}/>

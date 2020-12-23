@@ -10,6 +10,7 @@ const initialState = {
 
 export default function DisplayTablesReducer (state = initialState, action) {
   switch (action.type) {
+    
     case SELECT_STUDY:
       return {
         ...state,

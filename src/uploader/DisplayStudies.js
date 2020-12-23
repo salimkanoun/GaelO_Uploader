@@ -18,17 +18,13 @@ import { Button, Container, Row, Col } from 'react-bootstrap'
 import ControllerSelectPatient from './ControllerSelectPatient'
 import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
-import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
+import { selectStudy, selectStudiesReady } from '../actions/DisplayTables'
 
 class StudiesTab extends Component {
 
     state = {
-        isToggled: false, //Status of CheckPatient modal
-    }
-
-    constructor(props) {
-        super(props)
-        this.toggleCheckPatient = this.toggleCheckPatient.bind(this)
+        //Status of CheckPatient modal
+        isToggled: false,
     }
 
     columns = [
@@ -39,7 +35,10 @@ class StudiesTab extends Component {
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 return (
-                    <input disabled={row.status !== 'Valid'} type='checkbox'checked={this.props.studiesReady.includes(row.studyInstanceUID)} onChange={(event) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, event.target.checked) }} />
+                    <input disabled={row.status !== 'Valid'} 
+                            type='checkbox' 
+                            checked={this.props.studiesReady.includes(row.studyInstanceUID)} 
+                            onChange={(event) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, event.target.checked) }} />
                 )
             }
         },
@@ -97,24 +96,21 @@ class StudiesTab extends Component {
     /**
      * Toggle modal 'CheckPatient' of given row 
      */
-    toggleCheckPatient() {
-        this.setState((state) => { return { isToggled: !state.isToggled } })
-    }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.selectedStudy !== this.props.selectedStudy) {
-            this.render()
-        }
+    toggleCheckPatient = () => {
+        this.setState( (state) => { return { isToggled: !state.isToggled } } )
     }
 
     rowClasses = (row, rowIndex) => {
-        let className = ''
-        if (row.status === 'Rejected') className = 'du-studies row-danger'
-        else if (row.status === 'Incomplete' || row.status === 'Already Known') className = 'du-studies row-warning'
-        else if (row.status === 'Valid' && row.selectedStudies === true) className = 'du-studies row-success'
-        else className = 'du-studies td'
-        if (row.studyInstanceUID === this.props.selectedStudy) className = className + ' row-clicked'
-        return className
+        let className = ['du-studies']
+        
+        if (row.status === 'Rejected') className.push('row-danger')
+        else if (row.status === 'Incomplete' || row.status === 'Already Known') className.push('row-warning')
+        else if (row.status === 'Valid' && row.selectedStudies === true) className.push('row-success')
+        else className.push('td')
+        
+        if (row.studyInstanceUID === this.props.selectedStudy) className.push('row-clicked')
+
+        return className.join(' ')
     }
 
     render() {

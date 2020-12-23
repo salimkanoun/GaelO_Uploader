@@ -15,7 +15,7 @@
 import React, { Component } from 'react'
 import { Popover, OverlayTrigger, Button } from 'react-bootstrap'
 import { Slider, Typography } from '@material-ui/core';
-import OptionCog from '../images/optionCog'
+import OptionCog from '../assets/images/optionCog'
 export default class Options extends Component {
 
     state = {
@@ -23,27 +23,26 @@ export default class Options extends Component {
         zipIntensity: 3
     }
 
-    constructor(props){
-        super(props)
-        this.updateBatchSize = this.updateBatchSize.bind(this)
-        this.updateZipIntensity = this.updateZipIntensity.bind(this)
-    }
-
     updateBatchSize = (object, value) => {
+
         this.setState({
             batchUploadSize : value
+        }, ()=>{
+            localStorage.setItem('batchUploadSize', value)
         })
-        localStorage.setItem('batchUploadSize', value);
+        
     }
 
     updateZipIntensity = (object, value) => {
         this.setState({
             zipIntensity : value
+        }, ()=>{
+            localStorage.setItem('zipIntensity', value)
         })
-        localStorage.setItem('zipIntensity', value);
+        
     }
 
-    componentDidMount() {
+    componentDidMount = () => {
 
         if(localStorage.getItem('zipIntensity') !== null){
 
@@ -55,13 +54,15 @@ export default class Options extends Component {
             })
 
         }else{
+
             localStorage.setItem('zipIntensity', 3)
             localStorage.setItem('batchUploadSize', 200)
+
         }
         
     }
 
-    render() {
+    render = () => {
         return (
             <>
                 <OverlayTrigger rootClose trigger="click" placement="right" overlay={

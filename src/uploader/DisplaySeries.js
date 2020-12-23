@@ -17,7 +17,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import { Container, Row, Col } from 'react-bootstrap'
 import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
-import { selectSeriesReady, selectSeries } from './actions/DisplayTables'
+import { selectSeriesReady, selectSeries } from '../actions/DisplayTables'
 
 class DisplaySeries extends Component {
 

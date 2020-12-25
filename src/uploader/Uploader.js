@@ -46,10 +46,9 @@ class Uploader extends Component {
 
     constructor(props) {
         super(props)
+
         this.config = this.props.config
         this.uploadModel = new Model();
-        this.addFile = this.addFile.bind(this)
-        this.onUploadClick = this.onUploadClick.bind(this)
 
         this.uppy = Uppy({
             id: 'uppy',
@@ -74,7 +73,7 @@ class Uploader extends Component {
 
     }
 
-    async componentDidMount() {
+    componentDidMount = async () => {
         if (this.config.developerMode) {
             await logIn()
             await registerStudy()
@@ -101,7 +100,7 @@ class Uploader extends Component {
      * Read droped files (listen to DropZone event)
      * @param {Array} files 
      */
-    addFile(files) {
+    addFile = (files) => {
 
         if (files.length === 1 && files[0].type === 'application/zip') {
             this.readAsZipFile(files[0])
@@ -138,7 +137,7 @@ class Uploader extends Component {
      * Read and parse a single dicom file
      * @param {File} file 
      */
-    async read(file) {
+    read = async (file) => {
         try {
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
@@ -195,7 +194,7 @@ class Uploader extends Component {
 
     }
 
-    async readAsZipFile(file) {
+    readAsZipFile = async (file) => {
         this.setState({
             isUnzipping: true
         })
@@ -239,7 +238,7 @@ class Uploader extends Component {
     /**
      * Check studies/series with warning and populate redux
      */
-    async checkSeriesAndUpdateRedux() {
+    checkSeriesAndUpdateRedux = async () => {
         this.setState({ isCheckDone: false })
         this.props.selectStudy(undefined)
         this.resetVisits()
@@ -287,7 +286,7 @@ class Uploader extends Component {
         this.setState({ isCheckDone: true })
     }
 
-    async checkStudy(study) {
+    checkStudy = async (study) => {
         let warnings = {}
         // Check if the study corresponds to the visits in wait for series upload
         let expectedVisit = this.searchPerfectMatchStudy(study)
@@ -317,7 +316,7 @@ class Uploader extends Component {
         return warnings
     }
 
-    searchPerfectMatchStudy(studyObject) {
+    searchPerfectMatchStudy = (studyObject) => {
 
         let thisPatient = studyObject.getObjectPatientName()
         thisPatient.birthDate = studyObject.getPatientBirthDate()
@@ -341,7 +340,7 @@ class Uploader extends Component {
     /**
      * Reset visit status on adding additional DICOMs
      */
-    resetVisits() {
+    resetVisits = () => {
         for (let visit of this.props.visits) {
             this.props.setNotUsedVisit(visit.idVisit)
         }
@@ -350,7 +349,7 @@ class Uploader extends Component {
     /**
      * Upload selected and validated series on click
      */
-    async onUploadClick() {
+    onUploadClick = async () => {
 
         //build array of series object to be uploaded
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
@@ -431,7 +430,7 @@ class Uploader extends Component {
         this.setState({ isUploading: true })
     }
 
-    render() {
+    render = () => {
         return (
             <Fragment>
                 <div>

@@ -64,7 +64,7 @@ class DisplayWarning extends Component {
      * @param {Object} row
      * @return {Boolean}
      */
-    getWarningStatus(row) {
+    getWarningStatus = (row) => {
         if (this.props.type === 'study')
             return this.props.studies[row.studyInstanceUID].warnings[row.key].dismissed
         else if (this.props.type === 'series')
@@ -75,7 +75,7 @@ class DisplayWarning extends Component {
      * Build the tab rows according to the type of object
      * @return {Array}
      */
-    buildRow() {
+    buildRow = () => {
         if (this.props.selectionID !== undefined && this.props.selectionID !== null) {
             let rows = []
             switch (this.props.type) {
@@ -104,7 +104,7 @@ class DisplayWarning extends Component {
         }
     }
 
-    render() {
+    render = () => {
         return (
             <BootstrapTable
                 keyField='key'

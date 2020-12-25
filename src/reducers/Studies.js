@@ -9,6 +9,7 @@ export default function StudiesReducer (state = initialState, action) {
   let studyInstanceUID
 
   switch (action.type) {
+    
     case ADD_STUDY:
       // Add study to reducer
       const studyObject = action.payload

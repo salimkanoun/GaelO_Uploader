@@ -22,17 +22,14 @@ export default function WarningsReducer (state = initialState, action) {
       // Update given series warning in reducer
       const seriesWarning = action.payload.warningToUpdate.key
       const seriesInstanceUID = action.payload.seriesInstanceUID
-      console.log(action.payload)
-      console.log(state)
-      let warningTargetObject = state.warningsSeries[seriesInstanceUID][seriesWarning]
-      warningTargetObject['dismissed'] = !warningTargetObject['dismissed']
+
+      let seriesToUpdate = state.warningsSeries[seriesInstanceUID]
+      seriesToUpdate[seriesWarning]['dismissed'] = !seriesToUpdate[seriesWarning]['dismissed']
+
       return {
         warningsSeries: {
           ...state.warningsSeries,
-          [seriesInstanceUID]: {
-            ...state.warningsSeries[seriesInstanceUID],
-            [seriesWarning]: warningTargetObject
-          }
+          [seriesInstanceUID]: { ...seriesToUpdate }
         }
       }
 

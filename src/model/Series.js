@@ -32,26 +32,32 @@ export default class Series {
 	}
 
 	getSeriesInstanceUID(){
+		if(this.seriesInstanceUID == null){
+			throw new Error('Null SeriesInstanceUID')
+		}
 		return this.seriesInstanceUID
 	}
 
 	getSeriesNumber(){
-		return this.seriesNumber
+		return this.seriesNumber == null ? '' : this.seriesNumber
 	}
 
 	getSeriesDate(){
-		return this.seriesDate
+		return this.seriesDate == null ? '' : this.seriesDate
 	}
 
 	getSeriesDescription(){
-		return this.seriesDescription
+		return this.seriesDescription == null ? '' : this.seriesDescription
 	}
 
 	getModality(){
-		return this.modality
+		return this.modality == null ? '' : this.modality
 	}
 
 	getStudyInstanceUID(){
+		if(this.studyInstanceUID == null){
+			throw new Error('Null StudyInstanceUID')
+		}
 		return this.studyInstanceUID
 	}
 

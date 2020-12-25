@@ -70,7 +70,7 @@ class ControllerSelectPatient extends Component {
         //If multiUpload mode on, set idVisit to the study and forbid its use for another study 
         if (this.props.multiUpload) {
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
-            this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy, true)
+            this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy)
         } else {
             if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') this.props.selectStudiesReady(this.props.studies[this.props.selectedStudy].studyInstanceUID, true)
         }

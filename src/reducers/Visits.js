@@ -1,11 +1,10 @@
-import { ADD_VISIT, SET_USED } from '../actions/actions-types'
+import { ADD_VISIT, SET_USED_VISIT, SET_NOT_USED_VISIT } from '../actions/actions-types'
 
 const initialState = {
   visits: []
 }
 
 /* MULTIUPLOAD mode reducer */
-
 export default function VisitsReducer (state = initialState, action) {
   switch (action.type) {
 
@@ -16,26 +15,39 @@ export default function VisitsReducer (state = initialState, action) {
         visits: visitsArray
       }
 
-    case SET_USED:
+    case SET_USED_VISIT:
       // Set used state of given visit
       const idVisit = action.payload.idVisit
       const studyID = action.payload.studyID
-      const isUsed = action.payload.isUsed
-      let thisNewVisit = {}
-      const newVisitsArray = []
-      // Find idVist in state
-      for (const thisRow in state.visits) {
-        // Once found, save it in thisNewVisit
-        if (state.visits[thisRow].idVisit === idVisit) {
-          thisNewVisit = state.visits[thisRow]
-        } else newVisitsArray.push(state.visits[thisRow]) // Save all the other rows in a new array
-      }
-      if (isUsed) thisNewVisit.studyID = studyID
-      else delete thisNewVisit.studyID
-      thisNewVisit.isUsed = isUsed
-      newVisitsArray.push(thisNewVisit)
+
+      // Find the idVist in state and update his attached StudyInstanceUID and used status
+      let newVisitsArray = state.visits.map( (visit) => {
+        if(visit.idVisit === idVisit){
+          visit.studyID = studyID
+          visit.isUsed = true
+        }
+
+        return visit
+      })
+
       return {
-        visits: [...newVisitsArray]
+        visits: newVisitsArray
+      }
+    
+    case SET_NOT_USED_VISIT:
+      const idVisit2 = action.payload.idVisit
+
+      // Find the idVist in state and update his attached StudyInstanceUID and used status
+      let newVisitsArray2 = state.visits.map( (visit) => {
+        if(visit.idVisit === idVisit2){
+          delete visit.studyID
+          visit.isUsed = false
+        }
+        return visit
+      })
+
+      return {
+        visits: newVisitsArray2
       }
 
     default:

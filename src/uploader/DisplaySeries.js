@@ -17,7 +17,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import { Container, Row, Col } from 'react-bootstrap'
 import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
-import { selectSeriesReady, selectSeries } from '../actions/DisplayTables'
+import { addSeriesReady, removeSeriesReady, selectSeries } from '../actions/DisplayTables'
 
 class DisplaySeries extends Component {
 
@@ -34,7 +34,14 @@ class DisplaySeries extends Component {
                 formatter: (cell, row, rowIndex, formatExtraData) => {
                     if (row.status === 'Known study') return <> </>
                     return (
-                        <input disabled={row.status === 'Rejected'} checked={this.props.seriesReady.includes(row.seriesInstanceUID)} type='checkbox' onChange={(event) => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, event.target.checked) }} />
+                        <input disabled={row.status === 'Rejected'} 
+                            checked={this.props.seriesReady.includes(row.seriesInstanceUID)} 
+                            type='checkbox' 
+                            onChange={(event) => {
+                                    if (event.target.checked) formatExtraData.props.addSeriesReady(row.seriesInstanceUID)
+                                    else formatExtraData.props.removeSeriesReady(row.seriesInstanceUID)
+                                 }} 
+                        />
                     )
                 }
             },
@@ -128,7 +135,8 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
-    selectSeriesReady,
+    addSeriesReady,
+    removeSeriesReady,
     selectSeries
 }
 

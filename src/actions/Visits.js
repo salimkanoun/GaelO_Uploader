@@ -1,4 +1,4 @@
-import { ADD_VISIT, SET_USED } from './actions-types'
+import { ADD_VISIT, SET_USED_VISIT, SET_NOT_USED_VISIT } from './actions-types'
 /* MULTIUPLOAD mode functions */
 
 /**
@@ -18,9 +18,16 @@ export function addVisit (visitObject) {
  * @param {String} studyID
  * @param {Boolean} isUsed new status of visit
  */
-export function setUsedVisit (idVisit, studyID, isUsed) {
+export function setUsedVisit (idVisit, studyID) {
   return {
-    type: SET_USED,
-    payload: { idVisit: idVisit, studyID: studyID, isUsed: isUsed }
+    type: SET_USED_VISIT,
+    payload: { idVisit: idVisit, studyID: studyID}
+  }
+}
+
+export function setNotUsedVisit(idVisit){
+  return {
+    type: SET_NOT_USED_VISIT,
+    payload: { idVisit: idVisit}
   }
 }

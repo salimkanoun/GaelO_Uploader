@@ -22,9 +22,9 @@ import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } f
 import { addStudy, addWarningsStudy } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries } from '../actions/Warnings'
-import { addVisit, setUsedVisit } from '../actions/Visits'
+import { addVisit, setNotUsedVisit } from '../actions/Visits'
 import { selectStudy, selectStudiesReady } from '../actions/DisplayTables'
-import { selectSeriesReady } from '../actions/DisplayTables'
+import { addSeriesReady } from '../actions/DisplayTables'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
@@ -276,7 +276,10 @@ class Uploader extends Component {
                 //Add series related warnings to Redux
                 this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
                 //Automatically add to Redux seriesReady if contains no warnings
-                this.props.selectSeriesReady(seriesInstance.seriesInstanceUID, Util.isEmptyObject(seriesInstance.getWarnings()))
+                if( Util.isEmptyObject(seriesInstance.getWarnings()) ){
+                    this.props.addSeriesReady(seriesInstance.seriesInstanceUID)
+                }
+                
             }
         }
         this.setState({ isCheckDone: true })
@@ -337,9 +340,8 @@ class Uploader extends Component {
      * Reset visit status on adding additional DICOMs
      */
     resetVisits() {
-        for (let visit in this.props.visits) {
-            let thisVisit = this.props.visits[visit]
-            this.props.setUsedVisit(thisVisit.idVisit, thisVisit.studyID, false)
+        for (let visit of this.props.visits) {
+            this.props.setNotUsedVisit(visit.idVisit)
         }
     }
 
@@ -487,10 +489,10 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
-    setUsedVisit,
+    setNotUsedVisit,
     selectStudy,
     selectStudiesReady,
-    selectSeriesReady
+    addSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

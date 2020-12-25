@@ -1,4 +1,4 @@
-import { UPDATE_WARNING_SERIES, ADD_WARNINGS_SERIES } from './actions-types'
+import { TOOGLE_WARNING_SERIES, ADD_WARNINGS_SERIES } from './actions-types'
 
 /**
  * Add warnings to Redux series
@@ -17,9 +17,9 @@ export function addWarningsSeries (seriesInstanceUID, warnings) {
  * @param {*} warningToUpdate
  * @param {*} seriesInstanceUID
  */
-export function updateWarningSeries (warningToUpdate, seriesInstanceUID) {
+export function toogleWarningSeries (warningToUpdate, seriesInstanceUID) {
   return {
-    type: UPDATE_WARNING_SERIES,
+    type: TOOGLE_WARNING_SERIES,
     payload: { warningToUpdate: warningToUpdate, seriesInstanceUID: seriesInstanceUID }
   }
 }

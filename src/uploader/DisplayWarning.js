@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import BootstrapTable from 'react-bootstrap-table-next'
 import { connect } from 'react-redux';
-import { updateWarningSeries } from '../actions/Warnings'
+import { toogleWarningSeries } from '../actions/Warnings'
 import { updateWarningStudy } from '../actions/Studies'
-import { setUsedVisit } from '../actions/Visits'
-import { selectStudiesReady, selectSeriesReady } from '../actions/DisplayTables'
+import { setUsedVisit, setNotUsedVisit } from '../actions/Visits'
+import { selectStudiesReady, addSeriesReady, removeSeriesReady } from '../actions/DisplayTables'
 import ButtonIgnore from './render_component/ButtonIgnore'
 
 class DisplayWarning extends Component {
@@ -43,11 +43,14 @@ class DisplayWarning extends Component {
                     warning={this.getWarningStatus(row)}
                     onClick={() => {
                         if (this.props.type === 'series') {
-                            this.props.updateWarningSeries(row, row.seriesInstanceUID)
-                            if (this.props.series[row.seriesInstanceUID].status === 'Valid') this.props.selectSeriesReady(row.seriesInstanceUID, false) 
-                            else this.props.selectSeriesReady(row.seriesInstanceUID, true) 
+                            this.props.toogleWarningSeries(row, row.seriesInstanceUID)
+                            if (this.props.series[row.seriesInstanceUID].status === 'Valid') this.props.removeSeriesReady(row.seriesInstanceUID) 
+                            else this.props.addSeriesReady(row.seriesInstanceUID) 
                         } else if (this.props.type === 'study') {
-                            if (this.props.multiUpload) this.props.setUsedVisit(row.idVisit, this.props.selectedStudy, !row.dismissed)
+                            if (this.props.multiUpload) {
+                                if(row.dismissed) this.props.setNotUsedVisit(row.idVisit)
+                                else this.props.setUsedVisit(row.idVisit, this.props.selectedStudy)
+                            }
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
                             this.props.selectStudiesReady(row.studyInstanceUID, false)
                         }
@@ -132,11 +135,13 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
-    updateWarningSeries,
+    toogleWarningSeries,
     updateWarningStudy,
     setUsedVisit,
+    setNotUsedVisit,
     selectStudiesReady,
-    selectSeriesReady
+    addSeriesReady,
+    removeSeriesReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplayWarning)

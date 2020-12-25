@@ -23,7 +23,7 @@ import { addStudy, addWarningsStudy } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries } from '../actions/Warnings'
 import { addVisit, setNotUsedVisit } from '../actions/Visits'
-import { selectStudy, selectStudiesReady } from '../actions/DisplayTables'
+import { selectStudy, addStudyReady } from '../actions/DisplayTables'
 import { addSeriesReady } from '../actions/DisplayTables'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
@@ -266,7 +266,9 @@ class Uploader extends Component {
             //Add study warnings to Redux
             this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
             //If study has no warnings, select the valid study
-            if (this.props.studies[studyInstanceUID].warnings === undefined && !this.config.multiUpload) this.props.selectStudiesReady(studyInstanceUID, true)
+            if (this.props.studies[studyInstanceUID].warnings === undefined && !this.config.multiUpload) {
+                this.props.addStudyReady(studyInstanceUID)
+            }
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
             for (let seriesInstance of series) {
@@ -290,7 +292,7 @@ class Uploader extends Component {
         // Check if the study corresponds to the visits in wait for series upload
         let expectedVisit = this.searchPerfectMatchStudy(study)
         //If study is a perfect match, add it to studiesReady in Redux
-        if (expectedVisit !== undefined) this.props.selectStudiesReady(study.studyInstanceUID, true)
+        if (expectedVisit !== undefined) this.props.addStudyReady(study.studyInstanceUID)
         if (!this.config.multiUpload && expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
         // Check if visit ID is set
         if (this.config.multiUpload && (expectedVisit === undefined || expectedVisit.idVisit === null)) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
@@ -491,7 +493,7 @@ const mapDispatchToProps = {
     addVisit,
     setNotUsedVisit,
     selectStudy,
-    selectStudiesReady,
+    addStudyReady,
     addSeriesReady
 }
 

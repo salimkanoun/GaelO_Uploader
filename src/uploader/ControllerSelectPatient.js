@@ -20,7 +20,7 @@ import SelectPatient from './SelectPatient'
 import CheckPatient from './render_component/CheckPatient'
 import { updateWarningStudy, setVisitID } from '../actions/Studies'
 import { setUsedVisit } from '../actions/Visits'
-import { selectStudiesReady } from '../actions/DisplayTables'
+import { addStudyReady } from '../actions/DisplayTables'
 import Util from '../model/Util'
 
 class ControllerSelectPatient extends Component {
@@ -72,7 +72,9 @@ class ControllerSelectPatient extends Component {
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
             this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy)
         } else {
-            if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') this.props.selectStudiesReady(this.props.studies[this.props.selectedStudy].studyInstanceUID, true)
+            if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
+                this.props.addStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID)
+            }
         }
         this.setState({ isDisabled: true })
         this.props.closeListener()
@@ -234,7 +236,7 @@ const mapDispatchToProps = {
     updateWarningStudy,
     setUsedVisit,
     setVisitID,
-    selectStudiesReady
+    addStudyReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ControllerSelectPatient)

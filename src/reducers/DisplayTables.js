@@ -1,5 +1,5 @@
 // Gérer les IDs, selected study, warnings
-import { SELECT_STUDY, ADD_SERIES_READY, REMOVE_SERIES_READY, SELECT_SERIES, STUDIES_READY } from '../actions/actions-types'
+import { SELECT_STUDY, ADD_SERIES_READY, REMOVE_SERIES_READY, SELECT_SERIES, ADD_STUDIES_READY, REMOVE_STUDIES_READY } from '../actions/actions-types'
 
 const initialState = {
   selectedStudy: undefined,
@@ -8,9 +8,10 @@ const initialState = {
   studiesReady: []
 }
 
-export default function DisplayTablesReducer (state = initialState, action) {
+export default function DisplayTablesReducer(state = initialState, action) {
+
   switch (action.type) {
-    
+
     case SELECT_STUDY:
       return {
         ...state,
@@ -24,39 +25,39 @@ export default function DisplayTablesReducer (state = initialState, action) {
         selectedSeries: action.payload
       }
 
-    case STUDIES_READY:
-      let studiesReady
-      if (action.payload.isSelect) {
-        // If select add SeriesInstanceUID to selectedSeries
-        // Distinct cases for uniqueUpload mode purpose
-        if (state.studiesReady === undefined) studiesReady = [action.payload.studiesInstanceUID]
-        else if (!state.studiesReady.includes(action.payload.studiesInstanceUID)) studiesReady = [...state.studiesReady, action.payload.studiesInstanceUID]
-        else studiesReady = [...state.studiesReady]
-      } else if (!action.payload.isSelect) {
-        // If not remove SeriesInstanceUID from selected Series Array
-        if (state.studiesReady !== undefined) studiesReady = state.studiesReady.filter(thisRowID => thisRowID !== action.payload.studiesInstanceUID)
-        else studiesReady = [...state.studiesReady]
-      }
+    case ADD_STUDIES_READY:
+      let newStudiesReady2 = state.studiesReady
+      // If select add SeriesInstanceUID to selectedSeries
+      // Distinct cases for uniqueUpload mode purpose
+      if (!state.studiesReady.includes(action.payload.studyInstanceUID)) newStudiesReady2.push(action.payload.studyInstanceUID)
+
       return {
         ...state,
-        studiesReady: studiesReady
+        studiesReady: [...newStudiesReady2]
+      }
+
+    case REMOVE_STUDIES_READY:
+      //remove SeriesInstanceUID from selected Series Array
+      let newStudiesReady = state.studiesReady.filter(thisRowID => thisRowID !== action.payload.studyInstanceUID)
+      return {
+        ...state,
+        studiesReady: [...newStudiesReady]
       }
 
     case ADD_SERIES_READY:
       let seriesReady = state.seriesReady
 
-      if (!seriesReady.includes(action.payload.seriesInstanceUID)){
+      if (!seriesReady.includes(action.payload.seriesInstanceUID)) {
         // If select add SeriesInstanceUID to selectedSeries
         seriesReady.push(action.payload.seriesInstanceUID)
       }
 
       return {
         ...state,
-        seriesReady : [...seriesReady]
+        seriesReady: [...seriesReady]
       }
 
     case REMOVE_SERIES_READY:
-
       let newSeriesReady = state.seriesReady.filter(thisRowID => thisRowID !== action.payload.validSeriesInstanceUID)
       return {
         ...state,

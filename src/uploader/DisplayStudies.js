@@ -18,7 +18,7 @@ import { Button, Container, Row, Col } from 'react-bootstrap'
 import ControllerSelectPatient from './ControllerSelectPatient'
 import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
-import { selectStudy, selectStudiesReady } from '../actions/DisplayTables'
+import { selectStudy, addStudyReady, removeStudyReady } from '../actions/DisplayTables'
 
 class StudiesTab extends Component {
 
@@ -38,7 +38,10 @@ class StudiesTab extends Component {
                     <input disabled={row.status !== 'Valid'} 
                             type='checkbox' 
                             checked={this.props.studiesReady.includes(row.studyInstanceUID)} 
-                            onChange={(event) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, event.target.checked) }} />
+                            onChange={(event) => { 
+                                if(event.target.checked) formatExtraData.props.addStudyReady(row.studyInstanceUID) 
+                                else formatExtraData.props.removeStudyReady(row.studyInstanceUID) 
+                            }} />
                 )
             }
         },
@@ -149,7 +152,8 @@ const mapStateToProps = state => {
 }
 const mapDispatchToProps = {
     selectStudy,
-    selectStudiesReady
+    addStudyReady,
+    removeStudyReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

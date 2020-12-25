@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { toogleWarningSeries } from '../actions/Warnings'
 import { updateWarningStudy } from '../actions/Studies'
 import { setUsedVisit, setNotUsedVisit } from '../actions/Visits'
-import { selectStudiesReady, addSeriesReady, removeSeriesReady } from '../actions/DisplayTables'
+import { removeStudyReady, addSeriesReady, removeSeriesReady } from '../actions/DisplayTables'
 import ButtonIgnore from './render_component/ButtonIgnore'
 
 class DisplayWarning extends Component {
@@ -52,7 +52,7 @@ class DisplayWarning extends Component {
                                 else this.props.setUsedVisit(row.idVisit, this.props.selectedStudy)
                             }
                             this.props.updateWarningStudy(row, row.studyInstanceUID)
-                            this.props.selectStudiesReady(row.studyInstanceUID, false)
+                            this.props.removeStudyReady(row.studyInstanceUID)
                         }
                     }}/>
             ),
@@ -139,7 +139,7 @@ const mapDispatchToProps = {
     updateWarningStudy,
     setUsedVisit,
     setNotUsedVisit,
-    selectStudiesReady,
+    removeStudyReady,
     addSeriesReady,
     removeSeriesReady
 }

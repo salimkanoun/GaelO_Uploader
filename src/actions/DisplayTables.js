@@ -1,4 +1,4 @@
-import { SELECT_STUDY, ADD_SERIES_READY, REMOVE_SERIES_READY, SELECT_SERIES, STUDIES_READY } from './actions-types'
+import { SELECT_STUDY, ADD_SERIES_READY, REMOVE_SERIES_READY, SELECT_SERIES, ADD_STUDIES_READY, REMOVE_STUDIES_READY } from './actions-types'
 
 /**
  * Update Redux state of current selectedStudy
@@ -46,9 +46,16 @@ export function removeSeriesReady (seriesInstanceUID) {
  * @param {String} studiesInstanceUID
  * @param {Boolean} isSelect
  */
-export function selectStudiesReady (studiesInstanceUID, isSelect) {
+export function addStudyReady (studyInstanceUID) {
   return {
-    type: STUDIES_READY,
-    payload: { studiesInstanceUID: studiesInstanceUID, isSelect: isSelect }
+    type: ADD_STUDIES_READY,
+    payload: { studyInstanceUID: studyInstanceUID }
+  }
+}
+
+export function removeStudyReady(studyInstanceUID){
+  return {
+    type: REMOVE_STUDIES_READY,
+    payload: { studyInstanceUID: studyInstanceUID }
   }
 }

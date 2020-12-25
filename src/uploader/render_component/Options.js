@@ -15,7 +15,7 @@
 import React, { Component } from 'react'
 import { Popover, OverlayTrigger, Button } from 'react-bootstrap'
 import { Slider, Typography } from '@material-ui/core';
-import OptionCog from '../assets/images/optionCog'
+import OptionCog from '../../assets/images/optionCog'
 export default class Options extends Component {
 
     state = {

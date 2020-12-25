@@ -14,7 +14,7 @@ import DicomDropZone from './render_component/DicomDropZone'
 import ParsingDetails from './render_component/ParsingDetails'
 import ControllerStudiesSeries from './ControllerStudiesSeries'
 import ProgressUpload from './render_component/ProgressUpload'
-import Options from './Options'
+import Options from './render_component/Options'
 import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'

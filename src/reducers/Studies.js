@@ -32,7 +32,6 @@ export default function StudiesReducer (state = initialState, action) {
       }
 
     case SET_VISIT_ID:
-      // MULTIUPLOAD mode
       // Set idVisit for given study in reducer
       studyInstanceUID = action.payload.studyInstanceUID
       const idVisit = action.payload.idVisit
@@ -45,7 +44,6 @@ export default function StudiesReducer (state = initialState, action) {
 
     case UPDATE_WARNING_STUDY:
       // Update given study warning in reducer
-      console.log(action.payload)
       studyInstanceUID = action.payload.studyInstanceUID
       const studyWarning = action.payload.warningToUpdate.key
 

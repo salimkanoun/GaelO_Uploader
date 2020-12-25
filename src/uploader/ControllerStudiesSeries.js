@@ -100,7 +100,8 @@ class ControllerStudiesSeries extends Component {
   buildSeriesRows() {
     const seriesArray = []
     if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
-      const seriesToDisplay = Object.keys(this.props.studies[this.props.selectedStudy].series)
+      const seriesToDisplay = this.props.studies[this.props.selectedStudy].series
+      console.log(seriesToDisplay)
       seriesToDisplay.forEach((series) => {
         const seriesToPush = this.props.series[series]
         if (this.props.studies[this.props.selectedStudy].warnings['ALREADY_KNOWN_STUDY'] !== undefined) seriesToPush.status = 'Known study'

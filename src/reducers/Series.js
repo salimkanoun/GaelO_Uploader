@@ -11,7 +11,6 @@ export default function SeriesReducer (state = initialState, action) {
     case ADD_SERIES:
       // Add Series to reducer
       const seriesObject = action.payload
-      seriesObject.numberOfInstances = Object.keys(seriesObject.instances).length
       return {
         series: {
           ...state.series,

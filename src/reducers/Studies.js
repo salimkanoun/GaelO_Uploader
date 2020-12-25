@@ -5,7 +5,9 @@ const initialState = {
 }
 
 export default function StudiesReducer (state = initialState, action) {
+  
   let studyInstanceUID
+
   switch (action.type) {
     case ADD_STUDY:
       // Add study to reducer
@@ -45,20 +47,13 @@ export default function StudiesReducer (state = initialState, action) {
       console.log(action.payload)
       studyInstanceUID = action.payload.studyInstanceUID
       const studyWarning = action.payload.warningToUpdate.key
+
+      let studyToModify = state.studies[studyInstanceUID]
+      studyToModify['warnings'][studyWarning]['dismissed'] = !studyToModify['warnings'][studyWarning]['dismissed']
       return {
-        ...state,
         studies: {
           ...state.studies,
-          [studyInstanceUID]: {
-            ...state.studies[studyInstanceUID],
-            warnings: {
-              ...state.studies[studyInstanceUID].warnings,
-              [studyWarning]: {
-                ...state.studies[studyInstanceUID].warnings[studyWarning],
-                dismissed: !state.studies[studyInstanceUID].warnings[studyWarning].dismissed
-              }
-            }
-          }
+          [studyInstanceUID]: {...studyToModify}
         }
       }
 
@@ -66,6 +61,3 @@ export default function StudiesReducer (state = initialState, action) {
       return state
   }
 }
-// EO Add expected data
-// IsValidatedPatient
-// IsKnownFromServer

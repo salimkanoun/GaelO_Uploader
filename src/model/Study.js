@@ -59,10 +59,6 @@ export default class Study {
         return Object.keys(this.series)
     }
 
-    getPatientName() {
-        return (this.getPatientFirstName() + this.getPatientLastName())
-    }
-
     getObjectPatientName(){
         return {givenName: this.getPatientFirstName(), familyName: this.getPatientLastName()}
     }
@@ -114,8 +110,5 @@ export default class Study {
         let hash = SHA1( this.getPatientID() + '|' + this.getStudyInstanceUID() ).toString()
         return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`
     }
-
-    getWarnings() {
-        return this.warnings
-    }
+    
 }

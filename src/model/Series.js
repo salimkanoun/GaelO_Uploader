@@ -31,6 +31,30 @@ export default class Series {
 		this.warnings = {};
 	}
 
+	getSeriesInstanceUID(){
+		return this.seriesInstanceUID
+	}
+
+	getSeriesNumber(){
+		return this.seriesNumber
+	}
+
+	getSeriesDate(){
+		return this.seriesDate
+	}
+
+	getSeriesDescription(){
+		return this.seriesDescription
+	}
+
+	getModality(){
+		return this.modality
+	}
+
+	getStudyInstanceUID(){
+		return this.studyInstanceUID
+	}
+
 	addInstance(instanceObject) {
 		if (!this.isExistingInstance(instanceObject.SOPInstanceUID)) {
 			this.instances[instanceObject.SOPInstanceUID] = instanceObject
@@ -53,6 +77,10 @@ export default class Series {
 		return instances
 	}
 
+	getInstancesObject(){
+		return this.instances
+	}
+
 	getNbInstances() {
 		return Object.keys(this.instances).length;
 	}
@@ -67,7 +95,7 @@ export default class Series {
 		return nbConsideredWarnings > 0;
 	}
 
-	async checkSeries() {
+	async __checkSeries() {
 		let firstInstance = this.getArrayInstances()[0]
 		let dicomFile = new DicomFile(firstInstance.getFile())
 		await dicomFile.readDicomFile()
@@ -104,11 +132,8 @@ export default class Series {
 		}
 	}
 
-	getWarnings() {
+	async getWarnings() {
+		await this.__checkSeries()
 		return this.warnings
-	}
-
-	setWarningStatus(key, dismissed) {
-		this.warnings[key]['dismissed'] = dismissed
 	}
 }

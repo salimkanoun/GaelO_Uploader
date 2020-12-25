@@ -260,25 +260,35 @@ class Uploader extends Component {
                 studyToAdd.getAcquisitionDate(), 
                 studyToAdd.getPatientBirthDate(), 
                 studyToAdd.getStudyDescription(),
-                studyToAdd.series
+                Object.keys(studyToAdd.series)
             )
             //Add study warnings to Redux
             this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
             //If study has no warnings, select the valid study
-            if (this.props.studies[studyInstanceUID].warnings === undefined && !this.config.multiUpload) {
+            if ( this.props.studies[studyInstanceUID].warnings === undefined && !this.config.multiUpload) {
                 this.props.addStudyReady(studyInstanceUID)
             }
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
+            
             for (let seriesInstance of series) {
-                await seriesInstance.checkSeries()
+
+                let seriesWarnings = await seriesInstance.getWarnings()
                 //Add series to redux
-                this.props.addSeries(seriesInstance)
+                this.props.addSeries(
+                    seriesInstance.getInstancesObject(),
+                    seriesInstance.getSeriesInstanceUID(),
+                    seriesInstance.getSeriesNumber(),
+                    seriesInstance.getSeriesDate(),
+                    seriesInstance.getSeriesDescription(),
+                    seriesInstance.getModality(),
+                    seriesInstance.getStudyInstanceUID()
+                )
                 //Add series related warnings to Redux
-                this.props.addWarningsSeries(seriesInstance.seriesInstanceUID, seriesInstance.getWarnings())
+                this.props.addWarningsSeries(seriesInstance.getSeriesInstanceUID(), seriesWarnings )
                 //Automatically add to Redux seriesReady if contains no warnings
-                if( Util.isEmptyObject(seriesInstance.getWarnings()) ){
-                    this.props.addSeriesReady(seriesInstance.seriesInstanceUID)
+                if( Util.isEmptyObject( seriesWarnings ) ){
+                    this.props.addSeriesReady( seriesInstance.getSeriesInstanceUID() )
                 }
                 
             }

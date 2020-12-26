@@ -13,6 +13,7 @@
     "@uppy/core": "^1.11.0",
     "@uppy/react": "^1.8.0",
     "@uppy/tus": "^1.6.0",
+    "babel-loader": "^8.2.2",
     "blob": "^0.1.0",
     "bootstrap": "^4.5.0",
     "crypto-js": "^4.0.0",

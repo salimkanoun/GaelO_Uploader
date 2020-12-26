@@ -59,10 +59,6 @@ export default class Study {
         return Object.keys(this.series)
     }
 
-    getObjectPatientName(){
-        return {givenName: this.getPatientFirstName(), familyName: this.getPatientLastName()}
-    }
-
     getPatientFirstName() {
         return (this.patientFirstName === undefined || this.patientFirstName === null) ? '' : this.patientFirstName.toUpperCase()
     }

@@ -4,12 +4,12 @@ import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, SET_VISIT_ID } from
  * Add study to Redux studies Object
  * @param {Object} studyObject
  */
-export function addStudy (idVisit, studyInstanceUID, patientFirstName, patientLastName, patientSex, patientID, acquisitionDate, patientBirthDate, studyDescription, series ) {
+export function addStudy (studyInstanceUID, patientFirstName, patientLastName, patientSex, patientID, acquisitionDate, patientBirthDate, studyDescription, orthancStudyID, series ) {
 
   return {
     type: ADD_STUDY,
     payload: {
-      idVisit : idVisit,
+      idVisit : null,
       patientFirstName : patientFirstName,
       patientLastName : patientLastName,
       patientName : patientFirstName+' '+patientLastName,
@@ -19,7 +19,9 @@ export function addStudy (idVisit, studyInstanceUID, patientFirstName, patientLa
       acquisitionDate : acquisitionDate,
       patientBirthDate : patientBirthDate,
       studyInstanceUID : studyInstanceUID,
-      series : series
+      orthancStudyID : orthancStudyID,
+      series : series,
+      warnings: {}
     }
   }
 }

@@ -4,7 +4,7 @@
 export function getPossibleImport () {
   return fetch('/scripts/get_possible_import.php')
     .then((answer) => {
-      if (!answer.ok) { throw answer }
+      if (!answer.ok) { return [] }
       return (answer.json())
     })
     .catch((error) => {

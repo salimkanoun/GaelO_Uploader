@@ -19,7 +19,7 @@ import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
-import { addStudy, addWarningsStudy } from '../actions/Studies'
+import { addStudy, addWarningsStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries } from '../actions/Warnings'
 import { addVisit, setNotUsedVisit } from '../actions/Visits'
@@ -244,14 +244,11 @@ class Uploader extends Component {
         this.resetVisits()
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
-            //Check studies warnings
-            let studyWarnings = await this.checkStudy(this.uploadModel.data[studyInstanceUID])
+            //Retrieve StudyObject from Model
             let studyToAdd = this.uploadModel.data[studyInstanceUID]
-            let idVisit = undefined
-            if (!this.config.multiUpload) idVisit = this.config.idVisit
+
             //Add study to Redux
             this.props.addStudy(
-                idVisit,
                 studyToAdd.getStudyInstanceUID(), 
                 studyToAdd.getPatientFirstName(), 
                 studyToAdd.getPatientLastName(), 
@@ -260,14 +257,29 @@ class Uploader extends Component {
                 studyToAdd.getAcquisitionDate(), 
                 studyToAdd.getPatientBirthDate(), 
                 studyToAdd.getStudyDescription(),
+                studyToAdd.getOrthancStudyID(),
                 Object.keys(studyToAdd.series)
             )
             //Add study warnings to Redux
-            this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
-            //If study has no warnings, select the valid study
-            if ( this.props.studies[studyInstanceUID].warnings === undefined && !this.config.multiUpload) {
-                this.props.addStudyReady(studyInstanceUID)
+            let studyRedux = this.props.studies[studyInstanceUID]
+            //If Not multiupload assigned the targetted idVisit
+            if (!this.config.multiUpload) {
+                this.props.setVisitID(studyInstanceUID, this.config.idVisit)
+            }else{
+                //if multiupload Search for a perfect Match and assign it
+                let perfectMatchVisit = this.searchPerfectMatchStudy(studyRedux)
+                if (perfectMatchVisit != null) {
+                    //SK IL FAUT AUSSI LE METTRE EN DISABLE DANS LE REDUX DE VISIT
+                    this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
+                }
             }
+            
+            let studyWarnings = await this.getStudyWarning(studyRedux)
+
+            //If no warning mark it as ready, if not add warning to redux
+            if( Util.isEmptyObject(studyWarnings) ) this.props.addStudyReady(studyInstanceUID)
+            else this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
+
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
             
@@ -296,18 +308,21 @@ class Uploader extends Component {
         this.setState({ isCheckDone: true })
     }
 
-    checkStudy = async (study) => {
+    /**
+     * Generate warnings for a given study
+     * @param {*} study 
+     */
+    getStudyWarning = async (studyRedux) => {
         let warnings = {}
-        // Check if the study corresponds to the visits in wait for series upload
-        let expectedVisit = this.searchPerfectMatchStudy(study)
-        //If study is a perfect match, add it to studiesReady in Redux
-        if (expectedVisit !== undefined) this.props.addStudyReady(study.studyInstanceUID)
-        if (!this.config.multiUpload && expectedVisit === undefined) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
-        // Check if visit ID is set
-        if (this.config.multiUpload && (expectedVisit === undefined || expectedVisit.idVisit === null)) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID;
+
+        //if Visit ID is not set add Null Visit ID (visitID Needs to be assigned)
+        if ( studyRedux.idVisit == null ) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID
+        //If Visit ID Assigned and not perfect match add Not Expected Visit to force user's validation
+        else if ( ! this.isPerfectMatch( studyRedux, this.getVisitDataById(studyRedux.idVisit)) ) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
+
         // Check if study is already known by server
         try{
-            let newStudy = await isNewStudy(study.getOrthancStudyID())
+            let newStudy = await isNewStudy( studyRedux.orthancStudyID )
             if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
         } catch (error){
             console.warn(error)
@@ -326,25 +341,49 @@ class Uploader extends Component {
         return warnings
     }
 
-    searchPerfectMatchStudy = (studyObject) => {
-
-        let thisPatient = studyObject.getObjectPatientName()
-        thisPatient.birthDate = studyObject.getPatientBirthDate()
-        thisPatient.sex = studyObject.getPatientSex();
-        thisPatient.acquisitionDate = studyObject.getAcquisitionDate()
-
+    /**
+     * Search a perfect match visit for a registered study in redux
+     * @param {object} studyRedux 
+     */
+    searchPerfectMatchStudy = (studyRedux) => {
         // Linear search through expected visits list
-        for (let visit of this.props.visits) {
-            if (Util.areEqualFields(visit.firstName.trim().charAt(0), thisPatient.givenName.trim().charAt(0))
-                && Util.areEqualFields(visit.lastName.trim().charAt(0), thisPatient.familyName.trim().charAt(0))
-                && Util.areEqualFields(visit.patientSex.trim().charAt(0), thisPatient.sex.trim().charAt(0))
-                && Util.isProbablyEqualDates(visit.patientDOB, Util.formatRawDate(thisPatient.birthDate))
-                && Util.isProbablyEqualDates(visit.acquisitionDate, Util.formatRawDate(thisPatient.acquisitionDate))) {
-                return visit;
+        for (let visitObject of this.props.visits) {
+            if ( this.isPerfectMatch(studyRedux, visitObject) ) {
+                return visitObject;
             }
-        };
+        }
 
         return undefined;
+    }
+
+    getVisitDataById = (idVisit) => {
+        for (let visit of this.props.visits) {
+            if ( visit.idVisit === idVisit ) {
+                return visit;
+            }
+        }
+    }
+
+    /**
+     * Determine if all identification keys are matching of a study / visit couple
+     * @param {object} studyRedux 
+     * @param {object} visitObject 
+     */
+    isPerfectMatch = (studyRedux, visitObject) => {
+
+        let patientFirstname = studyRedux.patientFirstName
+        let patientLastname = studyRedux.patientLastName
+        let birthDate = studyRedux.patientBirthDate
+        let sex = studyRedux.patientSex
+        let acquisitionDate = studyRedux.acquisitionDate
+
+        if (Util.areEqualFields(visitObject.firstName.trim().charAt(0), patientFirstname.trim().charAt(0))
+        && Util.areEqualFields(visitObject.lastName.trim().charAt(0), patientLastname.trim().charAt(0))
+        && Util.areEqualFields(visitObject.patientSex.trim().charAt(0), sex.trim().charAt(0))
+        && Util.isProbablyEqualDates(visitObject.patientDOB, Util.formatRawDate(birthDate))
+        && Util.isProbablyEqualDates(visitObject.acquisitionDate, Util.formatRawDate(acquisitionDate))) {
+            return true
+        } else return false
     }
 
     /**
@@ -503,7 +542,8 @@ const mapDispatchToProps = {
     setNotUsedVisit,
     selectStudy,
     addStudyReady,
-    addSeriesReady
+    addSeriesReady,
+    setVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

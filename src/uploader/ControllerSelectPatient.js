@@ -47,35 +47,48 @@ class ControllerSelectPatient extends Component {
      * @param {Object} thisRow 
      */
     onClick = (thisRow) => {
+
+        //Change updated item
         let newRows = this.state.rows.map((row) => {
             let row2 = { ...row }
             if (row2.rowName === thisRow.rowName) row2.ignoredStatus = !row.ignoredStatus
             return row2
         })
-        this.setState(() => ({ rows: newRows }), () => {
-            let isDisabled = false
-            for (let row in this.state.rows) {
-                if (this.state.rows[row].ignoredStatus === false) isDisabled = true
-            }
-            this.setState(() => ({ isDisabled: isDisabled }))
+
+        //Determine if it still has item difference awaiting to be ignored
+        let isDisabled = false
+        newRows.forEach( row  => {
+            if  ( !row.ignoredStatus ) isDisabled = true
         })
+
+        //Update state with new status
+        this.setState( () => ({ 
+            rows: newRows,
+            isDisabled: isDisabled 
+        }) )
     }
 
     /**
      * Dismiss study warning to check patient on user validation
      */
     validateCheckPatient = () => {
+       
+        //Update redux to remove the Not Expected Visit
         if (this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'] !== undefined) this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
-        if (this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'] !== undefined) this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'], this.props.selectedStudy)
         //If multiUpload mode on, set idVisit to the study and forbid its use for another study 
         if (this.props.multiUpload) {
+            //Assigned the VisitID
             this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
+            //Remove the Null Warning (SK BOF BOF DEVRAIT ETRE GERER AUTOMATIQUEMENT QUAND ON SET LE VISIT ID)
+            this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'], this.props.selectedStudy)
             this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy)
-        } else {
-            if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
-                this.props.addStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID)
-            }
         }
+
+        //If ready mark this study ready
+        if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
+            this.props.addStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID)
+        }
+        
         this.setState({ isDisabled: true })
         this.props.closeListener()
     }

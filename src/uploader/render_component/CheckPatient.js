@@ -43,15 +43,13 @@ export default class CheckPatient extends Component {
         },
     ]
 
-    displayMessage() {
-        if (!this.props.multiUpload) return (<p>The imported patient informations do not match with the ones 
-            in the server. We let you check these informations below:</p>)
-    }
-
     render() {
         return (
             <>
-                {this.displayMessage()}
+                { (!this.props.multiUpload) ? 
+                    <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p> 
+                    : null 
+                }
                 <BootstrapTable
                     keyField='rowName'
                     classes="table table-borderless"

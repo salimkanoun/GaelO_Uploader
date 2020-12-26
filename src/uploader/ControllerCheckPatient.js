@@ -13,28 +13,17 @@
  */
 
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
-
-import { Modal, Button } from 'react-bootstrap'
-import SelectPatient from './SelectPatient'
+import { Button } from 'react-bootstrap'
 import CheckPatient from './render_component/CheckPatient'
-import { updateWarningStudy, setVisitID } from '../actions/Studies'
-import { setUsedVisit } from '../actions/Visits'
-import { addStudyReady } from '../actions/DisplayTables'
 import Util from '../model/Util'
 
-class ControllerCheckPatient extends Component {
+export default class ControllerCheckPatient extends Component {
 
     state = {
         rows: [], //Table rows to display
         isDisabled: true, //Status of 'validate' button
-        selectedVisit: undefined, //ID of selected visit
     }
-    
-    /**
-     * Build table rows on study selection
-     * @param {*} prevState 
-     */
+
     componentDidMount = () => {
 
         let rows = this.buildRows()
@@ -76,33 +65,7 @@ class ControllerCheckPatient extends Component {
         })
         return false
     }
-
-    /**
-     * Dismiss study warning to check patient on user validation
-     */
-    validateCheckPatient = () => {
-
-       //SK ICI SUREMENT A FAIRE DANS SELECT PATIENT
-
-        //Update redux to remove the Not Expected Visit
-        if (this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'] !== undefined) this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
-        //If multiUpload mode on, set idVisit to the study and forbid its use for another study 
-        if (this.props.multiUpload) {
-            //Assigned the VisitID
-            this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
-            //Remove the Null Warning (SK BOF BOF DEVRAIT ETRE GERER AUTOMATIQUEMENT QUAND ON SET LE VISIT ID)
-            this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'], this.props.selectedStudy)
-            this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy)
-        }
-
-        //If ready mark this study ready
-        if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
-            this.props.addStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID)
-        }
-        
-        this.props.closeListener()
-    }
-
+    
     /**
      * Check matching of patient information
      * @return {Array}
@@ -110,6 +73,8 @@ class ControllerCheckPatient extends Component {
     buildRows = () => {
 
         let rows = []
+
+        if (this.props.expectedVisit == null) return rows
 
         //SK CES PROPS DOIVENT VENIR DE SELECT PATIENT
         let currentStudy = this.props.currentStudy
@@ -183,39 +148,12 @@ class ControllerCheckPatient extends Component {
 
     render = () => {
         return (
-            <Modal show={this.props.show} onHide={this.props.closeListener}>
-                <Modal.Header className="modal-header" closeButton>
-                    <Modal.Title className="modal-title">
-                        {this.props.multiUpload ? 'Select Patient' : 'Check Patient'}
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="modal-body du-patient">
-                    <SelectPatient hidden={!this.props.multiUpload} studyInstanceUID={this.props.selectedStudy} generateRows={this.generateRows} />
-                    <CheckPatient onClick={this.onClick} rows={this.state.rows} multiUpload={this.props.multiUpload} />
-                </Modal.Body>
-                <Modal.Footer className="modal-footer">
-                    <Button type="button" onClick={this.validateCheckPatient} className="btn btn-primary" data-dismiss="modal" disabled={this.state.isDisabled}>
-                        This is the correct patient
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <div className="modal-body du-patient">
+                <CheckPatient onClick={this.onClick} rows={this.state.rows} />
+                <Button type="button" onClick={this.props.onValidatePatient} className="btn btn-primary" disabled={this.state.isDisabled}>
+                    This is the correct patient
+                </Button>
+            </div>
         )
     }
 }
-
-const mapStateToProps = state => {
-    return {
-        selectedStudy: state.DisplayTables.selectedStudy,
-        studies: state.Studies.studies,
-        visits: state.Visits.visits,
-    }
-}
-
-const mapDispatchToProps = {
-    updateWarningStudy,
-    setUsedVisit,
-    setVisitID,
-    addStudyReady
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ControllerSelectPatient)

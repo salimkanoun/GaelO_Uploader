@@ -14,9 +14,9 @@
 
 import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
-import { Button, Container, Row, Col } from 'react-bootstrap'
-import ControllerSelectPatient from './ControllerSelectPatient'
+import { Button, Container, Row, Col, Modal } from 'react-bootstrap'
 import DisplayWarning from './DisplayWarning'
+import SelectPatient2 from './SelectPatient2'
 import { connect } from 'react-redux';
 import { selectStudy, addStudyReady, removeStudyReady } from '../actions/DisplayTables'
 
@@ -24,7 +24,7 @@ class StudiesTab extends Component {
 
     state = {
         //Status of CheckPatient modal
-        isToggled: false,
+        showSelectPatient: false,
     }
 
     columns = [
@@ -54,7 +54,7 @@ class StudiesTab extends Component {
                     if (this.props.studiesRows[rowIndex].warnings['ALREADY_KNOWN_STUDY'] !== undefined) return (<></>)
                     if ((this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'].dismissed)
                     || (this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed)) {
-                        return (<Button onClick={() => { this.toggleCheckPatient(); }}>
+                        return (<Button onClick={() => { this.toggleSelectPatient(); }}>
                             {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
                         </Button>)
                     }
@@ -99,8 +99,8 @@ class StudiesTab extends Component {
     /**
      * Toggle modal 'CheckPatient' of given row 
      */
-    toggleCheckPatient = () => {
-        this.setState( (state) => { return { isToggled: !state.isToggled } } )
+    toggleSelectPatient = () => {
+        this.setState( (state) => { return { showSelectPatient: !state.showSelectPatient } } )
     }
 
     rowClasses = (row, rowIndex) => {
@@ -116,10 +116,42 @@ class StudiesTab extends Component {
         return className.join(' ')
     }
 
+    validateCheckPatient = () => {
+       
+        //Update redux to remove the Not Expected Visit
+        if (this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'] !== undefined) this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
+        //If multiUpload mode on, set idVisit to the study and forbid its use for another study 
+        if (this.props.multiUpload) {
+           //Remove the Null Warning (SK BOF BOF DEVRAIT ETRE GERER AUTOMATIQUEMENT QUAND ON SET LE VISIT ID)
+            this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'], this.props.selectedStudy)
+        }
+
+         //Assigned the VisitID
+         this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
+         this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy)
+
+        //If ready mark this study ready
+        if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
+            this.props.addStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID)
+        }
+        
+    }
+
     render() {
         return (
             <Container fluid>
                 <span className='title'>Studies</span>
+
+                <Modal show={this.state.showSelectPatient} onHide={this.toggleSelectPatient}>
+                    <Modal.Header className="modal-header" closeButton>
+                        <Modal.Title className="modal-title">
+                            {this.props.multiUpload ? 'Select Patient' : 'Check Patient'}
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body className="modal-body du-patient">
+                        <SelectPatient2 multiUpload={this.props.multiUpload} />
+                    </Modal.Body>
+                </Modal>
                 <Row>
                     <Col xs={12} md={8}>
                         <BootstrapTable
@@ -133,7 +165,7 @@ class StudiesTab extends Component {
                             columns={this.columns}
                             selectRow={this.selectRow}
                         />
-                        <ControllerSelectPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} checkStudyReady={(studyID) => this.props.checkStudyReady(studyID)} />
+
                     </Col>
                     <Col xs={6} md={4}>
                         <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload} />

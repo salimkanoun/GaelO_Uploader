@@ -15,7 +15,7 @@ export function addSeries (instances, seriesInstanceUID, seriesNumber, seriesDat
     modality : modality,
     studyInstanceUID : studyInstanceUID,
     warnings : {},
-    numberOfInstances : instances.length
+    numberOfInstances : Object.keys(instances).length
   }
 
   return {

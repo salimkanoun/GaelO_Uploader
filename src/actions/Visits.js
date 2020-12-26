@@ -1,4 +1,4 @@
-import { ADD_VISIT, SET_USED_VISIT, SET_NOT_USED_VISIT } from './actions-types'
+import { ADD_VISIT, SET_USED_VISIT, SET_NOT_USED_VISIT, RESET_VISITS } from './actions-types'
 /* MULTIUPLOAD mode functions */
 
 /**
@@ -29,5 +29,11 @@ export function setNotUsedVisit(idVisit){
   return {
     type: SET_NOT_USED_VISIT,
     payload: { idVisit: idVisit}
+  }
+}
+
+export function resetVisits(){
+  return {
+    type : RESET_VISITS
   }
 }

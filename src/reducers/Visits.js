@@ -1,8 +1,10 @@
-import { ADD_VISIT, SET_USED_VISIT, SET_NOT_USED_VISIT } from '../actions/actions-types'
+import { ADD_VISIT, SET_USED_VISIT, SET_NOT_USED_VISIT, RESET_VISITS } from '../actions/actions-types'
 
 const initialState = {
-  visits: []
+  visits: {}
 }
+
+//SK studyID à remplacer par StudyInstanceUID
 
 /* MULTIUPLOAD mode reducer */
 export default function VisitsReducer (state = initialState, action) {
@@ -10,9 +12,12 @@ export default function VisitsReducer (state = initialState, action) {
 
     case ADD_VISIT:
       // Add visit to reducer
-      const visitsArray = action.payload
+      const visitObject = action.payload
       return {
-        visits: visitsArray
+        visits: {
+          ...state.visits,
+          [visitObject.idVisit] : {...visitObject}
+        }
       }
 
     case SET_USED_VISIT:
@@ -20,34 +25,33 @@ export default function VisitsReducer (state = initialState, action) {
       const idVisit = action.payload.idVisit
       const studyID = action.payload.studyID
 
-      // Find the idVist in state and update his attached StudyInstanceUID and used status
-      let newVisitsArray = state.visits.map( (visit) => {
-        if(visit.idVisit === idVisit){
-          visit.studyID = studyID
-          visit.isUsed = true
-        }
-
-        return visit
-      })
-
       return {
-        visits: newVisitsArray
+        visits: {
+          ...state.visits,
+          [idVisit] : {
+            ...state.visits[idVisit], 
+            studyID : studyID
+          }
+        }
       }
     
     case SET_NOT_USED_VISIT:
       const idVisit2 = action.payload.idVisit
 
-      // Find the idVist in state and update his attached StudyInstanceUID and used status
-      let newVisitsArray2 = state.visits.map( (visit) => {
-        if(visit.idVisit === idVisit2){
-          delete visit.studyID
-          visit.isUsed = false
-        }
-        return visit
-      })
-
       return {
-        visits: newVisitsArray2
+        visits: {
+          ...state.visits,
+          [idVisit2] : {
+            ...state.visits[idVisit2], 
+            studyID : undefined
+          }
+        }
+      }
+    
+    case RESET_VISITS:
+      
+      return {
+        visits: {}
       }
 
     default:

@@ -22,7 +22,7 @@ import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } f
 import { addStudy, addWarningsStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries } from '../actions/Warnings'
-import { addVisit, setNotUsedVisit } from '../actions/Visits'
+import { addVisit, setNotUsedVisit, setUsedVisit, resetVisits } from '../actions/Visits'
 import { selectStudy, addStudyReady } from '../actions/DisplayTables'
 import { addSeriesReady } from '../actions/DisplayTables'
 import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
@@ -78,22 +78,21 @@ class Uploader extends Component {
             await logIn()
             await registerStudy()
         }
+        await this.loadAvailableVisits()
+
+    }
+
+    loadAvailableVisits = async ()=>{
 
         let answer = await getPossibleImport()
-        console.log(answer)
-        let visitTypes = Object.values(answer)
-        console.log(visitTypes)
-        let visits = []
-        visitTypes.forEach(types => {
-            for (let type in types) {
-                types[type].forEach(visit => {
-                    let visitToPush = visit
-                    visitToPush['isUsed'] = false
-                    visits.push(visitToPush)
-                })
-            }
-        })
-        this.props.addVisit(visits)
+
+        //Add All availables visits in visit reducer
+        for (let visitArray of Object.values(answer.AvailablePatients) ) {
+            visitArray.forEach(visit => {
+                this.props.addVisit(visit)
+            })
+        }
+
     }
 
     /**
@@ -241,7 +240,8 @@ class Uploader extends Component {
     checkSeriesAndUpdateRedux = async () => {
         this.setState({ isCheckDone: false })
         this.props.selectStudy(undefined)
-        this.resetVisits()
+        this.props.resetVisits()
+        await this.loadAvailableVisits()
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
             //Retrieve StudyObject from Model
@@ -262,17 +262,15 @@ class Uploader extends Component {
             )
             //Add study warnings to Redux
             let studyRedux = this.props.studies[studyInstanceUID]
-            //If Not multiupload assigned the targetted idVisit
-            if (!this.config.multiUpload) {
-                this.props.setVisitID(studyInstanceUID, this.config.idVisit)
-            }else{
-                //if multiupload Search for a perfect Match and assign it
-                let perfectMatchVisit = this.searchPerfectMatchStudy(studyRedux)
-                if (perfectMatchVisit != null) {
-                    //SK IL FAUT AUSSI LE METTRE EN DISABLE DANS LE REDUX DE VISIT
-                    this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
-                }
+
+            //Search for a perfect Match in visit candidates and assign it
+            let perfectMatchVisit = this.searchPerfectMatchStudy(studyRedux)
+            if (perfectMatchVisit != null) {
+                //SK IL FAUT AUSSI LE METTRE EN DISABLE DANS LE REDUX DE VISIT
+                this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
+                this.props.setUsedVisit(perfectMatchVisit.idVisit, studyInstanceUID)
             }
+            
             
             let studyWarnings = await this.getStudyWarning(studyRedux)
 
@@ -347,7 +345,7 @@ class Uploader extends Component {
      */
     searchPerfectMatchStudy = (studyRedux) => {
         // Linear search through expected visits list
-        for (let visitObject of this.props.visits) {
+        for (let visitObject of Object.values(this.props.visits) ) {
             if ( this.isPerfectMatch(studyRedux, visitObject) ) {
                 return visitObject;
             }
@@ -385,16 +383,6 @@ class Uploader extends Component {
             return true
         } else return false
     }
-
-    /**
-     * Reset visit status on adding additional DICOMs
-     */
-    resetVisits = () => {
-        for (let visit of this.props.visits) {
-            this.props.setNotUsedVisit(visit.idVisit)
-        }
-    }
-
     /**
      * Upload selected and validated series on click
      */
@@ -543,7 +531,9 @@ const mapDispatchToProps = {
     selectStudy,
     addStudyReady,
     addSeriesReady,
-    setVisitID
+    setVisitID,
+    setUsedVisit,
+    resetVisits
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

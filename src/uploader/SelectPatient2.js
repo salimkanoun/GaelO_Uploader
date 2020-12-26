@@ -38,8 +38,7 @@ class SelectPatient2 extends Component {
                 visitTypeArray.push({ value: visitType, label: visitType })
             }
         }
-        console.log(Object.values(this.props.visits))
-        console.log(visitTypeArray)
+
         //if(visitTypeArray.length === 1) this.selectType(visitTypeArray[0])
 
         return visitTypeArray
@@ -97,8 +96,6 @@ class SelectPatient2 extends Component {
                     <ListGroup variant='flush'>
                         {this.displayPatients()}
                     </ListGroup>
-                    <span className='du-patp-label'>Comparison</span>
-                    <p>We let you check if the selected patient and the imported patient informations are matching:</p>
                 </div>
                 <ControllerCheckPatient currentStudy ={this.props.studies[this.props.selectedStudy]} expectedVisit={this.state.selectedVisit} onValidatePatient={this.props.onValidatePatient} />
             </>

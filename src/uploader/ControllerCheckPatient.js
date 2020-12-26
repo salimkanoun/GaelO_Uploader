@@ -24,15 +24,16 @@ export default class ControllerCheckPatient extends Component {
         isDisabled: true, //Status of 'validate' button
     }
 
-    componentDidMount = () => {
+    componentDidUpdate(prevProps) {
+        if (this.props.expectedVisit !== prevProps.expectedVisit) {
+            let rows = this.buildRows()
+            let stillMissing = this.isStillAwaitingItems(rows)
 
-        let rows = this.buildRows()
-        let stillMissing = this.isStillAwaitingItems(rows)
-
-        this.setState({ 
-            rows: this.buildRows(),
-            isDisabled : stillMissing
-        })
+            this.setState({
+                rows: rows,
+                isDisabled: stillMissing
+            })
+        }
     }
 
     /**
@@ -51,21 +52,22 @@ export default class ControllerCheckPatient extends Component {
 
         //Determine if it still has item difference awaiting to be ignored
         let isDisabled = this.isStillAwaitingItems(newRows)
-
+        
         //Update state with new status
-        this.setState( () => ({ 
+        this.setState(() => ({
             rows: newRows,
-            isDisabled: isDisabled 
-        }) )
+            isDisabled: isDisabled
+        }))
     }
 
     isStillAwaitingItems = (rows) => {
-        rows.forEach( row  => {
-            if  ( !row.ignoredStatus ) return true
+        let answer = false
+        rows.forEach(row => {
+            if (row.ignoredStatus === false) answer = true
         })
-        return false
+        return answer
     }
-    
+
     /**
      * Check matching of patient information
      * @return {Array}
@@ -81,8 +83,8 @@ export default class ControllerCheckPatient extends Component {
         let expectedVisit = this.props.expectedVisit
 
         //Retrive Data from DICOM Model
-        let dicomLastName  = currentStudy.patientLastName.toUpperCase().slice(0, 1)
-        let dicomFirstName  = currentStudy.patientFirstName.toUpperCase().slice(0, 1)
+        let dicomLastName = currentStudy.patientLastName.toUpperCase().slice(0, 1)
+        let dicomFirstName = currentStudy.patientFirstName.toUpperCase().slice(0, 1)
         let dicomDateOfBirth = Util.formatRawDate(currentStudy.patientBirthDate)
         let dicomAcquisitionDate = Util.formatRawDate(currentStudy.acquisitionDate)
         let dicomPatientSex = currentStudy.patientSex
@@ -139,7 +141,7 @@ export default class ControllerCheckPatient extends Component {
      * @return {Boolean}
      */
     isCheckPass = (expected, current) => {
-        if ( expected === '' || expected === current ) {
+        if (expected === '' || expected === current) {
             return null
         } else {
             return false
@@ -148,7 +150,7 @@ export default class ControllerCheckPatient extends Component {
 
     render = () => {
         return (
-            <div className="modal-body du-patient">
+            <div className="du-patient">
                 <CheckPatient onClick={this.onClick} rows={this.state.rows} />
                 <Button type="button" onClick={this.props.onValidatePatient} className="btn btn-primary" disabled={this.state.isDisabled}>
                     This is the correct patient

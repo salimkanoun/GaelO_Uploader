@@ -43,7 +43,19 @@ export default class CheckPatient extends Component {
         },
     ]
 
-    render() {
+    getRowClasses = (row, rowIndex) => {
+        
+        if (row.ignoredStatus === false) {
+            return 'du-studies row-danger'
+        } else if (row.ignoredStatus === null) {
+            return 'du-studies row-success'
+        }else{
+            return 'du-studies td'
+        }
+        
+    }
+
+    render = () => {
         return (
             <>
                 { (!this.props.multiUpload) ? 
@@ -56,7 +68,7 @@ export default class CheckPatient extends Component {
                     bordered={false}
                     bodyClasses="du-studies-tbody"
                     headerClasses="du-studies th"
-                    rowClasses={rowClasses}
+                    rowClasses={this.getRowClasses}
                     data={this.props.rows}
                     columns={this.columns}
                     selectRow={this.selectRow}
@@ -65,13 +77,5 @@ export default class CheckPatient extends Component {
             </>
         )
     }
-}
 
-const rowClasses = (row, rowIndex) => {
-    if (row.ignoredStatus === false) {
-        return 'du-studies row-danger'
-    } else if (row.ignoredStatus === null) {
-        return 'du-studies row-success'
-    }
-    return 'du-studies td'
 }

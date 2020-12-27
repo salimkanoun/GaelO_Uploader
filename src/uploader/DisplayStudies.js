@@ -16,14 +16,14 @@ import React, { Component } from 'react'
 import BootstrapTable from 'react-bootstrap-table-next';
 import { Button, Container, Row, Col, Modal } from 'react-bootstrap'
 import DisplayWarning from './DisplayWarning'
-import SelectPatient2 from './SelectPatient2'
+import SelectPatient from './SelectPatient'
+import Util from '../model/Util'
 import { connect } from 'react-redux';
 import { selectStudy, addStudyReady, removeStudyReady } from '../actions/DisplayTables'
 
 class StudiesTab extends Component {
 
     state = {
-        //Status of CheckPatient modal
         showSelectPatient: false,
     }
 
@@ -50,16 +50,27 @@ class StudiesTab extends Component {
             text: '',
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => {
-                if (this.props.studiesRows[rowIndex].warnings !== undefined) {
-                    if (this.props.studiesRows[rowIndex].warnings['ALREADY_KNOWN_STUDY'] !== undefined) return (<></>)
-                    if ((this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'].dismissed)
-                    || (this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed)) {
-                        return (<Button onClick={() => { this.toggleSelectPatient(); }}>
-                            {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
-                        </Button>)
+                if ( !Util.isEmptyObject(this.props.studiesRows[rowIndex].warnings) ) {
+                    if (this.props.studiesRows[rowIndex].warnings['ALREADY_KNOWN_STUDY'] !== undefined)
+                        return (<></>)
+                    else if ( this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed ) {
+                        return (
+                            <Button onClick={this.toggleSelectPatient}>
+                                {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
+                            </Button>
+                        )
                     }
+                    else if ( this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== undefined && this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed ) {
+                        return (
+                            <Button onClick={this.unvalidateCheckPatient}>
+                                Reset Patient
+                            </Button>
+                        )
+                    }
+                }else{
+                    return (<></>)
                 }
-                return (<></>)
+                
             }
         },
         {
@@ -137,6 +148,11 @@ class StudiesTab extends Component {
         
     }
 
+    unvalidateCheckPatient(){
+        console.log('unvalidate')
+
+    }
+
     render() {
         return (
             <Container fluid>
@@ -149,7 +165,7 @@ class StudiesTab extends Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body du-patient">
-                        <SelectPatient2 multiUpload={this.props.multiUpload} />
+                        <SelectPatient multiUpload={this.props.multiUpload} />
                     </Modal.Body>
                 </Modal>
                 <Row>

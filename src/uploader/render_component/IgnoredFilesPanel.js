@@ -37,7 +37,7 @@ export default class IgnoredFilesPanel extends Component {
     /**
      * Create rows for table display
      */
-    createRows() {
+    createRows = () => {
         let ignoredFileNames = Object.keys(this.props.dataIgnoredFiles)
         let rows = []
         ignoredFileNames.forEach(ignoredFileName => {
@@ -50,7 +50,7 @@ export default class IgnoredFilesPanel extends Component {
         return rows
     }
 
-    render() {
+    render = () => {
         return (
             <Modal show={this.props.display} onHide={this.props.closeListener}>
                 <Modal.Header className="modal-header" closeButton>

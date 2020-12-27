@@ -18,7 +18,8 @@ import Button from 'react-bootstrap/Button'
 import { Col, Row } from 'react-bootstrap'
 
 export default class ProgressUpload extends Component {
-  render () {
+
+  render = () => {
     return (
       <Row>
         <Col md='auto'>
@@ -31,5 +32,6 @@ export default class ProgressUpload extends Component {
         </Col>
       </Row>
     )
+    
   }
 }

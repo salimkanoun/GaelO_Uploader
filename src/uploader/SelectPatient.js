@@ -19,7 +19,7 @@ import Select from 'react-select'
 import Util from '../model/Util'
 import ControllerCheckPatient from './ControllerCheckPatient'
 
-class SelectPatient2 extends Component {
+class SelectPatient extends Component {
 
     state = {
         selectedVisitType: undefined,
@@ -111,4 +111,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, null)(SelectPatient2)
+export default connect(mapStateToProps, null)(SelectPatient)

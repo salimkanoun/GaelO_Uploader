@@ -16,9 +16,14 @@ import React, { Component } from 'react'
 import Button from 'react-bootstrap/Button'
 
 export default class ButtonIgnore extends Component {
-  render () {
+
+  render = () => {
     return (
-      <Button hidden={this.props.hidden} onClick={() => this.props.onClick(this.props.row)}> {(this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore'} </Button>
+      <Button hidden={this.props.hidden} 
+        onClick={() => this.props.onClick(this.props.row)}> 
+        { (this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore'} 
+      </Button>
     )
   }
+  
 }

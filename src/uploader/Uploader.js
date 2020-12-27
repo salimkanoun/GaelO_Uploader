@@ -25,7 +25,7 @@ import { addWarningsSeries } from '../actions/Warnings'
 import { addVisit, setNotUsedVisit, setUsedVisit, resetVisits } from '../actions/Visits'
 import { selectStudy, addStudyReady } from '../actions/DisplayTables'
 import { addSeriesReady } from '../actions/DisplayTables'
-import { NOT_EXPECTED_VISIT, NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
+import { NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
 class Uploader extends Component {
 
@@ -266,11 +266,9 @@ class Uploader extends Component {
             //Search for a perfect Match in visit candidates and assign it
             let perfectMatchVisit = this.searchPerfectMatchStudy(studyRedux)
             if (perfectMatchVisit != null) {
-                //SK IL FAUT AUSSI LE METTRE EN DISABLE DANS LE REDUX DE VISIT
                 this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
                 this.props.setUsedVisit(perfectMatchVisit.idVisit, studyInstanceUID)
             }
-            
             
             let studyWarnings = await this.getStudyWarning(studyRedux)
 
@@ -315,8 +313,6 @@ class Uploader extends Component {
 
         //if Visit ID is not set add Null Visit ID (visitID Needs to be assigned)
         if ( studyRedux.idVisit == null ) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID
-        //If Visit ID Assigned and not perfect match add Not Expected Visit to force user's validation
-        else if ( ! this.isPerfectMatch( studyRedux, this.getVisitDataById(studyRedux.idVisit)) ) warnings[NOT_EXPECTED_VISIT.key] = NOT_EXPECTED_VISIT;
 
         // Check if study is already known by server
         try{

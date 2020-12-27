@@ -39,7 +39,7 @@ class DisplayWarning extends Component {
             dataField: 'ignoreButton',
             text: '',
             formatter: (cell, row, rowIndex, extraData) => (
-                <ButtonIgnore hidden={row.ignorable === false || (row.key === 'NOT_EXPECTED_VISIT' && !row.dismissed)}
+                <ButtonIgnore hidden={row.ignorable === false}
                     warning={this.getWarningStatus(row)}
                     onClick={() => {
                         if (this.props.type === 'series') {

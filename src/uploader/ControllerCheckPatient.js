@@ -78,7 +78,6 @@ export default class ControllerCheckPatient extends Component {
 
         if (this.props.expectedVisit == null) return rows
 
-        //SK CES PROPS DOIVENT VENIR DE SELECT PATIENT
         let currentStudy = this.props.currentStudy
         let expectedVisit = this.props.expectedVisit
 

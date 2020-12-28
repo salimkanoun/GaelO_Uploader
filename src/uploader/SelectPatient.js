@@ -19,6 +19,7 @@ import Select from 'react-select'
 import Util from '../model/Util'
 import ControllerCheckPatient from './ControllerCheckPatient'
 import { setVisitID } from '../actions/Studies'
+import { addStudyReady } from '../actions/DisplayTables'
 
 class SelectPatient extends Component {
 
@@ -91,6 +92,8 @@ class SelectPatient extends Component {
 
         //Update redux to remove the Not Expected Visit
         this.props.setVisitID(this.props.selectedStudy, this.state.selectedVisit.idVisit)
+        //Peut il venir du reducer pour checker tout les warning on disaprus ?
+        this.props.addStudyReady(this.props.selectedStudy)
         this.props.onValidate()
         //SK MANQUE LE STUDYREADY QUAND LES WARNING SON PASS
 
@@ -129,7 +132,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-    setVisitID
+    setVisitID,
+    addStudyReady
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SelectPatient)

@@ -27,7 +27,7 @@ export default function WarningsStudyReducer(state = initialState, action) {
             console.log(warningKey)
             console.log(studyInstanceUID)
             let studyToUpdate = state.warningsStudy[studyInstanceUID]
-            studyToUpdate[warningKey]['dismissed'] = !studyToUpdate[warningKey]['dismissed']
+            delete studyToUpdate[warningKey]
 
             return {
                 warningsStudy: {

@@ -30,7 +30,6 @@ class DisplaySeries extends Component {
             {
                 dataField: 'selectedSeries',
                 text: '',
-                formatExtraData: this,
                 formatter: (cell, row, rowIndex, formatExtraData) => {
                     if (row.status === 'Known study') return <> </>
                     return (
@@ -38,8 +37,8 @@ class DisplaySeries extends Component {
                             checked={this.props.seriesReady.includes(row.seriesInstanceUID)} 
                             type='checkbox' 
                             onChange={(event) => {
-                                    if (event.target.checked) formatExtraData.props.addSeriesReady(row.seriesInstanceUID)
-                                    else formatExtraData.props.removeSeriesReady(row.seriesInstanceUID)
+                                    if (event.target.checked) this.props.addSeriesReady(row.seriesInstanceUID)
+                                    else this.props.removeSeriesReady(row.seriesInstanceUID)
                                  }} 
                         />
                     )

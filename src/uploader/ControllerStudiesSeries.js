@@ -20,18 +20,15 @@ import DisplaySeries from './DisplaySeries.js'
 class ControllerStudiesSeries extends Component {
 
   /**
-   * Fetch studies from Redux State to display in table
+   * Fetch studies from Redux State to display in study table
    * @return {Object}
    */
   buildStudiesRows() {
     const studies = []
-    if (Object.keys(this.props.studies).length > 0) {
-      for (const study in this.props.studies) {
-        const tempStudy = this.props.studies[study]
-        tempStudy.status = this.studyWarningsPassed(study)
-        tempStudy.selectedStudies = this.props.studiesReady.includes(tempStudy.studyInstanceUID)
-        studies.push({ ...tempStudy })
-      }
+    for (const study of Object.values(this.props.studies) ) {
+      study.status = this.studyWarningsPassed(study.studyInstanceUID)
+      study.selectedStudies = this.props.studiesReady.includes(study.studyInstanceUID)
+      studies.push({ ...study })
     }
     return studies
   }
@@ -43,10 +40,10 @@ class ControllerStudiesSeries extends Component {
    */
   studyWarningsPassed(study) {
 
-    if( this.props.warningsStudies[study] === undefined) {
+    if (this.props.warningsStudies[study] === undefined) {
 
-      for( let seriesInstanceUID of  this.props.studies[study].series){
-        if( ! this.IsSeriesWarningsPassed(seriesInstanceUID)) {
+      for (let seriesInstanceUID of this.props.studies[study].series) {
+        if (!this.IsSeriesWarningsPassed(seriesInstanceUID)) {
           return 'Incomplete'
         }
       }
@@ -54,15 +51,12 @@ class ControllerStudiesSeries extends Component {
 
     } else {
 
-      if(this.props.warningsStudies[study]['ALREADY_KNOWN_STUDY'] !== undefined){
+      if (this.props.warningsStudies[study]['ALREADY_KNOWN_STUDY'] !== undefined) {
         return 'Already Known'
       }
 
-      // Check for not dissmissed warnings in study
-      for (const warning of Object.values(this.props.warningsStudies[study])) {
-        if (!warning.dismissed) {
-          return 'Rejected'
-        }
+      if (this.props.warningsStudies[study]['NULL_VISIT_ID'] !== undefined) {
+        return 'Rejected'
       }
 
     }
@@ -70,18 +64,17 @@ class ControllerStudiesSeries extends Component {
   }
 
   /**
-   * Add status and selection state to previous information from the selected study's series
-   * in order to build series table
-   * @return {Array}
+   * Fetch studies from Redux State to display in Series table
+   * @return {Object}
    */
   buildSeriesRows() {
     const seriesArray = []
-    if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
+    console.log(this.props.selectedStudy)
+    if (this.props.selectedStudy !== null) {
 
       let studyInstanceUID = this.props.selectedStudy
       const seriesToDisplay = this.props.studies[studyInstanceUID].series
 
-      console.log(seriesToDisplay)
       seriesToDisplay.forEach((seriesInstanceUID) => {
 
         let seriesToPush = this.props.series[seriesInstanceUID]

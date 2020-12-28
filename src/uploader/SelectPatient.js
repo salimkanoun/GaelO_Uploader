@@ -90,7 +90,8 @@ class SelectPatient extends Component {
     validateCheckPatient = () => {
 
         //Update redux to remove the Not Expected Visit
-        this.props.setVisitID(this.props.selectedStudy, this.state.selectedVisit)
+        this.props.setVisitID(this.props.selectedStudy, this.state.selectedVisit.idVisit)
+        this.props.onValidate()
         //SK MANQUE LE STUDYREADY QUAND LES WARNING SON PASS
 
         //If ready mark this study ready

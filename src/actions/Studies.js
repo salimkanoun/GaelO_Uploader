@@ -94,6 +94,16 @@ export function unsetVisitID(studyInstanceUID, idVisit) {
       }
     )
 
+    dispatch(
+      {
+        type: UPDATE_WARNING_STUDY,
+        payload: {
+          studyInstanceUID: studyInstanceUID,
+          warningKey: 'NULL_VISIT_ID'
+        }
+      }
+    )
+
   }
 
 }

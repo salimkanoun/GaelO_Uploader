@@ -20,6 +20,7 @@ import SelectPatient from './SelectPatient'
 import Util from '../model/Util'
 import { connect } from 'react-redux';
 import { selectStudy, addStudyReady, removeStudyReady } from '../actions/DisplayTables'
+import { unsetVisitID } from '../actions/Studies'
 
 class StudiesTab extends Component {
 
@@ -32,15 +33,14 @@ class StudiesTab extends Component {
             dataField: 'selectedStudies',
             text: '',
             hidden: (!this.props.multiUpload),
-            formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 return (
                     <input disabled={row.status !== 'Valid'}
                         type='checkbox'
                         checked={this.props.studiesReady.includes(row.studyInstanceUID)}
                         onChange={(event) => {
-                            if (event.target.checked) formatExtraData.props.addStudyReady(row.studyInstanceUID)
-                            else formatExtraData.props.removeStudyReady(row.studyInstanceUID)
+                            if (event.target.checked) this.props.addStudyReady(row.studyInstanceUID)
+                            else this.props.removeStudyReady(row.studyInstanceUID)
                         }} />
                 )
             }
@@ -53,16 +53,20 @@ class StudiesTab extends Component {
                 if (!Util.isEmptyObject(this.props.warningsStudies[row.studyInstanceUID])) {
                     if (this.props.warningsStudies[row.studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined)
                         return (<></>)
-                    else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined && !this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'].dismissed) {
+                    else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined ) {
                         return (
-                            <Button onClick={this.toggleSelectPatient}>
+                            <Button variant="primary" onClick={this.toggleSelectPatient}>
                                 {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
                             </Button>
                         )
                     }
-                    else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined && this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'].dismissed) {
+                    else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] === undefined ) {
                         return (
-                            <Button onClick={this.unvalidateCheckPatient}>
+                            <Button variant="warning" 
+                                    onClick={() => {
+                                        this.props.unsetVisitID(row.studyInstanceUID, row.idVisit)
+                                        }
+                                    }>
                                 Reset Patient
                             </Button>
                         )
@@ -79,7 +83,7 @@ class StudiesTab extends Component {
         },
         {
             dataField: 'patientName',
-            text: 'Patient name',
+            text: 'Patient Name',
             style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
@@ -89,7 +93,7 @@ class StudiesTab extends Component {
         },
         {
             dataField: 'accessionNumber',
-            text: 'Accession #',
+            text: 'Accession Nb',
             style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
@@ -103,14 +107,17 @@ class StudiesTab extends Component {
         clickToSelect: true,
         hideSelectColumn: true,
         onSelect: (row) => {
+            console.log(row)
             this.props.selectStudy(row.studyInstanceUID)
         }
     };
 
     /**
-     * Toggle modal 'CheckPatient' of given row 
+     * Toggle modal 'CheckPatient' 
+     * 
      */
     toggleSelectPatient = () => {
+        console.log('toogle')
         this.setState((state) => { return { showSelectPatient: !state.showSelectPatient } })
     }
 
@@ -127,11 +134,6 @@ class StudiesTab extends Component {
         return className.join(' ')
     }
 
-    unvalidateCheckPatient() {
-        console.log('unvalidate')
-
-    }
-
     render() {
         return (
             <>
@@ -142,7 +144,7 @@ class StudiesTab extends Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body du-patient">
-                        <SelectPatient multiUpload={this.props.multiUpload} />
+                        <SelectPatient multiUpload={this.props.multiUpload} onValidate={this.toggleSelectPatient}/>
                     </Modal.Body>
                 </Modal>
 
@@ -184,7 +186,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     selectStudy,
     addStudyReady,
-    removeStudyReady
+    removeStudyReady,
+    unsetVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

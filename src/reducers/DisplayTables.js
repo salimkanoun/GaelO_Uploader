@@ -2,8 +2,8 @@
 import { SELECT_STUDY, ADD_SERIES_READY, REMOVE_SERIES_READY, SELECT_SERIES, ADD_STUDIES_READY, REMOVE_STUDIES_READY } from '../actions/actions-types'
 
 const initialState = {
-  selectedStudy: undefined,
-  selectedSeries: undefined,
+  selectedStudy: null,
+  selectedSeries: null,
   seriesReady: [],
   studiesReady: []
 }
@@ -16,7 +16,7 @@ export default function DisplayTablesReducer(state = initialState, action) {
       return {
         ...state,
         selectedStudy: action.payload,
-        selectedSeries: undefined
+        selectedSeries: null
       }
 
     case SELECT_SERIES:

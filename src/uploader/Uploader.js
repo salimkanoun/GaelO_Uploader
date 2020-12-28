@@ -19,10 +19,10 @@ import Util from '../model/Util'
 
 import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
 
-import { addStudy, addWarningsStudy, setVisitID } from '../actions/Studies'
+import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
-import { addWarningsSeries } from '../actions/Warnings'
-import { addVisit, setNotUsedVisit, setUsedVisit, resetVisits } from '../actions/Visits'
+import { addWarningsSeries, addWarningsStudy } from '../actions/Warnings'
+import { addVisit, resetVisits } from '../actions/Visits'
 import { selectStudy, addStudyReady } from '../actions/DisplayTables'
 import { addSeriesReady } from '../actions/DisplayTables'
 import { NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
@@ -85,6 +85,8 @@ class Uploader extends Component {
     loadAvailableVisits = async ()=>{
 
         let answer = await getPossibleImport()
+
+        answer= {"AvailablePatients":{"PET0":[{"numeroPatient":"17017101051001","firstName":"F","lastName":"V","patientSex":"M","patientDOB":"02-00-1941","investigatorName":"KARLIN","country":"France","centerNumber":"10501","acquisitionDate":"11-10-2020","visitType":"PET0","idVisit":179}]}}
 
         //Add All availables visits in visit reducer
         for (let visitArray of Object.values(answer.AvailablePatients) ) {
@@ -267,7 +269,6 @@ class Uploader extends Component {
             let perfectMatchVisit = this.searchPerfectMatchStudy(studyRedux)
             if (perfectMatchVisit != null) {
                 this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
-                this.props.setUsedVisit(perfectMatchVisit.idVisit, studyInstanceUID)
             }
             
             let studyWarnings = await this.getStudyWarning(studyRedux)
@@ -523,12 +524,10 @@ const mapDispatchToProps = {
     addWarningsStudy,
     addWarningsSeries,
     addVisit,
-    setNotUsedVisit,
     selectStudy,
     addStudyReady,
     addSeriesReady,
     setVisitID,
-    setUsedVisit,
     resetVisits
 }
 

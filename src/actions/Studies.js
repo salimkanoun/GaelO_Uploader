@@ -1,4 +1,5 @@
-import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, SET_VISIT_ID } from './actions-types'
+
+import { ADD_STUDY, SET_VISIT_ID, SET_USED_VISIT, SET_NOT_USED_VISIT, UNSET_VISIT_ID } from './actions-types'
 
 /**
  * Add study to Redux studies Object
@@ -20,48 +21,66 @@ export function addStudy (studyInstanceUID, patientFirstName, patientLastName, p
       patientBirthDate : patientBirthDate,
       studyInstanceUID : studyInstanceUID,
       orthancStudyID : orthancStudyID,
-      series : series,
-      warnings: {}
+      series : series
     }
   }
 }
 
-/**
- * Add warnings to Redux studies after check
- * @param {String} studyInstanceUID
- * @param {Object} warnings
- */
-export function addWarningsStudy (studyInstanceUID, warnings) {
-  return {
-    type: ADD_WARNING_STUDY,
-    payload: { studyInstanceUID: studyInstanceUID, warnings: warnings }
-  }
-}
+
 
 /**
- * Update Redux passed study warning
- * @param {Object} warningToUpdate
- * @param {String} studyInstanceUID
- */
-export function updateWarningStudy (warningToUpdate, studyInstanceUID) {
-  return {
-    type: UPDATE_WARNING_STUDY,
-    payload: { warningToUpdate: warningToUpdate, studyInstanceUID: studyInstanceUID }
-  }
-}
-
-/**
- * MULTIUPLOAD mode function only
  * Set idVisit to the passed study awaiting check
  * @param {String} studyInstanceUID
  * @param {Integer} idVisit
  */
 export function setVisitID (studyInstanceUID, idVisit) {
-  return {
-    type: SET_VISIT_ID,
-    payload: {
-      studyInstanceUID: studyInstanceUID,
-      idVisit: idVisit
-    }
+
+  return function (dispatch){
+    //Make id visit used
+    dispatch( 
+      {
+        type: SET_USED_VISIT,
+        payload: { idVisit: idVisit}
+      }
+    )
+    //Attach Visit to study
+    dispatch(
+      {
+        type: SET_VISIT_ID,
+        payload: {
+          studyInstanceUID: studyInstanceUID,
+          idVisit: idVisit
+        }
+      }
+    )
+
+
   }
+
+
+}
+
+export function unsetVisitID(studyInstanceUID, idVisit) {
+
+  return function (dispatch){
+
+    //Mark Visit not used in the visit redux
+    dispatch( 
+      {
+        type: SET_NOT_USED_VISIT,
+        payload: { idVisit: idVisit}
+      }
+    )
+
+    dispatch( 
+      {
+        type : UNSET_VISIT_ID,
+        payload: {
+          studyInstanceUID: studyInstanceUID
+        }
+      }
+    )
+
+  }
+
 }

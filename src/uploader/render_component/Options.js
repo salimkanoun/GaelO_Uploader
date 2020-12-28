@@ -66,9 +66,10 @@ export default class Options extends Component {
         return (
             <>
                 <OverlayTrigger rootClose trigger="click" placement="right" overlay={
-                    <Popover className='popover' id="popover-basic">
+                    <Popover style={{padding : '20'}}>
                         <Popover.Title as="h3">Options</Popover.Title>
                         <Popover.Content>
+                            <div>
                             <Typography id="discrete-slider-restrict" gutterBottom>
                                 Upload batch size
                             </Typography>
@@ -78,6 +79,7 @@ export default class Options extends Component {
                                 aria-labelledby="discrete-slider-restrict"
                                 step={null}
                                 marks={batchSize}
+                                min={50}
                                 max={500}
                                 valueLabelDisplay="auto"
                                 valueLabelFormat={(x) => x}
@@ -97,6 +99,7 @@ export default class Options extends Component {
                                 valueLabelDisplay="auto"
                                 onChangeCommitted={this.updateZipIntensity}
                             />
+                            </div>
                         </Popover.Content>
                     </Popover>
                 }>
@@ -116,7 +119,7 @@ const batchSize = [
     },
     {
         value: 100,
-        label: '100Mo',
+        label: '',
     },
     {
         value: 200,
@@ -124,6 +127,6 @@ const batchSize = [
     },
     {
         value: 500,
-        label: '500Mo',
+        label: '',
     },
 ];

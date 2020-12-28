@@ -18,9 +18,10 @@ export const REMOVE_STUDIES_READY = 'REMOVE_STUDIES_READY'
 export const ADD_SERIES_READY = 'ADD_SERIES_READY'
 export const REMOVE_SERIES_READY = 'REMOVE_SERIES_READY'
 
-// Visits Actions for multiupload mode
+// Visits
 export const ADD_VISIT = 'ADD_VISIT'
 export const SET_VISIT_ID = 'SET_VISIT_ID'
+export const UNSET_VISIT_ID = 'UNSET_VISIT_ID'
 export const SET_USED_VISIT = 'SET_USED_VISIT'
 export const SET_NOT_USED_VISIT = 'SET_NOT_USED_VISIT'
 export const RESET_VISITS = 'RESET_VISITS'

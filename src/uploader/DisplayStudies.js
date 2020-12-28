@@ -114,7 +114,7 @@ class StudiesTab extends Component {
         this.setState( (state) => { return { showSelectPatient: !state.showSelectPatient } } )
     }
 
-    rowClasses = (row, rowIndex) => {
+    getRowClasses = (row) => {
         let className = ['du-studies']
         
         if (row.status === 'Rejected') className.push('row-danger')
@@ -139,7 +139,6 @@ class StudiesTab extends Component {
 
          //Assigned the VisitID
          this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
-         this.props.setUsedVisit(this.state.selectedVisit, this.props.selectedStudy)
 
         //If ready mark this study ready
         if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
@@ -161,7 +160,7 @@ class StudiesTab extends Component {
                 <Modal show={this.state.showSelectPatient} onHide={this.toggleSelectPatient}>
                     <Modal.Header className="modal-header" closeButton>
                         <Modal.Title className="modal-title">
-                            {this.props.multiUpload ? 'Select Patient' : 'Check Patient'}
+                            Select/Check Patient
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body du-patient">
@@ -175,7 +174,7 @@ class StudiesTab extends Component {
                             classes="table table-borderless"
                             bodyClasses="du-studies-tbody"
                             headerClasses="du-studies th"
-                            rowClasses={this.rowClasses}
+                            rowClasses={this.getRowClasses}
                             wrapperClasses="table-responsive"
                             data={this.props.studiesRows}
                             columns={this.columns}

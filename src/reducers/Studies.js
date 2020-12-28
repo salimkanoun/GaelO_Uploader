@@ -1,15 +1,15 @@
-import { ADD_STUDY, ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, SET_VISIT_ID } from '../actions/actions-types'
+import { ADD_STUDY, SET_VISIT_ID, UNSET_VISIT_ID } from '../actions/actions-types'
 
 const initialState = {
   studies: {}
 }
 
-export default function StudiesReducer (state = initialState, action) {
-  
+export default function StudiesReducer(state = initialState, action) {
+
   let studyInstanceUID
 
   switch (action.type) {
-    
+
     case ADD_STUDY:
       // Add study to reducer
       const studyObject = action.payload
@@ -17,17 +17,6 @@ export default function StudiesReducer (state = initialState, action) {
         studies: {
           ...state.studies,
           [studyObject.studyInstanceUID]: { ...studyObject }
-        }
-      }
-
-    case ADD_WARNING_STUDY:
-      // Add warning to given study in reducer
-      studyInstanceUID = action.payload.studyInstanceUID
-      const warningsStudy = action.payload.warnings
-      return {
-        studies: {
-          ...state.studies,
-          [studyInstanceUID]: { ...state.studies[studyInstanceUID], warnings: { ...warningsStudy } }
         }
       }
 
@@ -41,22 +30,19 @@ export default function StudiesReducer (state = initialState, action) {
           [studyInstanceUID]: { ...state.studies[studyInstanceUID], idVisit: idVisit }
         }
       }
-
-    case UPDATE_WARNING_STUDY:
-      // Update given study warning in reducer
+    
+    case UNSET_VISIT_ID:
+      // Set idVisit for given study in reducer
       studyInstanceUID = action.payload.studyInstanceUID
-      const studyWarning = action.payload.warningToUpdate.key
-
-      let studyToModify = state.studies[studyInstanceUID]
-      studyToModify['warnings'][studyWarning]['dismissed'] = !studyToModify['warnings'][studyWarning]['dismissed']
       return {
         studies: {
           ...state.studies,
-          [studyInstanceUID]: {...studyToModify}
+          [studyInstanceUID]: { ...state.studies[studyInstanceUID], idVisit: null }
         }
       }
 
     default:
       return state
   }
+
 }

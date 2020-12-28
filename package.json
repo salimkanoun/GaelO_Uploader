@@ -6,15 +6,9 @@
   "private": false,
   "dependencies": {
     "@material-ui/core": "^4.11.0",
-    "@svgr/cli": "^5.4.0",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
     "@uppy/core": "^1.11.0",
     "@uppy/react": "^1.8.0",
     "@uppy/tus": "^1.6.0",
-    "babel-loader": "^8.2.2",
-    "blob": "^0.1.0",
     "bootstrap": "^4.5.0",
     "crypto-js": "^4.0.0",
     "dicom-parser": "^1.8.5",
@@ -32,9 +26,7 @@
     "react-select": "^3.1.0",
     "react-toastify": "^6.0.8",
     "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0",
-    "regenerator-runtime": "^0.13.5",
-    "util": "^0.12.3"
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -62,9 +54,11 @@
     "@babel/core": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-react": "^7.10.4",
+    "@svgr/cli": "^5.4.0",
     "@svgr/webpack": "^5.4.0",
     "babel-cli": "^6.26.0",
     "react-svg-loader": "^3.0.3",
+    "regenerator-runtime": "^0.13.5",
     "webpack-cli": "^3.3.12"
   }
 }

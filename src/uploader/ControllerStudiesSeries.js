@@ -17,6 +17,7 @@ import { connect } from 'react-redux'
 import Row from 'react-bootstrap/Row'
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
+import Util from '../model/Util.js'
 class ControllerStudiesSeries extends Component {
 
   /**
@@ -40,7 +41,7 @@ class ControllerStudiesSeries extends Component {
    */
   studyWarningsPassed(study) {
 
-    if (this.props.warningsStudies[study] === undefined) {
+    if (this.props.warningsStudies[study] === undefined || Util.isEmptyObject(this.props.warningsStudies[study]) ) {
 
       for (let seriesInstanceUID of this.props.studies[study].series) {
         if (!this.IsSeriesWarningsPassed(seriesInstanceUID)) {

@@ -65,6 +65,7 @@ class StudiesTab extends Component {
                             <Button variant="warning" 
                                     onClick={() => {
                                         this.props.unsetVisitID(row.studyInstanceUID, row.idVisit)
+                                        this.props.removeStudyReady(row.studyInstanceUID)
                                         }
                                     }>
                                 Reset Patient

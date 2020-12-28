@@ -21,7 +21,7 @@ export default class ButtonIgnore extends Component {
     return (
       <Button hidden={this.props.hidden} 
         onClick={() => this.props.onClick(this.props.row)}> 
-        { (this.props.warning !== undefined && this.props.warning) ? 'Consider' : 'Ignore'} 
+        { (this.props.dissmissed ) ? 'Consider' : 'Ignore'} 
       </Button>
     )
   }

@@ -35,13 +35,13 @@ class StudiesTab extends Component {
             formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 return (
-                    <input disabled={row.status !== 'Valid'} 
-                            type='checkbox' 
-                            checked={this.props.studiesReady.includes(row.studyInstanceUID)} 
-                            onChange={(event) => { 
-                                if(event.target.checked) formatExtraData.props.addStudyReady(row.studyInstanceUID) 
-                                else formatExtraData.props.removeStudyReady(row.studyInstanceUID) 
-                            }} />
+                    <input disabled={row.status !== 'Valid'}
+                        type='checkbox'
+                        checked={this.props.studiesReady.includes(row.studyInstanceUID)}
+                        onChange={(event) => {
+                            if (event.target.checked) formatExtraData.props.addStudyReady(row.studyInstanceUID)
+                            else formatExtraData.props.removeStudyReady(row.studyInstanceUID)
+                        }} />
                 )
             }
         },
@@ -50,27 +50,27 @@ class StudiesTab extends Component {
             text: '',
             hidden: false,
             formatter: (cell, row, rowIndex, extraData) => {
-                if ( !Util.isEmptyObject(this.props.studiesRows[rowIndex].warnings) ) {
-                    if (this.props.studiesRows[rowIndex].warnings['ALREADY_KNOWN_STUDY'] !== undefined)
+                if (!Util.isEmptyObject(this.props.warningsStudies[row.studyInstanceUID])) {
+                    if (this.props.warningsStudies[row.studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined)
                         return (<></>)
-                    else if ( this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed ) {
+                    else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined && !this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'].dismissed) {
                         return (
                             <Button onClick={this.toggleSelectPatient}>
                                 {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
                             </Button>
                         )
                     }
-                    else if ( this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== undefined && this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed ) {
+                    else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined && this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'].dismissed) {
                         return (
                             <Button onClick={this.unvalidateCheckPatient}>
                                 Reset Patient
                             </Button>
                         )
                     }
-                }else{
+                } else {
                     return (<></>)
                 }
-                
+
             }
         },
         {
@@ -106,57 +106,35 @@ class StudiesTab extends Component {
             this.props.selectStudy(row.studyInstanceUID)
         }
     };
-    
+
     /**
      * Toggle modal 'CheckPatient' of given row 
      */
     toggleSelectPatient = () => {
-        this.setState( (state) => { return { showSelectPatient: !state.showSelectPatient } } )
+        this.setState((state) => { return { showSelectPatient: !state.showSelectPatient } })
     }
 
     getRowClasses = (row) => {
         let className = ['du-studies']
-        
+
         if (row.status === 'Rejected') className.push('row-danger')
         else if (row.status === 'Incomplete' || row.status === 'Already Known') className.push('row-warning')
         else if (row.status === 'Valid' && row.selectedStudies === true) className.push('row-success')
         else className.push('td')
-        
+
         if (row.studyInstanceUID === this.props.selectedStudy) className.push('row-clicked')
 
         return className.join(' ')
     }
 
-    validateCheckPatient = () => {
-       
-        //Update redux to remove the Not Expected Visit
-        if (this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'] !== undefined) this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NOT_EXPECTED_VISIT'], this.props.selectedStudy)
-        //If multiUpload mode on, set idVisit to the study and forbid its use for another study 
-        if (this.props.multiUpload) {
-           //Remove the Null Warning (SK BOF BOF DEVRAIT ETRE GERER AUTOMATIQUEMENT QUAND ON SET LE VISIT ID)
-            this.props.updateWarningStudy(this.props.studies[this.props.selectedStudy].warnings['NULL_VISIT_ID'], this.props.selectedStudy)
-        }
-
-         //Assigned the VisitID
-         this.props.setVisitID(this.props.studies[this.props.selectedStudy].studyInstanceUID, this.state.selectedVisit)
-
-        //If ready mark this study ready
-        if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
-            this.props.addStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID)
-        }
-        
-    }
-
-    unvalidateCheckPatient(){
+    unvalidateCheckPatient() {
         console.log('unvalidate')
 
     }
 
     render() {
         return (
-            <Container fluid>
-                <span className='title'>Studies</span>
-
+            <>
                 <Modal show={this.state.showSelectPatient} onHide={this.toggleSelectPatient}>
                     <Modal.Header className="modal-header" closeButton>
                         <Modal.Title className="modal-title">
@@ -167,26 +145,30 @@ class StudiesTab extends Component {
                         <SelectPatient multiUpload={this.props.multiUpload} />
                     </Modal.Body>
                 </Modal>
-                <Row>
-                    <Col xs={12} md={8}>
-                        <BootstrapTable
-                            keyField='studyInstanceUID'
-                            classes="table table-borderless"
-                            bodyClasses="du-studies-tbody"
-                            headerClasses="du-studies th"
-                            rowClasses={this.getRowClasses}
-                            wrapperClasses="table-responsive"
-                            data={this.props.studiesRows}
-                            columns={this.columns}
-                            selectRow={this.selectRow}
-                        />
 
-                    </Col>
-                    <Col xs={6} md={4}>
-                        <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload} />
-                    </Col>
-                </Row>
-            </Container>
+                <Container fluid>
+                    <span className='title'>Studies</span>
+                    <Row>
+                        <Col xs={12} md={8}>
+                            <BootstrapTable
+                                keyField='studyInstanceUID'
+                                classes="table table-borderless"
+                                bodyClasses="du-studies-tbody"
+                                headerClasses="du-studies th"
+                                rowClasses={this.getRowClasses}
+                                wrapperClasses="table-responsive"
+                                data={this.props.studiesRows}
+                                columns={this.columns}
+                                selectRow={this.selectRow}
+                            />
+
+                        </Col>
+                        <Col xs={6} md={4}>
+                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload} />
+                        </Col>
+                    </Row>
+                </Container>
+            </>
         )
     }
 }
@@ -194,7 +176,9 @@ class StudiesTab extends Component {
 const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
-        studiesReady: state.DisplayTables.studiesReady
+        studiesReady: state.DisplayTables.studiesReady,
+        warningsStudies: state.WarningsStudy.warningsStudy,
+        studies: state.Studies.studies,
     }
 }
 const mapDispatchToProps = {

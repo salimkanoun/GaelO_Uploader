@@ -18,6 +18,7 @@ import ListGroup from 'react-bootstrap/ListGroup'
 import Select from 'react-select'
 import Util from '../model/Util'
 import ControllerCheckPatient from './ControllerCheckPatient'
+import { setVisitID } from '../actions/Studies'
 
 class SelectPatient extends Component {
 
@@ -86,6 +87,21 @@ class SelectPatient extends Component {
         )
     }
 
+    validateCheckPatient = () => {
+
+        //Update redux to remove the Not Expected Visit
+        this.props.setVisitID(this.props.selectedStudy, this.state.selectedVisit)
+        //SK MANQUE LE STUDYREADY QUAND LES WARNING SON PASS
+
+        //If ready mark this study ready
+        //SK ICI CETTE FONCTION DOIT VENIR D AILLEURS
+        /*
+        if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
+            this.props.addStudyReady(this.props.selectedStudy)
+        }*/
+
+    }
+
     render = () => {
         return (
             <>
@@ -97,7 +113,7 @@ class SelectPatient extends Component {
                         {this.displayPatients()}
                     </ListGroup>
                 </div>
-                <ControllerCheckPatient currentStudy ={this.props.studies[this.props.selectedStudy]} expectedVisit={this.state.selectedVisit} onValidatePatient={this.props.onValidatePatient} />
+                <ControllerCheckPatient currentStudy ={this.props.studies[this.props.selectedStudy]} expectedVisit={this.state.selectedVisit} onValidatePatient={this.validateCheckPatient} />
             </>
         )
     }
@@ -111,4 +127,8 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, null)(SelectPatient)
+const mapDispatchToProps = {
+    setVisitID
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SelectPatient)

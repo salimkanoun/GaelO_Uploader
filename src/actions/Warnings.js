@@ -18,10 +18,10 @@ export function addWarningsStudy (studyInstanceUID, warnings) {
  * @param {Object} warningToUpdate
  * @param {String} studyInstanceUID
  */
-export function updateWarningStudy (warningToUpdate, studyInstanceUID) {
+export function updateWarningStudy (warningKey, studyInstanceUID) {
   return {
     type: UPDATE_WARNING_STUDY,
-    payload: { warningToUpdate: warningToUpdate, studyInstanceUID: studyInstanceUID }
+    payload: { warningKey: warningKey, studyInstanceUID: studyInstanceUID }
   }
 }
 
@@ -42,9 +42,9 @@ export function addWarningsSeries (seriesInstanceUID, warnings) {
  * @param {*} warningToUpdate
  * @param {*} seriesInstanceUID
  */
-export function toogleWarningSeries (warningToUpdate, seriesInstanceUID) {
+export function toogleWarningSeries (warningKey, seriesInstanceUID) {
   return {
     type: TOOGLE_WARNING_SERIES,
-    payload: { warningToUpdate: warningToUpdate, seriesInstanceUID: seriesInstanceUID }
+    payload: { warningKey: warningKey, seriesInstanceUID: seriesInstanceUID }
   }
 }

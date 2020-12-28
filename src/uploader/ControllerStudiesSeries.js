@@ -81,6 +81,7 @@ class ControllerStudiesSeries extends Component {
       let studyInstanceUID = this.props.selectedStudy
       const seriesToDisplay = this.props.studies[studyInstanceUID].series
 
+      console.log(seriesToDisplay)
       seriesToDisplay.forEach((seriesInstanceUID) => {
 
         let seriesToPush = this.props.series[seriesInstanceUID]
@@ -116,7 +117,7 @@ class ControllerStudiesSeries extends Component {
     return (
       <div disabled={this.props.isUploading}>
         <Row>
-          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} checkStudyReady={(studyID) => { this.studyWarningsPassed(studyID) }} />
+          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} />
         </Row>
         <Row>
           <DisplaySeries seriesRows={this.buildSeriesRows()} />

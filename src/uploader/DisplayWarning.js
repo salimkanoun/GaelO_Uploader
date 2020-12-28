@@ -37,7 +37,7 @@ class DisplayWarning extends Component {
                     warning={this.getWarningStatus(row)}
                     onClick={() => {
                         if (this.props.type === 'series') {
-                            this.props.toogleWarningSeries(row, row.seriesInstanceUID)
+                            this.props.toogleWarningSeries(row.key, row.seriesInstanceUID)
                             if (this.props.series[row.seriesInstanceUID].status === 'Valid') this.props.removeSeriesReady(row.seriesInstanceUID) 
                             else this.props.addSeriesReady(row.seriesInstanceUID) 
                         } else if (this.props.type === 'study') {

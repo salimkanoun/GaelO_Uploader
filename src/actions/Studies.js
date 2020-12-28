@@ -1,5 +1,5 @@
 
-import { ADD_STUDY, SET_VISIT_ID, SET_USED_VISIT, SET_NOT_USED_VISIT, UNSET_VISIT_ID } from './actions-types'
+import { ADD_STUDY, SET_VISIT_ID, SET_USED_VISIT, SET_NOT_USED_VISIT, UNSET_VISIT_ID, UPDATE_WARNING_STUDY } from './actions-types'
 
 /**
  * Add study to Redux studies Object
@@ -36,6 +36,7 @@ export function addStudy (studyInstanceUID, patientFirstName, patientLastName, p
 export function setVisitID (studyInstanceUID, idVisit) {
 
   return function (dispatch){
+
     //Make id visit used
     dispatch( 
       {
@@ -43,6 +44,7 @@ export function setVisitID (studyInstanceUID, idVisit) {
         payload: { idVisit: idVisit}
       }
     )
+
     //Attach Visit to study
     dispatch(
       {
@@ -50,6 +52,17 @@ export function setVisitID (studyInstanceUID, idVisit) {
         payload: {
           studyInstanceUID: studyInstanceUID,
           idVisit: idVisit
+        }
+      }
+    )
+
+    //remove NULLVisitID Warning
+    dispatch(
+      {
+        type: UPDATE_WARNING_STUDY,
+        payload: {
+          studyInstanceUID: studyInstanceUID,
+          warningKey: 'NULL_VISIT_ID'
         }
       }
     )

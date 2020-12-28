@@ -22,9 +22,10 @@ export default function WarningsStudyReducer(state = initialState, action) {
 
         case UPDATE_WARNING_STUDY:
             // Update given series warning in reducer
-            const warningKey = action.payload.warningToUpdate.key
+            const warningKey = action.payload.warningKey
             const studyInstanceUID = action.payload.studyInstanceUID
-
+            console.log(warningKey)
+            console.log(studyInstanceUID)
             let studyToUpdate = state.warningsStudy[studyInstanceUID]
             studyToUpdate[warningKey]['dismissed'] = !studyToUpdate[warningKey]['dismissed']
 

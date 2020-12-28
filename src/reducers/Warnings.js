@@ -22,11 +22,11 @@ export default function WarningsReducer(state = initialState, action) {
 
     case TOOGLE_WARNING_SERIES:
       // Update given series warning in reducer
-      const seriesWarning = action.payload.warningToUpdate.key
+      const warningKey = action.payload.warningKey
       const seriesInstanceUID = action.payload.seriesInstanceUID
 
       let seriesToUpdate = state.warningsSeries[seriesInstanceUID]
-      seriesToUpdate[seriesWarning]['dismissed'] = !seriesToUpdate[seriesWarning]['dismissed']
+      seriesToUpdate[warningKey]['dismissed'] = !seriesToUpdate[warningKey]['dismissed']
 
       return {
         warningsSeries: {

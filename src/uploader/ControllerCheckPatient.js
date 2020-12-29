@@ -14,7 +14,7 @@
 
 import React, { Component } from 'react'
 
-import { Button, Row } from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 
 import CheckPatient from './render_component/CheckPatient'
 import Util from '../model/Util'

@@ -23,6 +23,7 @@ import SelectPatient from './SelectPatient'
 
 import { selectStudy, addStudyReady, removeStudyReady } from '../actions/DisplayTables'
 import { unsetVisitID } from '../actions/Studies'
+import Util from '../model/Util';
 
 class StudiesTab extends Component {
 
@@ -106,6 +107,9 @@ class StudiesTab extends Component {
         {
             dataField: 'acquisitionDate',
             text: 'Date',
+            formatter: (cell, row, rowIndex, extraData) => {
+                return Util.formatRawDate(cell)
+            }
         },
     ]
 

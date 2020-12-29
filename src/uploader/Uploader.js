@@ -75,13 +75,8 @@ class Uploader extends Component {
 
     }
 
-    componentDidMount = async () => {
-        this.loadAvailableVisits()
-
-    }
-
-    loadAvailableVisits = () => {
-
+    componentDidMount = () => {
+        //Load available visits in redux
         let availableVisits = this.props.config.availableVisits
 
         //Add All availables visits in visit reducer

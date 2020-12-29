@@ -11,13 +11,6 @@ export function selectStudy (studyInstanceUID) {
   }
 }
 
-export function unselectStudy(){
-  return {
-    type: SELECT_STUDY,
-    payload: null
-  }
-}
-
 /**
  * Update Redux state of current selectedSeries
  * @param {String} seriesInstanceUID

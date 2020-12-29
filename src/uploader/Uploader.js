@@ -24,8 +24,8 @@ import { isNewStudy } from '../services/api'
 import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries, addWarningsStudy } from '../actions/Warnings'
-import { addVisit, resetVisits } from '../actions/Visits'
-import { selectStudy, addStudyReady, unselectStudy } from '../actions/DisplayTables'
+import { addVisit } from '../actions/Visits'
+import { selectStudy, addStudyReady } from '../actions/DisplayTables'
 import { addSeriesReady } from '../actions/DisplayTables'
 import { NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
@@ -546,11 +546,9 @@ const mapDispatchToProps = {
     addWarningsSeries,
     addVisit,
     selectStudy,
-    unselectStudy,
     addStudyReady,
     addSeriesReady,
-    setVisitID,
-    resetVisits
+    setVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

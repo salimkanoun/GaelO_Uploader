@@ -9,6 +9,8 @@ import JSZip from 'jszip'
 import Model from '../model/Model'
 import DicomFile from '../model/DicomFile'
 
+import { Alert } from 'react-bootstrap'
+
 import DicomDropZone from './render_component/DicomDropZone'
 
 import ParsingDetails from './render_component/ParsingDetails'
@@ -17,7 +19,7 @@ import ProgressUpload from './render_component/ProgressUpload'
 import Options from './render_component/Options'
 import Util from '../model/Util'
 
-import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
+import { isNewStudy } from '../services/api'
 
 import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
@@ -74,25 +76,17 @@ class Uploader extends Component {
     }
 
     componentDidMount = async () => {
-        if (this.config.developerMode) {
-            await logIn()
-            await registerStudy()
-        }
-        await this.loadAvailableVisits()
+        this.loadAvailableVisits()
 
     }
 
-    loadAvailableVisits = async ()=>{
+    loadAvailableVisits = () => {
 
-        let answer = await getPossibleImport()
-
-        answer= {"AvailablePatients":{"PET0":[{"numeroPatient":"17017101051001","firstName":"F","lastName":"V","patientSex":"M","patientDOB":"02-00-1941","investigatorName":"KARLIN","country":"France","centerNumber":"10501","acquisitionDate":"11-10-2020","visitType":"PET0","idVisit":179}]}}
-
+        let availableVisits = this.props.config.availableVisits
+        
         //Add All availables visits in visit reducer
-        for (let visitArray of Object.values(answer.AvailablePatients) ) {
-            visitArray.forEach(visit => {
-                this.props.addVisit(visit)
-            })
+        for (let visit of availableVisits ) {
+            this.props.addVisit(visit)
         }
 
     }
@@ -110,7 +104,7 @@ class Uploader extends Component {
 
         if (this.state.fileParsed === 0) {
             //At first drop notify user started action
-            this.config.callbackOnStartAction()
+            this.config.onStartUsing()
         }
 
         //Add number of files to be parsed to the previous number (incremental parsing)
@@ -457,14 +451,15 @@ class Uploader extends Component {
 
         uploader.on('study-upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
             console.log('sutdy upload Finished')
-            validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+            this.config.onStudyUploaded( idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+
         })
 
 
         uploader.on('upload-finished', () => {
             console.log('full upload Finished')
-            //this.setState({ isUploading: false })
-            this.config.callbackOnUploadComplete()
+            this.setState({ isUploading: false })
+            this.config.onUploadComplete()
         })
 
         uploader.startUpload()
@@ -472,6 +467,8 @@ class Uploader extends Component {
     }
 
     render = () => {
+        if(this.config.availableVisits.length ===0) return <Alert variant='success'>  No Visits Awaiting Upload
+                </Alert>
         return (
             <Fragment>
                 <div>
@@ -497,11 +494,11 @@ class Uploader extends Component {
                     <ControllerStudiesSeries
                         isCheckDone={this.state.isCheckDone}
                         isUploading={this.state.isUploading}
-                        multiUpload={this.config.multiUpload}
+                        multiUpload={this.config.availableVisits.length > 1}
                         selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload
                         isUploading={this.state.isUploading}
-                        multiUpload={this.config.multiUpload}
+                        multiUpload={this.config.availableVisits.length > 1}
                         studyProgress={this.state.studyProgress}
                         studyLength={this.state.studyLength}
                         onUploadClick={this.onUploadClick}

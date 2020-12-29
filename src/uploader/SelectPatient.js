@@ -74,9 +74,8 @@ class SelectPatient extends Component {
         let visitOptions = []
 
         for (let visitObject of Object.values(this.props.visits)) {
-            console.log(visitObject.visitType)
-            console.log(selectedVisitType)
-            if (visitObject.visitType === selectedVisitType) {
+            //Select visits with selected visit type and not assigned to another study
+            if (visitObject.visitType === selectedVisitType && visitObject.studyInstanceUID === undefined) {
                 visitOptions.push(
                     { value: visitObject.idVisit, label: visitObject.numeroPatient }
                 )

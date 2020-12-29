@@ -5,8 +5,6 @@ const initialState = {
 }
 
 //SK studyID à remplacer par StudyInstanceUID
-
-/* MULTIUPLOAD mode reducer */
 export default function VisitsReducer (state = initialState, action) {
   switch (action.type) {
 
@@ -21,19 +19,17 @@ export default function VisitsReducer (state = initialState, action) {
       }
 
     case SET_USED_VISIT:
-      console.log(action.payload)
+
       // Set used state of given visit
       const idVisit = action.payload.idVisit
       const studyInstanceUID = action.payload.studyInstanceUID
-
-      console.log(idVisit)
-      console.log(studyInstanceUID)
+      
       return {
         visits: {
           ...state.visits,
           [idVisit] : {
             ...state.visits[idVisit], 
-            studyID : studyInstanceUID
+            studyInstanceUID : studyInstanceUID
           }
         }
       }
@@ -46,13 +42,12 @@ export default function VisitsReducer (state = initialState, action) {
           ...state.visits,
           [idVisit2] : {
             ...state.visits[idVisit2], 
-            studyID : undefined
+            studyInstanceUID : undefined
           }
         }
       }
     
     case RESET_VISITS:
-      
       return {
         visits: {}
       }

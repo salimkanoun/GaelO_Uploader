@@ -14,7 +14,7 @@
 
 import React, { Component } from 'react'
 
-import { Button } from 'react-bootstrap'
+import { Button, Row } from 'react-bootstrap'
 
 import CheckPatient from './render_component/CheckPatient'
 import Util from '../model/Util'
@@ -153,9 +153,11 @@ export default class ControllerCheckPatient extends Component {
         return (
             <div className="du-patient">
                 <CheckPatient onClick={this.onClick} rows={this.state.rows} />
-                <Button type="button" onClick={this.props.onValidatePatient} className="btn btn-primary" disabled={this.state.isDisabled}>
-                    This is the correct patient
-                </Button>
+                <div>
+                    <Button variant='primary' onClick={this.props.onValidatePatient} className="float-right" disabled={this.state.isDisabled}>
+                        This is the correct patient
+                    </Button>
+                </div>
             </div>
         )
     }

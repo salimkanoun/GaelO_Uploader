@@ -147,7 +147,7 @@ class StudiesTab extends Component {
                 <Modal show={this.state.showSelectPatient} onHide={this.toggleSelectPatient}>
                     <Modal.Header className="modal-header" closeButton>
                         <Modal.Title className="modal-title">
-                            Select/Check Patient
+                            Select Patient
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body du-patient">

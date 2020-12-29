@@ -468,8 +468,7 @@ class Uploader extends Component {
     }
 
     render = () => {
-        if(this.config.availableVisits.length ===0) return <Alert variant='success'>  No Visits Awaiting Upload
-                </Alert>
+        if(this.config.availableVisits.length ===0) return <Alert variant='success'>  No Visits Awaiting Upload </Alert>
         return (
             <Fragment>
                 <div>

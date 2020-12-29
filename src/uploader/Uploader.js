@@ -282,7 +282,7 @@ class Uploader extends Component {
         //Search for a perfect Match in visit candidates and assign it
         let perfectMatchVisit = this.searchPerfectMatchStudy(studyInstanceUID)
         if (perfectMatchVisit != null) {
-            this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
+            this.props.setVisitID(studyInstanceUID, perfectMatchVisit.visitID)
         }
         //Add study warnings to Redux
         let studyRedux = this.props.studies[studyInstanceUID]
@@ -330,7 +330,7 @@ class Uploader extends Component {
         let warnings = []
 
         //if Visit ID is not set add Null Visit ID (visitID Needs to be assigned)
-        if ( studyRedux.idVisit == null ) warnings.push(NULL_VISIT_ID)
+        if ( studyRedux.visitID == null ) warnings.push(NULL_VISIT_ID)
 
         // Check if study is already known by server
         try{
@@ -369,9 +369,9 @@ class Uploader extends Component {
         return undefined;
     }
 
-    getVisitDataById = (idVisit) => {
+    getVisitDataById = (visitID) => {
         for (let visit of this.props.visits) {
-            if ( visit.idVisit === idVisit ) {
+            if ( visit.visitID === visitID ) {
                 return visit;
             }
         }
@@ -390,11 +390,11 @@ class Uploader extends Component {
         let sex = studyRedux.patientSex
         let acquisitionDate = studyRedux.acquisitionDate
 
-        if (Util.areEqualFields(visitObject.firstName.trim().charAt(0), patientFirstname.trim().charAt(0))
-        && Util.areEqualFields(visitObject.lastName.trim().charAt(0), patientLastname.trim().charAt(0))
+        if (Util.areEqualFields(visitObject.patientFirstname.trim().charAt(0), patientFirstname.trim().charAt(0))
+        && Util.areEqualFields(visitObject.patientLastname.trim().charAt(0), patientLastname.trim().charAt(0))
         && Util.areEqualFields(visitObject.patientSex.trim().charAt(0), sex.trim().charAt(0))
         && Util.isProbablyEqualDates(visitObject.patientDOB, Util.formatRawDate(birthDate))
-        && Util.isProbablyEqualDates(visitObject.acquisitionDate, Util.formatRawDate(acquisitionDate))) {
+        && Util.isProbablyEqualDates(visitObject.visitDate, Util.formatRawDate(acquisitionDate))) {
             return true
         } else return false
     }
@@ -427,7 +427,7 @@ class Uploader extends Component {
         //group series by studyUID
         for (let studyInstanceUID of studyUIDArray) {
 
-            let idVisit = this.props.studies[studyInstanceUID].idVisit
+            let visitID = this.props.studies[studyInstanceUID].visitID
 
             let seriesInstanceUID = seriesObjectArrays.filter((seriesObject) => {
                 return (seriesObject.studyInstanceUID === studyInstanceUID)
@@ -444,7 +444,7 @@ class Uploader extends Component {
                 filesToUpload.push(...fileArray)
             })
 
-            uploader.addStudyToUpload(idVisit, filesToUpload, studyOrthancID)
+            uploader.addStudyToUpload(visitID, filesToUpload, studyOrthancID)
 
         }
 
@@ -466,9 +466,9 @@ class Uploader extends Component {
 
         })
 
-        uploader.on('study-upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
+        uploader.on('study-upload-finished', (visitID, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
             console.log('sutdy upload Finished')
-            this.config.onStudyUploaded( idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+            this.config.onStudyUploaded( visitID, sucessIDsUploaded, numberOfFiles, studyOrthancID)
 
         })
 

@@ -5,6 +5,7 @@ const initialState = {
 }
 
 export default function VisitsReducer(state = initialState, action) {
+
   switch (action.type) {
 
     case ADD_VISIT:
@@ -13,34 +14,33 @@ export default function VisitsReducer(state = initialState, action) {
       return {
         visits: {
           ...state.visits,
-          [visitObject.idVisit]: { ...visitObject }
+          [visitObject.visitID]: { ...visitObject }
         }
       }
 
     case SET_USED_VISIT:
-
+      const visitID = action.payload.visitID
       // Set used state of given visit
-      const idVisit = action.payload.idVisit
       const studyInstanceUID = action.payload.studyInstanceUID
 
       return {
         visits: {
           ...state.visits,
-          [idVisit]: {
-            ...state.visits[idVisit],
+          [visitID]: {
+            ...state.visits[visitID],
             studyInstanceUID: studyInstanceUID
           }
         }
       }
 
     case SET_NOT_USED_VISIT:
-      const idVisit2 = action.payload.idVisit
+      const visitID2 = action.payload.visitID
 
       return {
         visits: {
           ...state.visits,
-          [idVisit2]: {
-            ...state.visits[idVisit2],
+          [visitID2]: {
+            ...state.visits[visitID2],
             studyInstanceUID: undefined
           }
         }

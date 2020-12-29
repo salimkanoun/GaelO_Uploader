@@ -73,7 +73,7 @@ class StudiesTab extends Component {
                     return (
                         <Button variant="success" 
                                 onClick={() => {
-                                    this.props.unsetVisitID(row.studyInstanceUID, row.idVisit)
+                                    this.props.unsetVisitID(row.studyInstanceUID, row.visitID)
                                     this.props.removeStudyReady(row.studyInstanceUID)
                                     }
                                 }>

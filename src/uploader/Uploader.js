@@ -76,8 +76,8 @@ class Uploader extends Component {
     }
 
     componentDidMount = async () => {
-        await logIn()
-        await registerStudy()
+        //await logIn()
+        //await registerStudy()
         this.loadAvailableVisits()
     }
 

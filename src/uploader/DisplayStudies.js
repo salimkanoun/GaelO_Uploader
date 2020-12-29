@@ -62,7 +62,7 @@ class StudiesTab extends Component {
                         return (<></>)
                     else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined ) {
                         return (
-                            <Button variant="primary" onClick={this.toggleSelectPatient}>
+                            <Button variant="primary" onClick={this.toggleSelectPatient} block>
                                 {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
                             </Button>
                         )
@@ -76,7 +76,9 @@ class StudiesTab extends Component {
                                     this.props.unsetVisitID(row.studyInstanceUID, row.visitID)
                                     this.props.removeStudyReady(row.studyInstanceUID)
                                     }
-                                }>
+                                }
+                                block
+                                >
                             Selected
                         </Button>
                     )

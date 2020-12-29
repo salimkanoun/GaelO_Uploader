@@ -231,6 +231,7 @@ class Uploader extends Component {
      */
     checkSeriesAndUpdateRedux = async () => {
         this.setState({ isCheckDone: false })
+        //SK MANQUE UN RESET ALL pour vider tout les reducers
         this.props.unselectStudy()
         this.props.resetVisits()
         this.loadAvailableVisits()

@@ -231,71 +231,23 @@ class Uploader extends Component {
      */
     checkSeriesAndUpdateRedux = async () => {
         this.setState({ isCheckDone: false })
-        this.props.unselectStudy()
-        this.props.resetVisits()
-        this.loadAvailableVisits()
+
         //Scan every study in Model
-        for (let studyInstanceUID in this.uploadModel.data) {
-            //Retrieve StudyObject from Model
-            let studyToAdd = this.uploadModel.data[studyInstanceUID]
+        let studyArray = this.uploadModel.getStudiesArray()
+        for (let studyObject of studyArray) {
 
-            //Add study to Redux
-            this.props.addStudy(
-                studyToAdd.getStudyInstanceUID(), 
-                studyToAdd.getPatientFirstName(), 
-                studyToAdd.getPatientLastName(), 
-                studyToAdd.getPatientSex(), 
-                studyToAdd.getPatientID(), 
-                studyToAdd.getAcquisitionDate(), 
-                studyToAdd.getAccessionNumber(),
-                studyToAdd.getPatientBirthDate(), 
-                studyToAdd.getStudyDescription(),
-                studyToAdd.getOrthancStudyID(),
-                Object.keys(studyToAdd.series)
-            )
-            //Add study warnings to Redux
-            let studyRedux = this.props.studies[studyInstanceUID]
-
-            //Search for a perfect Match in visit candidates and assign it
-            let perfectMatchVisit = this.searchPerfectMatchStudy(studyRedux)
-            if (perfectMatchVisit != null) {
-                this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
-            }
-            
-            let studyWarnings = await this.getStudyWarning(studyRedux)
-
-            //If no warning mark it as ready, if not add warning to redux
-            if( studyWarnings.length === 0 ) this.props.addStudyReady(studyInstanceUID)
-            else {
-                studyWarnings.forEach( (warning)=> {
-                    this.props.addWarningsStudy(studyInstanceUID, warning)
-                })
-                
+            //If unknown studyInstanceUID, add it to Redux
+            if ( ! Object.keys(this.props.studies).includes( studyObject.getStudyInstanceUID() )){
+                this.registerStudyInRedux(studyObject)
             }
 
             //Scan every series in Model
-            let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
-            
-            for (let seriesInstance of series) {
+            let series = studyObject.getSeriesArray()
 
-                let seriesWarnings = await seriesInstance.getWarnings()
-                //Add series to redux
-                this.props.addSeries(
-                    seriesInstance.getInstancesObject(),
-                    seriesInstance.getSeriesInstanceUID(),
-                    seriesInstance.getSeriesNumber(),
-                    seriesInstance.getSeriesDate(),
-                    seriesInstance.getSeriesDescription(),
-                    seriesInstance.getModality(),
-                    seriesInstance.getStudyInstanceUID()
-                )
+            for (let seriesObject of series) {
 
-                //Automatically add to Redux seriesReady if contains no warnings
-                if(  Util.isEmptyObject( seriesWarnings ) ){
-                    this.props.addSeriesReady( seriesInstance.getSeriesInstanceUID() )
-                }else{
-                    //Add series related warnings to Redux
-                    this.props.addWarningsSeries(seriesInstance.getSeriesInstanceUID(), seriesWarnings )
+                if ( ! Object.keys(this.props.series).includes( seriesObject.getSeriesInstanceUID() )){
+                    this.registerSeriesInRedux(seriesObject)
                 }
                 
             }
@@ -303,7 +255,71 @@ class Uploader extends Component {
 
         //Mark check finished to make interface available and select the first study item
         this.setState({ isCheckDone: true })
-        if( Object.keys(this.props.studies).length >= 1) this.props.selectStudy( this.props.studies[Object.keys(this.props.studies)[0]].studyInstanceUID )
+        //If no study being selected, select the first one
+        if( this.props.selectedStudy===undefined && Object.keys(this.props.studies).length >= 1) this.props.selectStudy( this.props.studies[Object.keys(this.props.studies)[0]].studyInstanceUID )
+    }
+
+    /**
+     * Register a study of the dicom model to the redux
+     * @param {Study} studyToAdd 
+     */
+    registerStudyInRedux = async (studyToAdd) => {
+        this.props.addStudy(
+            studyToAdd.getStudyInstanceUID(), 
+            studyToAdd.getPatientFirstName(), 
+            studyToAdd.getPatientLastName(), 
+            studyToAdd.getPatientSex(), 
+            studyToAdd.getPatientID(), 
+            studyToAdd.getAcquisitionDate(), 
+            studyToAdd.getAccessionNumber(),
+            studyToAdd.getPatientBirthDate(), 
+            studyToAdd.getStudyDescription(),
+            studyToAdd.getOrthancStudyID()
+        )
+        
+        const studyInstanceUID = studyToAdd.getStudyInstanceUID()
+
+        //Search for a perfect Match in visit candidates and assign it
+        let perfectMatchVisit = this.searchPerfectMatchStudy(studyInstanceUID)
+        if (perfectMatchVisit != null) {
+            this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
+        }
+        //Add study warnings to Redux
+        let studyRedux = this.props.studies[studyInstanceUID]
+        let studyWarnings = await this.getStudyWarning(studyRedux)
+
+        //If no warning mark it as ready, if not add warning to redux
+        if( studyWarnings.length === 0 ) this.props.addStudyReady(studyInstanceUID)
+        else {
+            studyWarnings.forEach( (warning)=> {
+                this.props.addWarningsStudy(studyInstanceUID, warning)
+            })
+            
+        }
+    }
+
+    registerSeriesInRedux = async (seriesObject) => {
+
+        let seriesWarnings = await seriesObject.getWarnings()
+        //Add series to redux
+        this.props.addSeries(
+            seriesObject.getInstancesObject(),
+            seriesObject.getSeriesInstanceUID(),
+            seriesObject.getSeriesNumber(),
+            seriesObject.getSeriesDate(),
+            seriesObject.getSeriesDescription(),
+            seriesObject.getModality(),
+            seriesObject.getStudyInstanceUID()
+        )
+
+        //Automatically add to Redux seriesReady if contains no warnings
+        if(  Util.isEmptyObject( seriesWarnings ) ){
+            this.props.addSeriesReady( seriesObject.getSeriesInstanceUID() )
+        }else{
+            //Add series related warnings to Redux
+            this.props.addWarningsSeries(seriesObject.getSeriesInstanceUID(), seriesWarnings )
+        }
+
     }
 
     /**
@@ -338,10 +354,11 @@ class Uploader extends Component {
     }
 
     /**
-     * Search a perfect match visit for a registered study in redux
-     * @param {object} studyRedux 
+     * Search a perfect match visit for a registered studyInstanceUID in redux
+     * @param {string} studyInstanceUID 
      */
-    searchPerfectMatchStudy = (studyRedux) => {
+    searchPerfectMatchStudy = (studyInstanceUID) => {
+        let studyRedux = this.props.studies[studyInstanceUID]
         // Linear search through expected visits list
         for (let visitObject of Object.values(this.props.visits) ) {
             if ( this.isPerfectMatch(studyRedux, visitObject) ) {
@@ -516,6 +533,7 @@ const mapStateToProps = state => {
         studies: state.Studies.studies,
         series: state.Series.series,
         selectedSeries: state.DisplayTables.selectedSeries,
+        selectedStudy: state.DisplayTables.selectStudy,
         seriesReady: state.DisplayTables.seriesReady,
         studiesReady: state.DisplayTables.studiesReady,
         warningsSeries: state.Warnings.warningsSeries,

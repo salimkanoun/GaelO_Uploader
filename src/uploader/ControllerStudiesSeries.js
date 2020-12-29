@@ -40,30 +40,47 @@ class ControllerStudiesSeries extends Component {
    * @param {Object} study
    * @return {Boolean}
    */
-  getStudyStatus(study) {
+  getStudyStatus(studyInstanceUID) {
 
-    if ( this.props.warningsStudies[study] === undefined ) {
+    if ( this.props.warningsStudies[studyInstanceUID] === undefined ) {
+      //If no warning at study level, look if remaining warnings at series level
+      let seriesArray = this.getSeriesFromStudy(studyInstanceUID)
 
-      for (let seriesInstanceUID of this.props.studies[study].series) {
-        if (!this.IsSeriesWarningsPassed(seriesInstanceUID)) {
+      for (let series of seriesArray ) {
+        if ( !this.IsSeriesWarningsPassed(series.seriesInstanceUID)) {
           return 'Incomplete'
         }
       }
-
+      //If not, study is valid
       return 'Valid'
 
     } else {
-
-      if (this.props.warningsStudies[study]['ALREADY_KNOWN_STUDY'] !== undefined) {
+      //If warning at study level return them as string
+      if (this.props.warningsStudies[studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined) {
         return 'Already Known'
       }
 
-      if (this.props.warningsStudies[study]['NULL_VISIT_ID'] !== undefined) {
+      if (this.props.warningsStudies[studyInstanceUID]['NULL_VISIT_ID'] !== undefined) {
         return 'Rejected'
       }
 
     }
 
+  }
+
+  /**
+   * Get Series in Redux related to a StudyInstanceUID
+   * @param {string} studyInstanceUID 
+   */
+  getSeriesFromStudy = (studyInstanceUID) => {
+      //Read available series in Redux
+      let seriesArray = Object.values(this.props.series)
+      //Select series belonging to the current study
+      let seriesToDisplay = seriesArray.filter((series)=> {
+        return series.studyInstanceUID === studyInstanceUID
+      })
+
+      return seriesToDisplay
   }
 
   /**
@@ -75,17 +92,14 @@ class ControllerStudiesSeries extends Component {
 
     if (this.props.selectedStudy !== null) {
 
-      let studyInstanceUID = this.props.selectedStudy
-      const seriesToDisplay = this.props.studies[studyInstanceUID].series
+      let seriesToDisplay = this.getSeriesFromStudy(this.props.selectedStudy)
 
-      seriesToDisplay.forEach((seriesInstanceUID) => {
+      seriesToDisplay.forEach( (series) => {
 
-        let seriesToPush = this.props.series[seriesInstanceUID]
-        seriesToPush.status = this.IsSeriesWarningsPassed(seriesInstanceUID) ? 'Valid' : 'Rejected'
-        seriesToPush.selectedSeries = this.props.seriesReady.includes(seriesInstanceUID)
-
+        series.status = this.IsSeriesWarningsPassed(series.seriesInstanceUID) ? 'Valid' : 'Rejected'
+        series.selectedSeries = this.props.seriesReady.includes(series.seriesInstanceUID)
         seriesArray.push({
-          ...seriesToPush
+          ...series
         })
 
       })

@@ -1,4 +1,4 @@
-import { ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, TOOGLE_WARNING_SERIES, ADD_WARNINGS_SERIES } from './actions-types'
+import { ADD_WARNING_STUDY, REMOVE_WARNING_STUDY, TOOGLE_WARNING_SERIES, ADD_WARNINGS_SERIES } from './actions-types'
 
 
 /**
@@ -9,7 +9,7 @@ import { ADD_WARNING_STUDY, UPDATE_WARNING_STUDY, TOOGLE_WARNING_SERIES, ADD_WAR
 export function addWarningsStudy (studyInstanceUID, warnings) {
   return {
     type: ADD_WARNING_STUDY,
-    payload: { studyInstanceUID: studyInstanceUID, warnings: warnings }
+    payload: { studyInstanceUID: studyInstanceUID, warning: warnings }
   }
 }
 
@@ -20,7 +20,7 @@ export function addWarningsStudy (studyInstanceUID, warnings) {
  */
 export function updateWarningStudy (warningKey, studyInstanceUID) {
   return {
-    type: UPDATE_WARNING_STUDY,
+    type: REMOVE_WARNING_STUDY,
     payload: { warningKey: warningKey, studyInstanceUID: studyInstanceUID }
   }
 }

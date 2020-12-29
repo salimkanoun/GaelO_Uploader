@@ -274,8 +274,13 @@ class Uploader extends Component {
             let studyWarnings = await this.getStudyWarning(studyRedux)
 
             //If no warning mark it as ready, if not add warning to redux
-            if( Util.isEmptyObject(studyWarnings) ) this.props.addStudyReady(studyInstanceUID)
-            else this.props.addWarningsStudy(studyInstanceUID, studyWarnings)
+            if( studyWarnings.length === 0 ) this.props.addStudyReady(studyInstanceUID)
+            else {
+                studyWarnings.forEach( (warning)=> {
+                    this.props.addWarningsStudy(studyInstanceUID, warning)
+                })
+                
+            }
 
             //Scan every series in Model
             let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
@@ -293,11 +298,13 @@ class Uploader extends Component {
                     seriesInstance.getModality(),
                     seriesInstance.getStudyInstanceUID()
                 )
-                //Add series related warnings to Redux
-                this.props.addWarningsSeries(seriesInstance.getSeriesInstanceUID(), seriesWarnings )
+
                 //Automatically add to Redux seriesReady if contains no warnings
-                if( Util.isEmptyObject( seriesWarnings ) ){
+                if(  Util.isEmptyObject( seriesWarnings ) ){
                     this.props.addSeriesReady( seriesInstance.getSeriesInstanceUID() )
+                }else{
+                    //Add series related warnings to Redux
+                    this.props.addWarningsSeries(seriesInstance.getSeriesInstanceUID(), seriesWarnings )
                 }
                 
             }
@@ -310,15 +317,15 @@ class Uploader extends Component {
      * @param {*} study 
      */
     getStudyWarning = async (studyRedux) => {
-        let warnings = {}
+        let warnings = []
 
         //if Visit ID is not set add Null Visit ID (visitID Needs to be assigned)
-        if ( studyRedux.idVisit == null ) warnings[NULL_VISIT_ID.key] = NULL_VISIT_ID
+        if ( studyRedux.idVisit == null ) warnings.push(NULL_VISIT_ID)
 
         // Check if study is already known by server
         try{
             let newStudy = await isNewStudy( studyRedux.orthancStudyID )
-            if (!newStudy) warnings[ALREADY_KNOWN_STUDY.key] = ALREADY_KNOWN_STUDY
+            if (!newStudy) warnings.push(ALREADY_KNOWN_STUDY)
         } catch (error){
             console.warn(error)
             toast.error("Session expired, please refresh browser",  {

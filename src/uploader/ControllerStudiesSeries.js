@@ -14,20 +14,21 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+
 import Row from 'react-bootstrap/Row'
+
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
-import Util from '../model/Util.js'
 class ControllerStudiesSeries extends Component {
 
   /**
-   * Fetch studies from Redux State to display in study table
-   * @return {Object}
+   * Format studies from Redux State to display in study table
+   * @return {array}
    */
   buildStudiesRows() {
-    const studies = []
-    for (const study of Object.values(this.props.studies) ) {
-      study.status = this.studyWarningsPassed(study.studyInstanceUID)
+    let studies = []
+    for (let study of Object.values(this.props.studies) ) {
+      study.status = this.getStudyStatus(study.studyInstanceUID)
       study.selectedStudies = this.props.studiesReady.includes(study.studyInstanceUID)
       studies.push({ ...study })
     }
@@ -39,15 +40,16 @@ class ControllerStudiesSeries extends Component {
    * @param {Object} study
    * @return {Boolean}
    */
-  studyWarningsPassed(study) {
+  getStudyStatus(study) {
 
-    if (this.props.warningsStudies[study] === undefined || Util.isEmptyObject(this.props.warningsStudies[study]) ) {
+    if ( this.props.warningsStudies[study] === undefined ) {
 
       for (let seriesInstanceUID of this.props.studies[study].series) {
         if (!this.IsSeriesWarningsPassed(seriesInstanceUID)) {
           return 'Incomplete'
         }
       }
+
       return 'Valid'
 
     } else {
@@ -69,8 +71,8 @@ class ControllerStudiesSeries extends Component {
    * @return {Object}
    */
   buildSeriesRows() {
-    const seriesArray = []
-    console.log(this.props.selectedStudy)
+    let seriesArray = []
+
     if (this.props.selectedStudy !== null) {
 
       let studyInstanceUID = this.props.selectedStudy

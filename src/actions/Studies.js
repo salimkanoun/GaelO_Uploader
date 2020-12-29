@@ -1,5 +1,6 @@
 
-import { ADD_STUDY, SET_VISIT_ID, SET_USED_VISIT, SET_NOT_USED_VISIT, UNSET_VISIT_ID, UPDATE_WARNING_STUDY } from './actions-types'
+import { ADD_STUDY, SET_VISIT_ID, SET_USED_VISIT, SET_NOT_USED_VISIT, UNSET_VISIT_ID, REMOVE_WARNING_STUDY, ADD_WARNING_STUDY } from './actions-types'
+import { NULL_VISIT_ID } from '../model/Warning'
 
 /**
  * Add study to Redux studies Object
@@ -59,7 +60,7 @@ export function setVisitID (studyInstanceUID, idVisit) {
     //remove NULLVisitID Warning
     dispatch(
       {
-        type: UPDATE_WARNING_STUDY,
+        type: REMOVE_WARNING_STUDY,
         payload: {
           studyInstanceUID: studyInstanceUID,
           warningKey: 'NULL_VISIT_ID'
@@ -95,13 +96,15 @@ export function unsetVisitID(studyInstanceUID, idVisit) {
     )
 
     dispatch(
+
       {
-        type: UPDATE_WARNING_STUDY,
-        payload: {
+        type: ADD_WARNING_STUDY,
+        payload: { 
           studyInstanceUID: studyInstanceUID,
-          warningKey: 'NULL_VISIT_ID'
+          warning: NULL_VISIT_ID
         }
       }
+
     )
 
   }

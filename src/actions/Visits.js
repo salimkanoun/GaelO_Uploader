@@ -1,5 +1,4 @@
 import { ADD_VISIT, RESET_VISITS } from './actions-types'
-/* MULTIUPLOAD mode functions */
 
 /**
  * Add visit to Redux visits Object
@@ -12,6 +11,9 @@ export function addVisit (visitObject) {
   }
 }
 
+/**
+ * Remove all visits in redux, to restart the app (done at new loading of dicoms)
+ */
 export function resetVisits(){
   return {
     type : RESET_VISITS

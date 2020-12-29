@@ -1,4 +1,5 @@
-import { UPDATE_WARNING_STUDY, ADD_WARNING_STUDY } from '../actions/actions-types'
+import { REMOVE_WARNING_STUDY, ADD_WARNING_STUDY } from '../actions/actions-types'
+import Util from '../model/Util'
 
 const initialState = {
     warningsStudy: {}
@@ -6,33 +7,39 @@ const initialState = {
 
 export default function WarningsStudyReducer(state = initialState, action) {
 
-    let warnings = {}
+    let studyInstanceUID
 
     switch (action.type) {
 
         case ADD_WARNING_STUDY:
             // Add series warnings to reducer
-            warnings = action.payload.warnings
+            let warning = action.payload.warning
+            studyInstanceUID = action.payload.studyInstanceUID
+
+            let warningObject = state.warningsStudy[studyInstanceUID] == null ? {} : state.warningsStudy[studyInstanceUID]
+            warningObject[warning.key] = {...warning}
+
             return {
                 warningsStudy: {
                     ...state.warningsStudy,
-                    [action.payload.studyInstanceUID]: { ...warnings }
+                    [action.payload.studyInstanceUID]: { ...warningObject }
                 }
             }
 
-        case UPDATE_WARNING_STUDY:
+        case REMOVE_WARNING_STUDY:
             // Update given series warning in reducer
             const warningKey = action.payload.warningKey
-            const studyInstanceUID = action.payload.studyInstanceUID
-            console.log(warningKey)
-            console.log(studyInstanceUID)
-            let studyToUpdate = state.warningsStudy[studyInstanceUID]
-            delete studyToUpdate[warningKey]
+            studyInstanceUID = action.payload.studyInstanceUID
+
+            let newWarningState = state.warningsStudy
+            delete newWarningState[studyInstanceUID][warningKey]
+
+            //If no other warning
+            if( Util.isEmptyObject(newWarningState[studyInstanceUID]) ) delete state.warningsStudy[studyInstanceUID]
 
             return {
                 warningsStudy: {
-                    ...state.warningsStudy,
-                    [studyInstanceUID]: { ...studyToUpdate }
+                    ...newWarningState
                 }
             }
 

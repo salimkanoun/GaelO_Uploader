@@ -13,11 +13,15 @@
  */
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+
 import BootstrapTable from 'react-bootstrap-table-next';
 import { Container, Row, Col } from 'react-bootstrap'
-import DisplayWarning from './DisplayWarning'
-import { connect } from 'react-redux';
+
 import { addSeriesReady, removeSeriesReady, selectSeries } from '../actions/DisplayTables'
+import DisplayWarning from './DisplayWarning'
+
+
 
 class DisplaySeries extends Component {
 
@@ -89,7 +93,11 @@ class DisplaySeries extends Component {
         }
     }
 
-
+    getSeriesRowClasses = (row, rowIndex) => {
+        if (row.status === 'Rejected') return 'du-series row-danger'
+        if (row.status === 'Valid' && row.selectedSeries === true) return 'du-series row-success'
+        return 'du-series td'
+    }
 
     render() {
         return (
@@ -102,7 +110,7 @@ class DisplaySeries extends Component {
                             classes="table table-borderless"
                             bodyClasses="du-series-tbody"
                             headerClasses="du-series th"
-                            rowClasses={rowClasses}
+                            rowClasses={this.getSeriesRowClasses}
                             wrapperClasses="table-responsive"
                             data={this.props.seriesRows}
                             columns={this.columns}
@@ -118,12 +126,6 @@ class DisplaySeries extends Component {
             </Container>
         )
     }
-}
-
-const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected') return 'du-series row-danger'
-    if (row.status === 'Valid' && row.selectedSeries === true) return 'du-series row-success'
-    return 'du-series td'
 }
 
 

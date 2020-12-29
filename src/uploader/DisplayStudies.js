@@ -13,12 +13,14 @@
  */
 
 import React, { Component } from 'react'
-import BootstrapTable from 'react-bootstrap-table-next';
+import { connect } from 'react-redux';
+
 import { Button, Container, Row, Col, Modal } from 'react-bootstrap'
+import BootstrapTable from 'react-bootstrap-table-next';
+
 import DisplayWarning from './DisplayWarning'
 import SelectPatient from './SelectPatient'
-import Util from '../model/Util'
-import { connect } from 'react-redux';
+
 import { selectStudy, addStudyReady, removeStudyReady } from '../actions/DisplayTables'
 import { unsetVisitID } from '../actions/Studies'
 
@@ -47,10 +49,14 @@ class StudiesTab extends Component {
         },
         {
             dataField: 'studyInstanceUID',
-            text: '',
-            hidden: false,
+            hidden: true
+        },
+        {
+            dataField: 'visitAssignement',
+            isDummyField : true,
+            text: 'Assignement',
             formatter: (cell, row, rowIndex, extraData) => {
-                if (!Util.isEmptyObject(this.props.warningsStudies[row.studyInstanceUID])) {
+                if (this.props.warningsStudies[row.studyInstanceUID] !== undefined ) {
                     if (this.props.warningsStudies[row.studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined)
                         return (<></>)
                     else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined ) {
@@ -60,20 +66,20 @@ class StudiesTab extends Component {
                             </Button>
                         )
                     }
-                    else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] === undefined ) {
-                        return (
-                            <Button variant="warning" 
-                                    onClick={() => {
-                                        this.props.unsetVisitID(row.studyInstanceUID, row.idVisit)
-                                        this.props.removeStudyReady(row.studyInstanceUID)
-                                        }
-                                    }>
-                                Reset Patient
-                            </Button>
-                        )
-                    }
+                   
                 } else {
-                    return (<></>)
+
+                    return (
+                        <Button variant="success" 
+                                onClick={() => {
+                                    this.props.unsetVisitID(row.studyInstanceUID, row.idVisit)
+                                    this.props.removeStudyReady(row.studyInstanceUID)
+                                    }
+                                }>
+                            Selected
+                        </Button>
+                    )
+                    
                 }
 
             }

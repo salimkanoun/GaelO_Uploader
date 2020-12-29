@@ -13,7 +13,9 @@
  */
 
 import React, { Component } from 'react'
+
 import { Button } from 'react-bootstrap'
+
 import CheckPatient from './render_component/CheckPatient'
 import Util from '../model/Util'
 

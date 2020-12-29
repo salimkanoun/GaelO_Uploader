@@ -1,7 +1,7 @@
 // Studies Actions
 export const ADD_STUDY = 'ADD_STUDY'
 export const ADD_WARNING_STUDY = 'ADD_WARNING_STUDY'
-export const UPDATE_WARNING_STUDY = 'UPDATE_WARNING_STUDY'
+export const REMOVE_WARNING_STUDY = 'REMOVE_WARNING_STUDY'
 
 // Series Actions
 export const ADD_SERIES = 'ADD_SERIES'

@@ -14,9 +14,9 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import ListGroup from 'react-bootstrap/ListGroup'
+
 import Select from 'react-select'
-import Util from '../model/Util'
+
 import ControllerCheckPatient from './ControllerCheckPatient'
 import { setVisitID } from '../actions/Studies'
 import { addStudyReady } from '../actions/DisplayTables'
@@ -24,54 +24,65 @@ import { addStudyReady } from '../actions/DisplayTables'
 class SelectPatient extends Component {
 
     state = {
+        visitTypeOptions: [],
+        visitOptions: [],
         selectedVisitType: undefined,
-        selectedVisit : undefined
+        selectedVisit: undefined,
+        selectedVisitValue: undefined
     }
 
-    /**
-     * Fetch available visit types from Redux
-     * @return {Array}
-     */
-    getVisitTypesOptions = () => {
-        let visitTypeArray = []
-        for(let visitObject of Object.values(this.props.visits)){
-            let visitType = visitObject.visitType
-            if (!Util.arrayIncludesObject(visitTypeArray, 'value', visitType)) {
-                visitTypeArray.push({ value: visitType, label: visitType })
+    componentDidMount() {
+
+        let visitTypeOptions = this.getVisitTypeOptions()
+
+        //If only one visitType, set it as selected
+        this.setState({
+            visitTypeOptions: visitTypeOptions
+        }, () => {
+            if (visitTypeOptions.length === 1) {
+                this.selectType(visitTypeOptions[0])
             }
-        }
-
-        //if(visitTypeArray.length === 1) this.selectType(visitTypeArray[0])
-
-        return visitTypeArray
+        })
     }
 
+    getVisitTypeOptions = () => {
+
+        let visitTypeOptions = []
+
+        //Collect all unique visit type to make the visit type select
+        let visitsArray = Object.values(this.props.visits)
+        let visitTypeArray = visitsArray.map((visitObject) => {
+            return visitObject.visitType
+        })
+
+        let uniqueVisitType = [...new Set(visitTypeArray)]
+
+        uniqueVisitType.forEach(visitType => {
+            visitTypeOptions.push({ value: visitType, label: visitType })
+        })
+
+        return visitTypeOptions
+    }
+
+
     /**
-     * Fetch patient list of selected visit type from Redux
-     * and create item for each
-     * @return {Array}
+     * Retrun select of visits, labelled by patient code
+     * @param {string} selectedVisitType 
      */
-    displayPatients = () => {
+    getVisitOptions = (selectedVisitType) => {
 
-        if(this.state.selectedVisitType == null) return []
+        let visitOptions = []
 
-        let finalDisplay = []
-
-        for( let visitObject of Object.values(this.props.visits) ) {
-
-            if ( visitObject.visitType === this.state.selectedVisitType.value ) {
-                finalDisplay.push(
-                    <ListGroup.Item 
-                        key={visitObject.idVisit} 
-                        action 
-                        onClick={() => this.selectVisit(visitObject.idVisit)} 
-                        disabled={visitObject.studyID !== undefined}>
-                            {visitObject.numeroPatient}
-                    </ListGroup.Item>
+        for (let visitObject of Object.values(this.props.visits)) {
+            console.log(visitObject.visitType)
+            console.log(selectedVisitType)
+            if (visitObject.visitType === selectedVisitType) {
+                visitOptions.push(
+                    { value: visitObject.idVisit, label: visitObject.numeroPatient }
                 )
             }
         }
-        return finalDisplay
+        return visitOptions
     }
 
     /**
@@ -79,45 +90,47 @@ class SelectPatient extends Component {
      * @param {String} selectedVisitType 
      */
     selectType = (selectedVisitType) => {
-        this.setState({ selectedVisitType : selectedVisitType });
+
+        let visitOptions = this.getVisitOptions(selectedVisitType.value)
+        this.setState(
+            {
+                selectedVisitType: selectedVisitType,
+                visitOptions: visitOptions,
+                selectedVisit : (visitOptions.length === 1) ? visitOptions[0] : undefined,
+                selectedVisitValue : (visitOptions.length === 1) ? visitOptions[0].value : undefined
+            }
+        )
+
+
     }
 
-    selectVisit = (idVisit) =>{
+    selectVisit = (visitOption) => {
         this.setState(
-            {selectedVisit : this.props.visits[idVisit]}
+            {
+                selectedVisit: visitOption,
+                selectedVisitValue: visitOption.value
+            }
         )
     }
 
     validateCheckPatient = () => {
-
         //Update redux to remove the Not Expected Visit
         this.props.setVisitID(this.props.selectedStudy, this.state.selectedVisit.idVisit)
-        //Peut il venir du reducer pour checker tout les warning on disaprus ?
+        //SK ICI SI ON FAIT PASSER UN WARNING MODALITY ON POURRA PAS PASSER LES VISIT EN READY SANS CHEKER QUE LES AUTRES CHECKS SONT DISSMISS
         this.props.addStudyReady(this.props.selectedStudy)
         this.props.onValidate()
-        //SK MANQUE LE STUDYREADY QUAND LES WARNING SON PASS
-
-        //If ready mark this study ready
-        //SK ICI CETTE FONCTION DOIT VENIR D AILLEURS
-        /*
-        if (this.props.checkStudyReady(this.props.studies[this.props.selectedStudy].studyInstanceUID) !== 'Rejected') {
-            this.props.addStudyReady(this.props.selectedStudy)
-        }*/
-
     }
 
     render = () => {
         return (
             <>
-                <div hidden={false}>
+                <div hidden={ ! this.props.multiUpload}>
                     <span className='du-patp-label'>Select Visit Type</span>
-                    <Select options={this.getVisitTypesOptions()} onChange={this.selectType} />
+                    <Select options={this.state.visitTypeOptions} value={this.state.selectedVisitType} onChange={this.selectType} />
                     <span className='du-patp-label'>Select Patient</span>
-                    <ListGroup variant='flush'>
-                        {this.displayPatients()}
-                    </ListGroup>
+                    <Select options={this.state.visitOptions} value={this.state.selectedVisit} onChange={this.selectVisit} />
                 </div>
-                <ControllerCheckPatient currentStudy ={this.props.studies[this.props.selectedStudy]} expectedVisit={this.state.selectedVisit} onValidatePatient={this.validateCheckPatient} />
+                <ControllerCheckPatient currentStudy={this.props.studies[this.props.selectedStudy]} expectedVisit={this.state.selectedVisitValue} onValidatePatient={this.validateCheckPatient} />
             </>
         )
     }
@@ -126,7 +139,7 @@ class SelectPatient extends Component {
 const mapStateToProps = state => {
     return {
         visits: state.Visits.visits,
-        selectedStudy : state.DisplayTables.selectedStudy,
+        selectedStudy: state.DisplayTables.selectedStudy,
         studies: state.Studies.studies
     }
 }

@@ -55,6 +55,7 @@ class DisplayWarning extends Component {
             let rows = []
             switch (this.props.type) {
                 case 'study':
+                    if ( this.props.warningsStudies[this.props.selectionID] === undefined ) return []
                     for (let warning of Object.values(this.props.warningsStudies[this.props.selectionID]) ) {
                         rows.push({ 
                             studyInstanceUID: this.props.selectionID, 
@@ -63,6 +64,7 @@ class DisplayWarning extends Component {
                     }
                     return rows
                 case 'series':
+                    if ( this.props.warningsSeries[this.props.selectionID] === undefined ) return []
                     for (let warning of Object.values(this.props.warningsSeries[this.props.selectionID])) {
                         rows.push({ 
                             seriesInstanceUID: this.props.selectionID, 

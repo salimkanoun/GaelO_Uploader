@@ -21,16 +21,19 @@ export default function VisitsReducer (state = initialState, action) {
       }
 
     case SET_USED_VISIT:
+      console.log(action.payload)
       // Set used state of given visit
       const idVisit = action.payload.idVisit
-      const studyID = action.payload.studyID
+      const studyInstanceUID = action.payload.studyInstanceUID
 
+      console.log(idVisit)
+      console.log(studyInstanceUID)
       return {
         visits: {
           ...state.visits,
           [idVisit] : {
             ...state.visits[idVisit], 
-            studyID : studyID
+            studyID : studyInstanceUID
           }
         }
       }

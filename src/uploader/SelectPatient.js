@@ -115,7 +115,7 @@ class SelectPatient extends Component {
 
     validateCheckPatient = () => {
         //Update redux to remove the Not Expected Visit
-        this.props.setVisitID(this.props.selectedStudy, this.state.selectedVisit.idVisit)
+        this.props.setVisitID(this.props.selectedStudy, this.state.selectedVisitValue)
         //SK ICI SI ON FAIT PASSER UN WARNING MODALITY ON POURRA PAS PASSER LES VISIT EN READY SANS CHEKER QUE LES AUTRES CHECKS SONT DISSMISS
         this.props.addStudyReady(this.props.selectedStudy)
         this.props.onValidate()

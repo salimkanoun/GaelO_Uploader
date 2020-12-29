@@ -42,7 +42,10 @@ export function setVisitID (studyInstanceUID, idVisit) {
     dispatch( 
       {
         type: SET_USED_VISIT,
-        payload: { idVisit: idVisit}
+        payload: { 
+          idVisit: idVisit, 
+          studyInstanceUID : studyInstanceUID
+        }
       }
     )
 

@@ -59,14 +59,6 @@ export default class Study {
         return Object.keys(this.series)
     }
 
-    getPatientName() {
-        return (this.getPatientFirstName() + this.getPatientLastName())
-    }
-
-    getObjectPatientName(){
-        return {givenName: this.getPatientFirstName(), familyName: this.getPatientLastName()}
-    }
-
     getPatientFirstName() {
         return (this.patientFirstName === undefined || this.patientFirstName === null) ? '' : this.patientFirstName.toUpperCase()
     }
@@ -76,7 +68,14 @@ export default class Study {
     }
 
     getStudyInstanceUID() {
-        return (this.studyInstanceUID === undefined || this.studyInstanceUID === null) ? '' : this.studyInstanceUID
+        if(this.studyInstanceUID == null) {
+            throw new Error('Missing StudyInstanceUID')
+        }
+        else return this.studyInstanceUID
+    }
+
+    getAccessionNumber(){
+        return (this.accessionNumber === undefined || this.accessionNumber === null) ? '' : this.accessionNumber
     }
 
     getStudyID() {
@@ -108,11 +107,8 @@ export default class Study {
     }
 
     getOrthancStudyID() {
-        let hash = SHA1(this.patientID + '|' + this.studyInstanceUID).toString()
+        let hash = SHA1( this.getPatientID() + '|' + this.getStudyInstanceUID() ).toString()
         return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`
     }
-
-    getWarnings() {
-        return this.warnings
-    }
+    
 }

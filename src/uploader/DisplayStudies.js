@@ -13,22 +13,22 @@
  */
 
 import React, { Component } from 'react'
-import BootstrapTable from 'react-bootstrap-table-next';
-import { Button, Container, Row, Col } from 'react-bootstrap'
-import ControllerSelectPatient from './ControllerSelectPatient'
-import DisplayWarning from './DisplayWarning'
 import { connect } from 'react-redux';
-import { selectStudy, selectStudiesReady } from './actions/DisplayTables'
+
+import { Button, Container, Row, Col, Modal } from 'react-bootstrap'
+import BootstrapTable from 'react-bootstrap-table-next';
+
+import DisplayWarning from './DisplayWarning'
+import SelectPatient from './SelectPatient'
+
+import { selectStudy, addStudyReady, removeStudyReady } from '../actions/DisplayTables'
+import { unsetVisitID } from '../actions/Studies'
+import Util from '../model/Util';
 
 class StudiesTab extends Component {
 
     state = {
-        isToggled: false, //Status of CheckPatient modal
-    }
-
-    constructor(props) {
-        super(props)
-        this.toggleCheckPatient = this.toggleCheckPatient.bind(this)
+        showSelectPatient: false,
     }
 
     columns = [
@@ -36,28 +36,55 @@ class StudiesTab extends Component {
             dataField: 'selectedStudies',
             text: '',
             hidden: (!this.props.multiUpload),
-            formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
                 return (
-                    <input disabled={row.status !== 'Valid'} type='checkbox'checked={this.props.studiesReady.includes(row.studyInstanceUID)} onChange={(event) => { formatExtraData.props.selectStudiesReady(row.studyInstanceUID, event.target.checked) }} />
+                    <input disabled={row.status !== 'Valid'}
+                        type='checkbox'
+                        checked={this.props.studiesReady.includes(row.studyInstanceUID)}
+                        onChange={(event) => {
+                            if (event.target.checked) this.props.addStudyReady(row.studyInstanceUID)
+                            else this.props.removeStudyReady(row.studyInstanceUID)
+                        }} />
                 )
             }
         },
         {
             dataField: 'studyInstanceUID',
-            text: '',
-            hidden: false,
+            hidden: true
+        },
+        {
+            dataField: 'visitAssignement',
+            isDummyField : true,
+            text: 'Assign',
             formatter: (cell, row, rowIndex, extraData) => {
-                if (this.props.studiesRows[rowIndex].warnings !== undefined) {
-                    if (this.props.studiesRows[rowIndex].warnings['ALREADY_KNOWN_STUDY'] !== undefined) return (<></>)
-                    if ((this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NOT_EXPECTED_VISIT'].dismissed)
-                    || (this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'] !== undefined && !this.props.studiesRows[rowIndex].warnings['NULL_VISIT_ID'].dismissed)) {
-                        return (<Button onClick={() => { this.toggleCheckPatient(); }}>
-                            {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
-                        </Button>)
+                if (this.props.warningsStudies[row.studyInstanceUID] !== undefined ) {
+                    if (this.props.warningsStudies[row.studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined)
+                        return (<></>)
+                    else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined ) {
+                        return (
+                            <Button variant="primary" onClick={this.toggleSelectPatient} block>
+                                {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
+                            </Button>
+                        )
                     }
+                   
+                } else {
+
+                    return (
+                        <Button variant="success" 
+                                onClick={() => {
+                                    this.props.unsetVisitID(row.studyInstanceUID, row.visitID)
+                                    this.props.removeStudyReady(row.studyInstanceUID)
+                                    }
+                                }
+                                block
+                                >
+                            Done
+                        </Button>
+                    )
+                    
                 }
-                return (<></>)
+
             }
         },
         {
@@ -66,7 +93,7 @@ class StudiesTab extends Component {
         },
         {
             dataField: 'patientName',
-            text: 'Patient name',
+            text: 'Patient Name',
             style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
@@ -76,12 +103,15 @@ class StudiesTab extends Component {
         },
         {
             dataField: 'accessionNumber',
-            text: 'Accession #',
+            text: 'Accession',
             style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'acquisitionDate',
             text: 'Date',
+            formatter: (cell, row, rowIndex, extraData) => {
+                return Util.formatRawDate(cell)
+            }
         },
     ]
 
@@ -90,57 +120,70 @@ class StudiesTab extends Component {
         clickToSelect: true,
         hideSelectColumn: true,
         onSelect: (row) => {
+            console.log(row)
             this.props.selectStudy(row.studyInstanceUID)
         }
     };
-    
+
     /**
-     * Toggle modal 'CheckPatient' of given row 
+     * Toggle modal 'CheckPatient' 
+     * 
      */
-    toggleCheckPatient() {
-        this.setState((state) => { return { isToggled: !state.isToggled } })
+    toggleSelectPatient = () => {
+        console.log('toogle')
+        this.setState((state) => { return { showSelectPatient: !state.showSelectPatient } })
     }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.selectedStudy !== this.props.selectedStudy) {
-            this.render()
-        }
-    }
+    getRowClasses = (row) => {
+        let className = ['du-studies']
 
-    rowClasses = (row, rowIndex) => {
-        let className = ''
-        if (row.status === 'Rejected') className = 'du-studies row-danger'
-        else if (row.status === 'Incomplete' || row.status === 'Already Known') className = 'du-studies row-warning'
-        else if (row.status === 'Valid' && row.selectedStudies === true) className = 'du-studies row-success'
-        else className = 'du-studies td'
-        if (row.studyInstanceUID === this.props.selectedStudy) className = className + ' row-clicked'
-        return className
+        if (row.status === 'Rejected') className.push('row-danger')
+        else if (row.status === 'Incomplete' || row.status === 'Already Known') className.push('row-warning')
+        else if (row.status === 'Valid' && row.selectedStudies === true) className.push('row-success')
+        else className.push('td')
+
+        if (row.studyInstanceUID === this.props.selectedStudy) className.push('row-clicked')
+
+        return className.join(' ')
     }
 
     render() {
         return (
-            <Container fluid>
-                <span className='title'>Studies</span>
-                <Row>
-                    <Col xs={12} md={8}>
-                        <BootstrapTable
-                            keyField='studyInstanceUID'
-                            classes="table table-borderless"
-                            bodyClasses="du-studies-tbody"
-                            headerClasses="du-studies th"
-                            rowClasses={this.rowClasses}
-                            wrapperClasses="table-responsive"
-                            data={this.props.studiesRows}
-                            columns={this.columns}
-                            selectRow={this.selectRow}
-                        />
-                        <ControllerSelectPatient multiUpload={this.props.multiUpload} show={this.state.isToggled} closeListener={() => this.toggleCheckPatient()} checkStudyReady={(studyID) => this.props.checkStudyReady(studyID)} />
-                    </Col>
-                    <Col xs={6} md={4}>
-                        <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload} />
-                    </Col>
-                </Row>
-            </Container>
+            <>
+                <Modal show={this.state.showSelectPatient} onHide={this.toggleSelectPatient}>
+                    <Modal.Header className="modal-header" closeButton>
+                        <Modal.Title className="modal-title">
+                            Select Patient
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body className="modal-body du-patient">
+                        <SelectPatient multiUpload={this.props.multiUpload} onValidate={this.toggleSelectPatient}/>
+                    </Modal.Body>
+                </Modal>
+
+                <Container fluid>
+                    <span className='title'>Studies</span>
+                    <Row>
+                        <Col xs={12} md={8}>
+                            <BootstrapTable
+                                keyField='studyInstanceUID'
+                                classes="table table-borderless"
+                                bodyClasses="du-studies-tbody"
+                                headerClasses="du-studies th"
+                                rowClasses={this.getRowClasses}
+                                wrapperClasses="table-responsive"
+                                data={this.props.studiesRows}
+                                columns={this.columns}
+                                selectRow={this.selectRow}
+                            />
+
+                        </Col>
+                        <Col xs={6} md={4}>
+                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload} />
+                        </Col>
+                    </Row>
+                </Container>
+            </>
         )
     }
 }
@@ -148,12 +191,16 @@ class StudiesTab extends Component {
 const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
-        studiesReady: state.DisplayTables.studiesReady
+        studiesReady: state.DisplayTables.studiesReady,
+        warningsStudies: state.WarningsStudy.warningsStudy,
+        studies: state.Studies.studies,
     }
 }
 const mapDispatchToProps = {
     selectStudy,
-    selectStudiesReady
+    addStudyReady,
+    removeStudyReady,
+    unsetVisitID
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudiesTab)

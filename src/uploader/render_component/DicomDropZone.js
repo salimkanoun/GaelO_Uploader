@@ -6,15 +6,8 @@ export default class DicomDropZone extends Component {
     state = {
         isdragging : false
     }
-
-    constructor(props){
-        super(props)
-        this.dragEnter = this.dragEnter.bind(this)
-        this.dragLeave = this.dragLeave.bind(this)
-        this.onDrop = this.onDrop.bind(this)
-    }
-
-    getClasses(){
+    
+    getClasses = () => {
         let classArray = ['dropzone']
         if (this.props.isParsingFiles) classArray.push('dz-parsing')
         if (this.state.isdragging) classArray.push('dz-hover')
@@ -22,24 +15,24 @@ export default class DicomDropZone extends Component {
         return classArray.join(' ')
     }
 
-    dragEnter(){
+    dragEnter = () => {
         this.setState({
             isdragging : true
         })
     }
 
-    dragLeave(){
+    dragLeave = () => {
         this.setState({
             isdragging : false
         })
     }
 
-    onDrop(acceptedFiles){
+    onDrop = (acceptedFiles) => {
         this.dragLeave()
         this.props.addFile(acceptedFiles)
     }
 
-    getTextMessage(){
+    getTextMessage = () => {
         if(this.props.isParsingFiles ){
             return 'Parsing '+( Math.round(( (this.props.fileParsed+this.props.fileIgnored) / this.props.fileLoaded) *100) )+'%' 
         }else if(this.props.isUnzipping){
@@ -49,7 +42,7 @@ export default class DicomDropZone extends Component {
         }
     }
     
-    render(){
+    render = () => {
         return (
             <Dropzone onDragEnter={this.dragEnter} onDragLeave={this.dragLeave} onDrop={this.onDrop} >
                 {({ getRootProps, getInputProps }) => (

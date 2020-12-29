@@ -4,17 +4,23 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
-require('dotenv').config()
-console.log(process.env)
-
 const config = {
   // Declare default config
-  developerMode: true,
-  multiUpload: false,
   minNbOfInstances: 30,
-  idVisit: parseInt(process.env.REACT_APP_GAELO_VISITID),
-  callbackOnStartAction: () => {},
-  callbackOnUploadComplete: () => {}
+  availableVisits : [
+    {"patientCode":"17017101051001",
+    "patientFirstname":"F",
+    "patientLastname":"V",
+    "patientSex":"M",
+    "patientDOB":"02-00-1941",
+    "visitModality":"PT",
+    "visitDate":"11-10-2020",
+    "visitType":"PET0",
+    "visitID": 1 }
+  ],
+  onStudyUploaded : (visitID, sucessIDsUploaded, numberOfFiles, originalStudyOrthancID) => {console.log(visitID)},
+  onStartUsing : () => {console.log('use started')},
+  onUploadComplete: () => {console.log('upload finished')}
 }
 
 const container = document.getElementById('root')

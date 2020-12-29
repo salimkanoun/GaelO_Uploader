@@ -28,7 +28,36 @@ export default class Series {
 		this.seriesDescription = seriesDescription
 		this.modality = modality
 		this.studyInstanceUID = studyInstanceUID
-		this.warnings = {};
+	}
+
+	getSeriesInstanceUID(){
+		if(this.seriesInstanceUID == null){
+			throw new Error('Null SeriesInstanceUID')
+		}
+		return this.seriesInstanceUID
+	}
+
+	getSeriesNumber(){
+		return this.seriesNumber == null ? '' : this.seriesNumber
+	}
+
+	getSeriesDate(){
+		return this.seriesDate == null ? '' : this.seriesDate
+	}
+
+	getSeriesDescription(){
+		return this.seriesDescription == null ? '' : this.seriesDescription
+	}
+
+	getModality(){
+		return this.modality == null ? '' : this.modality
+	}
+
+	getStudyInstanceUID(){
+		if(this.studyInstanceUID == null){
+			throw new Error('Null StudyInstanceUID')
+		}
+		return this.studyInstanceUID
 	}
 
 	addInstance(instanceObject) {
@@ -53,62 +82,54 @@ export default class Series {
 		return instances
 	}
 
+	getInstancesObject(){
+		return this.instances
+	}
+
 	getNbInstances() {
 		return Object.keys(this.instances).length;
 	}
 
-	hasWarnings() {
-		let nbConsideredWarnings = 0;
-		for (let w in this.warnings) {
-			if (!this.warnings[w].dismissed) {
-				nbConsideredWarnings++;
-			}
-		}
-		return nbConsideredWarnings > 0;
-	}
-
-	async checkSeries() {
+	async getWarnings() {
 		let firstInstance = this.getArrayInstances()[0]
 		let dicomFile = new DicomFile(firstInstance.getFile())
 		await dicomFile.readDicomFile()
+
+		let warnings = {}
 		// Check missing tags
 		if ((dicomFile.getModality()) === undefined) {
-			this.warnings[MISSING_TAG_00080060.key] = MISSING_TAG_00080060;
+			warnings[MISSING_TAG_00080060.key] = MISSING_TAG_00080060;
 		} else {
 			if ((dicomFile._getDicomTag('00080021') === undefined) && (dicomFile._getDicomTag('00080022') === undefined)) {
-				this.warnings[MISSING_TAG_00080022.key] = MISSING_TAG_00080022;
+				warnings[MISSING_TAG_00080022.key] = MISSING_TAG_00080022;
 			}
+			//Check PT specific tags
 			if (this.modality === 'PT') {
 				if ((dicomFile._getDicomTag('00101030')) === undefined) {
-					this.warnings[MISSING_TAG_00101030.key] = MISSING_TAG_00101030;
+					warnings[MISSING_TAG_00101030.key] = MISSING_TAG_00101030;
 				}
 				if ((dicomFile._getDicomTag('00080031')) === undefined && (dicomFile._getDicomTag('00080032')) === undefined) {
-					this.warnings[MISSING_TAG_00101031.key] = MISSING_TAG_00101031;
+					warnings[MISSING_TAG_00101031.key] = MISSING_TAG_00101031;
 				}
 				if ((dicomFile.getRadiopharmaceuticalTag('00181074')) === undefined) {
-					this.warnings[MISSING_TAG_00181074.key] = MISSING_TAG_00181074;
+					warnings[MISSING_TAG_00181074.key] = MISSING_TAG_00181074;
 				}
 				if ((dicomFile.getRadiopharmaceuticalTag('00181072')) === undefined && (dicomFile.getRadiopharmaceuticalTag('00181078')) === undefined) {
-					this.warnings[MISSING_TAG_00181072.key] = MISSING_TAG_00181072;
+					warnings[MISSING_TAG_00181072.key] = MISSING_TAG_00181072;
 				}
 				if ((dicomFile.getRadiopharmaceuticalTag('00181075')) === undefined) {
-					this.warnings[MISSING_TAG_00181075.key] = MISSING_TAG_00181075;
+					warnings[MISSING_TAG_00181075.key] = MISSING_TAG_00181075;
 				}
 			}
 		}
 		// Check number of instances
 		if (this.getNbInstances() < minNbOfInstances) {
-			this.warnings[LESS_THAN_MINIMAL_INSTANCES.key] = LESS_THAN_MINIMAL_INSTANCES;
-		} else {
-			delete this.warnings[LESS_THAN_MINIMAL_INSTANCES.key]
+			warnings[LESS_THAN_MINIMAL_INSTANCES.key] = LESS_THAN_MINIMAL_INSTANCES;
 		}
+
+		return warnings
+
 	}
 
-	getWarnings() {
-		return this.warnings
-	}
 
-	setWarningStatus(key, dismissed) {
-		this.warnings[key]['dismissed'] = dismissed
-	}
 }

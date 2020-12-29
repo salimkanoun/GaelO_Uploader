@@ -58,10 +58,10 @@ export default function DisplayTablesReducer(state = initialState, action) {
       }
 
     case REMOVE_SERIES_READY:
-      let newSeriesReady = state.seriesReady.filter(thisRowID => thisRowID !== action.payload.validSeriesInstanceUID)
+      let newSeriesReady = state.seriesReady.filter(thisRowID => thisRowID !== action.payload.seriesInstanceUID)
       return {
         ...state,
-        seriesReady: newSeriesReady
+        seriesReady: [...newSeriesReady]
       }
 
     default:

@@ -101,7 +101,7 @@ class StudiesTab extends Component {
         },
         {
             dataField: 'accessionNumber',
-            text: 'Accession Nb',
+            text: 'Accession',
             style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {

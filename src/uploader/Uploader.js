@@ -304,7 +304,10 @@ class Uploader extends Component {
                 
             }
         }
+
+        //Mark check finished to make interface available and select the first study item
         this.setState({ isCheckDone: true })
+        if( Object.keys(this.props.studies).length >= 1) this.props.selectStudy( this.props.studies[Object.keys(this.props.studies)[0]].studyInstanceUID )
     }
 
     /**

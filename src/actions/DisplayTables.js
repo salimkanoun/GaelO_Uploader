@@ -44,7 +44,7 @@ export function addSeriesReady ( seriesInstanceUID ) {
 export function removeSeriesReady (seriesInstanceUID) {
   return {
     type: REMOVE_SERIES_READY,
-    payload: { validSeriesInstanceUID: seriesInstanceUID}
+    payload: { seriesInstanceUID: seriesInstanceUID}
   }
 }
 

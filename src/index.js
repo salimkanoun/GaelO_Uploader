@@ -16,7 +16,7 @@ const config = {
     "visitModality":"PT",
     "visitDate":"11-10-2020",
     "visitType":"PET0",
-    "visitID":179}
+    "visitID": 1 }
   ],
   onStudyUploaded : (visitID, sucessIDsUploaded, numberOfFiles, originalStudyOrthancID) => {console.log(visitID)},
   onStartUsing : () => {console.log('use started')},

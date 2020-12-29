@@ -19,7 +19,7 @@ import ProgressUpload from './render_component/ProgressUpload'
 import Options from './render_component/Options'
 import Util from '../model/Util'
 
-import { isNewStudy } from '../services/api'
+import { isNewStudy, logIn, registerStudy } from '../services/api'
 
 import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
@@ -75,7 +75,9 @@ class Uploader extends Component {
 
     }
 
-    componentDidMount = () => {
+    componentDidMount = async () => {
+        await logIn()
+        await registerStudy()
         this.loadAvailableVisits()
     }
 

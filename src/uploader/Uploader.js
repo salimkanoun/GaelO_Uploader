@@ -83,7 +83,7 @@ class Uploader extends Component {
     loadAvailableVisits = () => {
 
         let availableVisits = this.props.config.availableVisits
-        
+
         //Add All availables visits in visit reducer
         for (let visit of availableVisits ) {
             this.props.addVisit(visit)
@@ -251,6 +251,7 @@ class Uploader extends Component {
                 studyToAdd.getPatientSex(), 
                 studyToAdd.getPatientID(), 
                 studyToAdd.getAcquisitionDate(), 
+                studyToAdd.getAccessionNumber(),
                 studyToAdd.getPatientBirthDate(), 
                 studyToAdd.getStudyDescription(),
                 studyToAdd.getOrthancStudyID(),

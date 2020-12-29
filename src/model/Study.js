@@ -74,6 +74,10 @@ export default class Study {
         else return this.studyInstanceUID
     }
 
+    getAccessionNumber(){
+        return (this.accessionNumber === undefined || this.accessionNumber === null) ? '' : this.accessionNumber
+    }
+
     getStudyID() {
         return (this.studyID === undefined || this.studyID === null) ? '' : this.studyID
     }

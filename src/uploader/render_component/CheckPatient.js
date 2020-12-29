@@ -33,8 +33,11 @@ export default class CheckPatient extends Component {
         {
             dataField: 'ignoreButton',
             text: '',
-            formatter: (cell, row, rowIndex, extraData) => ((row.ignoredStatus !== null) ?
-                <ButtonIgnore hidden={(row.ignoredStatus === '')} row={row} onClick={() => this.props.onClick(row)} warning={row.ignoredStatus} /> : null)
+            formatter: (cell, row, rowIndex, extraData) => ( 
+                (row.ignoredStatus !== null) ?
+                    <ButtonIgnore row={row} onClick={() => this.props.onClick(row)} dissmissed={row.ignoredStatus} />
+                    : null
+                )
         },
         {
             dataField: 'ignoredStatus',

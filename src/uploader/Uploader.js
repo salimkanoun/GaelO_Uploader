@@ -76,14 +76,15 @@ class Uploader extends Component {
     }
 
     componentDidMount = () => {
-        //Load available visits in redux
+        this.loadAvailableVisits()
+    }
+
+    loadAvailableVisits = () => {
         let availableVisits = this.props.config.availableVisits
-
         //Add All availables visits in visit reducer
-        for (let visit of availableVisits ) {
+        availableVisits.forEach(visit=> {
             this.props.addVisit(visit)
-        }
-
+        })
     }
 
     /**
@@ -232,7 +233,7 @@ class Uploader extends Component {
         this.setState({ isCheckDone: false })
         this.props.unselectStudy()
         this.props.resetVisits()
-        await this.loadAvailableVisits()
+        this.loadAvailableVisits()
         //Scan every study in Model
         for (let studyInstanceUID in this.uploadModel.data) {
             //Retrieve StudyObject from Model

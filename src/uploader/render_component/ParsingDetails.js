@@ -18,21 +18,16 @@ import IgnoredFilesPanel from './IgnoredFilesPanel'
 
 export default class ParsingDetails extends Component {
 
-  state ={
+  state = {
     showIgnoredFiles : false
   }
 
-  constructor(props){
-    super(props)
-    this.toogleShowIgnoredFile = this.toogleShowIgnoredFile.bind(this)
-  }
-
-  toogleShowIgnoredFile(){
+  toogleShowIgnoredFile = () => {
     this.setState( (state) => {return {showIgnoredFiles : !state.showIgnoredFiles}} )
 
   }
 
-  render () {
+  render = () => {
     return (
       <>
         <Badge variant='secondary'>{this.props.fileLoaded} File(s) loaded</Badge>

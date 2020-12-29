@@ -55,7 +55,7 @@ class StudiesTab extends Component {
         {
             dataField: 'visitAssignement',
             isDummyField : true,
-            text: 'Assignement',
+            text: 'Assign',
             formatter: (cell, row, rowIndex, extraData) => {
                 if (this.props.warningsStudies[row.studyInstanceUID] !== undefined ) {
                     if (this.props.warningsStudies[row.studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined)
@@ -79,7 +79,7 @@ class StudiesTab extends Component {
                                 }
                                 block
                                 >
-                            Selected
+                            Done
                         </Button>
                     )
                     

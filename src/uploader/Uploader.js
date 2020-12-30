@@ -240,7 +240,7 @@ class Uploader extends Component {
 
             //If unknown studyInstanceUID, add it to Redux
             if ( ! Object.keys(this.props.studies).includes( studyObject.getStudyInstanceUID() )){
-                this.registerStudyInRedux(studyObject)
+                await this.registerStudyInRedux(studyObject)
             }
 
             //Scan every series in Model
@@ -249,7 +249,7 @@ class Uploader extends Component {
             for (let seriesObject of series) {
 
                 if ( ! Object.keys(this.props.series).includes( seriesObject.getSeriesInstanceUID() )){
-                    this.registerSeriesInRedux(seriesObject)
+                    await this.registerSeriesInRedux(seriesObject)
                 }
                 
             }

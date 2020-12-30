@@ -55,14 +55,14 @@ class StudiesTab extends Component {
         {
             dataField: 'visitAssignement',
             isDummyField : true,
-            text: 'Assignement',
+            text: 'Assign',
             formatter: (cell, row, rowIndex, extraData) => {
                 if (this.props.warningsStudies[row.studyInstanceUID] !== undefined ) {
                     if (this.props.warningsStudies[row.studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined)
                         return (<></>)
                     else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined ) {
                         return (
-                            <Button variant="primary" onClick={this.toggleSelectPatient}>
+                            <Button variant="primary" onClick={this.toggleSelectPatient} block>
                                 {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
                             </Button>
                         )
@@ -73,11 +73,13 @@ class StudiesTab extends Component {
                     return (
                         <Button variant="success" 
                                 onClick={() => {
-                                    this.props.unsetVisitID(row.studyInstanceUID, row.idVisit)
+                                    this.props.unsetVisitID(row.studyInstanceUID, row.visitID)
                                     this.props.removeStudyReady(row.studyInstanceUID)
                                     }
-                                }>
-                            Selected
+                                }
+                                block
+                                >
+                            Done
                         </Button>
                     )
                     

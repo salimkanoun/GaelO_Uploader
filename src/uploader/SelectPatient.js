@@ -60,8 +60,6 @@ class SelectPatient extends Component {
             }
         }
 
-
-
         let uniqueVisitType = [...new Set(visitTypeArray)]
 
         uniqueVisitType.forEach(visitType => {
@@ -84,7 +82,7 @@ class SelectPatient extends Component {
             //Select visits with selected visit type and not assigned to another study
             if (visitObject.visitType === selectedVisitType && visitObject.studyInstanceUID === undefined) {
                 visitOptions.push(
-                    { value: visitObject.idVisit, label: visitObject.numeroPatient }
+                    { value: visitObject.visitID, label: visitObject.patientCode }
                 )
             }
         }

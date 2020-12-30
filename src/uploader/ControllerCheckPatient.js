@@ -93,11 +93,12 @@ export default class ControllerCheckPatient extends Component {
 
         //Format visit data for table
         // double == (not ===) check if undefined or null
-        let patientFirstName = expectedVisit.firstName == null ? '' : expectedVisit.firstName.toUpperCase().slice(0, 1)
-        let patientLastName = expectedVisit.lastName == null ? '' : expectedVisit.lastName.toUpperCase().slice(0, 1)
+        let patientFirstName = expectedVisit.patientFirstname == null ? '' : expectedVisit.patientFirstname.toUpperCase().slice(0, 1)
+        let patientLastName = expectedVisit.patientLastname == null ? '' : expectedVisit.patientLastname.toUpperCase().slice(0, 1)
         let patientBirthDate = expectedVisit.patientDOB
         let patientSex = expectedVisit.patientSex
-        let acquisitionDate = expectedVisit.acquisitionDate
+
+        let visitDate = expectedVisit.visitDate
         let modality = expectedVisit.modality
 
         rows.push({
@@ -130,9 +131,9 @@ export default class ControllerCheckPatient extends Component {
 
         rows.push({
             rowName: 'Acquisition Date',
-            expectedStudy: acquisitionDate,
+            expectedStudy: visitDate,
             currentStudy: dicomAcquisitionDate,
-            ignoredStatus: this.isCheckPass(acquisitionDate, dicomAcquisitionDate)
+            ignoredStatus: this.isCheckPass(visitDate, dicomAcquisitionDate)
         })
 
         rows.push({

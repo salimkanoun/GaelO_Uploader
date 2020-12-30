@@ -8,19 +8,17 @@ const config = {
   // Declare default config
   minNbOfInstances: 30,
   availableVisits : [
-    {"numeroPatient":"17017101051001",
-    "firstName":"F",
-    "lastName":"V",
+    {"patientCode":"17017101051001",
+    "patientFirstname":"F",
+    "patientLastname":"V",
     "patientSex":"M",
     "patientDOB":"02-00-1941",
-    "investigatorName":"KARLIN",
-    "country":"France",
-    "centerNumber":"10501",
-    "acquisitionDate":"11-10-2020",
+    "visitModality":"PT",
+    "visitDate":"11-10-2020",
     "visitType":"PET0",
-    "idVisit":179}
+    "visitID": 1 }
   ],
-  onStudyUploaded : (idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID) => {console.log(idVisit)},
+  onStudyUploaded : (visitID, sucessIDsUploaded, numberOfFiles, originalStudyOrthancID) => {console.log(visitID)},
   onStartUsing : () => {console.log('use started')},
   onUploadComplete: () => {console.log('upload finished')}
 }

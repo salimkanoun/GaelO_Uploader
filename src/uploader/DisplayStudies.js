@@ -155,7 +155,7 @@ class StudiesTab extends Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body du-patient">
-                        <SelectPatient multiUpload={this.props.multiUpload} onValidate={this.toggleSelectPatient}/>
+                        <SelectPatient multiUpload={this.props.multiUpload} onValidate={this.toggleSelectPatient} seriesRows={this.props.seriesRows}/>
                     </Modal.Body>
                 </Modal>
 
@@ -174,7 +174,6 @@ class StudiesTab extends Component {
                                 columns={this.columns}
                                 selectRow={this.selectRow}
                             />
-
                         </Col>
                         <Col xs={6} md={4}>
                             <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload} />

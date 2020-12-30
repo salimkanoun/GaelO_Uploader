@@ -89,6 +89,7 @@ export default class ControllerCheckPatient extends Component {
         let dicomDateOfBirth = Util.formatRawDate(currentStudy.patientBirthDate)
         let dicomAcquisitionDate = Util.formatRawDate(currentStudy.acquisitionDate)
         let dicomPatientSex = currentStudy.patientSex
+        let dicomModalities = this.getUniqueModalityArray()
 
         //Format visit data for table
         // double == (not ===) check if undefined or null
@@ -97,6 +98,7 @@ export default class ControllerCheckPatient extends Component {
         let patientBirthDate = expectedVisit.patientDOB
         let patientSex = expectedVisit.patientSex
         let acquisitionDate = expectedVisit.acquisitionDate
+        let modality = expectedVisit.modality
 
         rows.push({
             rowName: 'First Name',
@@ -133,6 +135,13 @@ export default class ControllerCheckPatient extends Component {
             ignoredStatus: this.isCheckPass(acquisitionDate, dicomAcquisitionDate)
         })
 
+        rows.push({
+            rowName: 'Modality',
+            expectedStudy: modality,
+            currentStudy: dicomModalities.join('/'),
+            ignoredStatus: dicomModalities.includes(modality)
+        })
+
         return rows
 
     }
@@ -147,6 +156,17 @@ export default class ControllerCheckPatient extends Component {
         } else {
             return false
         }
+    }
+
+    getUniqueModalityArray = () =>{
+
+        let modalityArray = this.props.seriesRows.map( seriesRow => {
+            return seriesRow.modality
+        })
+
+        modalityArray = [...new Set(modalityArray)]
+
+        return modalityArray
     }
 
     render = () => {

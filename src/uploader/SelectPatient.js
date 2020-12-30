@@ -137,7 +137,7 @@ class SelectPatient extends Component {
                     <span className='du-patp-label'>Select Patient</span>
                     <Select options={this.state.visitOptions} value={this.state.selectedVisit} onChange={this.selectVisit} />
                 </div>
-                <ControllerCheckPatient currentStudy={this.props.studies[this.props.selectedStudy]} expectedVisit={this.state.selectedVisitValue} onValidatePatient={this.validateCheckPatient} />
+                <ControllerCheckPatient currentStudy={this.props.studies[this.props.selectedStudy]} expectedVisit={this.state.selectedVisitValue} onValidatePatient={this.validateCheckPatient} seriesRows={this.props.seriesRows} />
             </>
         )
     }

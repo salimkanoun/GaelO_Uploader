@@ -110,13 +110,16 @@ class ControllerStudiesSeries extends Component {
   }
 
   render() {
+    let seriesRows  = this.buildSeriesRows()
+    let studiesRows = this.buildStudiesRows()
+
     return (
       <div disabled={ ! this.props.isCheckDone}>
         <Row>
-          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} />
+          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={studiesRows} seriesRows={seriesRows} />
         </Row>
         <Row>
-          <DisplaySeries seriesRows={this.buildSeriesRows()} />
+          <DisplaySeries seriesRows={seriesRows} />
         </Row>
       </div>
     )

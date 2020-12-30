@@ -9,12 +9,12 @@ const config = {
   minNbOfInstances: 30,
   availableVisits : [
     {"patientCode":"17017101051001",
-    "patientFirstname":"F",
-    "patientLastname":"V",
+    "patientFirstname":"C",
+    "patientLastname":"G",
     "patientSex":"M",
-    "patientDOB":"02-00-1941",
+    "patientDOB":"01-15-1973",
     "visitModality":"PT",
-    "visitDate":"11-10-2020",
+    "visitDate":"09-11-2008",
     "visitType":"PET0",
     "visitID": 1 }
   ],

@@ -123,7 +123,6 @@ class DisplaySeries extends Component {
                     <Col xs={6} md={4}>
                         <DisplayWarning
                             type='series'
-                            selectionID={this.props.selectedSeries}
                         />
                     </Col>
                 </Row>

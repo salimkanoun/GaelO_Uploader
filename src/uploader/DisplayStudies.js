@@ -120,7 +120,6 @@ class StudiesTab extends Component {
         clickToSelect: true,
         hideSelectColumn: true,
         onSelect: (row) => {
-            console.log(row)
             this.props.selectStudy(row.studyInstanceUID)
         }
     };
@@ -157,7 +156,7 @@ class StudiesTab extends Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body du-patient">
-                        <SelectPatient multiUpload={this.props.multiUpload} onValidate={this.toggleSelectPatient} seriesRows={this.props.seriesRows}/>
+                        <SelectPatient multiUpload={this.props.multiUpload} onValidate={this.toggleSelectPatient} />
                     </Modal.Body>
                 </Modal>
 
@@ -178,7 +177,7 @@ class StudiesTab extends Component {
                             />
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload} />
+                            <DisplayWarning type='study' />
                         </Col>
                     </Row>
                 </Container>

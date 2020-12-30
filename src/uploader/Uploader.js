@@ -276,12 +276,14 @@ class Uploader extends Component {
             studyToAdd.getAccessionNumber(),
             studyToAdd.getPatientBirthDate(), 
             studyToAdd.getStudyDescription(),
-            studyToAdd.getOrthancStudyID()
+            studyToAdd.getOrthancStudyID(),
+            studyToAdd.getChildModalitiesArray()
         )
         
         const studyInstanceUID = studyToAdd.getStudyInstanceUID()
 
         //Search for a perfect Match in visit candidates and assign it
+        console.log(this.searchPerfectMatchStudy(studyInstanceUID))
         let perfectMatchVisit = this.searchPerfectMatchStudy(studyInstanceUID)
         if (perfectMatchVisit != null) {
             this.props.setVisitID(studyInstanceUID, perfectMatchVisit.visitID)
@@ -391,12 +393,14 @@ class Uploader extends Component {
         let birthDate = studyRedux.patientBirthDate
         let sex = studyRedux.patientSex
         let acquisitionDate = studyRedux.acquisitionDate
+        let modalities = studyRedux.seriesModalitiesArray
 
         if (Util.areEqualFields(visitObject.patientFirstname.trim().charAt(0), patientFirstname.trim().charAt(0))
         && Util.areEqualFields(visitObject.patientLastname.trim().charAt(0), patientLastname.trim().charAt(0))
         && Util.areEqualFields(visitObject.patientSex.trim().charAt(0), sex.trim().charAt(0))
         && Util.isProbablyEqualDates(visitObject.patientDOB, Util.formatRawDate(birthDate))
-        && Util.isProbablyEqualDates(visitObject.visitDate, Util.formatRawDate(acquisitionDate))) {
+        && Util.isProbablyEqualDates(visitObject.visitDate, Util.formatRawDate(acquisitionDate))
+        && modalities.includes(visitObject.visitModality) ) {
             return true
         } else return false
     }

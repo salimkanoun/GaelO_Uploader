@@ -78,7 +78,7 @@ class ControllerCheckPatient extends Component {
     buildRows = () => {
 
         let rows = []
-        console.log(this.props.selectedVisitID)
+        
         if (this.props.selectedVisitID == null) return rows
 
         const currentStudy = this.props.studies[this.props.selectedStudy]

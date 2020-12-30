@@ -129,7 +129,6 @@ class StudiesTab extends Component {
      * 
      */
     toggleSelectPatient = () => {
-        console.log('toogle')
         this.setState((state) => { return { showSelectPatient: !state.showSelectPatient } })
     }
 

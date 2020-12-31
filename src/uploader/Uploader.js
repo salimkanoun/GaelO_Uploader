@@ -409,7 +409,7 @@ class Uploader extends Component {
      * Upload selected and validated series on click
      */
     onUploadClick = async () => {
-        this.props.resetRedux()
+        
         //build array of series object to be uploaded
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
             return this.props.series[seriesUID]

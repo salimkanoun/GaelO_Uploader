@@ -15,6 +15,7 @@
 import React, { Component } from 'react'
 import { Modal, Badge } from 'react-bootstrap'
 import BootstrapTable from 'react-bootstrap-table-next';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 
 export default class IgnoredFilesPanel extends Component {
 
@@ -36,7 +37,7 @@ export default class IgnoredFilesPanel extends Component {
     /**
      * Create rows for table display
      */
-    createRows() {
+    createRows = () => {
         let ignoredFileNames = Object.keys(this.props.dataIgnoredFiles)
         let rows = []
         ignoredFileNames.forEach(ignoredFileName => {
@@ -49,7 +50,7 @@ export default class IgnoredFilesPanel extends Component {
         return rows
     }
 
-    render() {
+    render = () => {
         return (
             <Modal show={this.props.display} onHide={this.props.closeListener}>
                 <Modal.Header className="modal-header" closeButton>
@@ -64,6 +65,7 @@ export default class IgnoredFilesPanel extends Component {
                         headerClasses="du-ignored-files-modal th"
                         classes="table table-responsive table-borderless"
                         data={ this.createRows() }
+                        pagination={ paginationFactory() }
                         columns={this.columns}
                     />
                 </Modal.Body>

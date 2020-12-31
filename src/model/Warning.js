@@ -1,22 +1,13 @@
 export const ALREADY_KNOWN_STUDY = {
   key: 'ALREADY_KNOWN_STUDY',
   content: 'This study is already known by the server.',
-  ignorable: false,
-  dismissed: false
-}
-
-export const NOT_EXPECTED_VISIT = {
-  key: 'NOT_EXPECTED_VISIT',
-  content: 'You should check the patient. The imported study information do not match with the expected ones.',
-  ignorable: true,
-  dismissed: false
+  ignorable: false
 }
 
 export const NULL_VISIT_ID = {
   key: 'NULL_VISIT_ID',
-  content: 'You need to select the patient.',
-  ignorable: false,
-  dismissed: false
+  content: 'You need to select/check the patient.',
+  ignorable: false
 }
 
 export const MISSING_TAG_00080060 = {

@@ -8,12 +8,11 @@ export default class DicomBatchUploader extends EventEmitter {
     progressionUploadArray = []
     sucessIDsUploaded= []
 
-    constructor (uppy, idVisit, files) {
+    constructor (uppy, visitID, files) {
         super()
         this.uppy = uppy
         this.files = files
-        this.idVisit = idVisit
-        this.timeStamp = Date.now()
+        this.visitID = visitID
         this.zipIntensity = localStorage.getItem('zipIntensity') === null ? 100 : parseInt(localStorage.getItem('zipIntensity'))
         this.batchUploadSize = localStorage.getItem('batchUploadSize') === null ? 3 : parseInt(localStorage.getItem('batchUploadSize'))
 
@@ -26,7 +25,6 @@ export default class DicomBatchUploader extends EventEmitter {
 
         this.uppy.on('upload-success', async (file, response) => {
             let fileTusId = response['uploadURL'].split('/').pop()
-            console.log(fileTusId)
             this.sucessIDsUploaded.push(fileTusId)
             ++this.currentBatchUpload
             this.emitBatchUploadDoneIfTerminated()
@@ -113,12 +111,11 @@ export default class DicomBatchUploader extends EventEmitter {
             let zipBlob = await this.zipFiles(batch, index)
             this.uppy.addFile(
                 {
-                    name: this.timeStamp+'_'+this.idVisit+'_'+index+'_'+this.batches.length+'.zip', // file name
+                    name: this.visitID+'_'+index+'_'+this.batches.length+'.zip', // file name
                     type: 'application/zip', // file type
                     meta: {
                         //add metadata
-                        idVisit : this.idVisit,
-                        timeStamp : this.timeStamp,
+                        visitID : this.visitID,
                         zipNumber : index,
                         numberOfZips : this.batches.length,
                         dicomFiles : batch.length,

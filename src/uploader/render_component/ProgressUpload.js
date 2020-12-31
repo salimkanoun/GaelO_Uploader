@@ -18,11 +18,12 @@ import Button from 'react-bootstrap/Button'
 import { Col, Row } from 'react-bootstrap'
 
 export default class ProgressUpload extends Component {
-  render () {
+
+  render = () => {
     return (
       <Row>
         <Col md='auto'>
-          <Button variant='primary' onClick={this.props.onUploadClick} disabled={this.props.isUploading}> Upload </Button>
+          <Button variant='primary' onClick={this.props.onUploadClick} disabled={this.props.disabled}> Upload </Button>
         </Col>
         <Col>
             {this.props.multiUpload ? <ProgressBar variant='success' now={this.props.studyProgress} max={this.props.studyLength} label={'Study ' + this.props.studyProgress + '/' + this.props.studyLength} /> : null}
@@ -31,5 +32,6 @@ export default class ProgressUpload extends Component {
         </Col>
       </Row>
     )
+    
   }
 }

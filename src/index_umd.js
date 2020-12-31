@@ -17,7 +17,7 @@ function installUploader (config, containerId = 'root') {
 
 function closeUploader(containerId = 'root'){
   const container = document.getElementById(containerId)
-  ReactDOM.unmountComponentAtNode(container)
+  return ReactDOM.unmountComponentAtNode(container)
 }
 
 export { installUploader, closeUploader }

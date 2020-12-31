@@ -1,4 +1,4 @@
-import { ADD_VISIT } from './actions-types'
+import { ADD_VISIT, RESET_REDUX } from './actions-types'
 
 /**
  * Add visit to Redux visits Object
@@ -9,4 +9,11 @@ export function addVisit (visitObject) {
     type: ADD_VISIT,
     payload: visitObject
   }
+}
+
+export function resetRedux(){
+  return {
+    type: RESET_REDUX
+  }
+
 }

@@ -24,7 +24,7 @@ import { isNewStudy, logIn, registerStudy } from '../services/api'
 import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries, addWarningsStudy } from '../actions/Warnings'
-import { addVisit } from '../actions/Visits'
+import { addVisit, resetRedux } from '../actions/Visits'
 import { selectStudy, addStudyReady } from '../actions/DisplayTables'
 import { addSeriesReady } from '../actions/DisplayTables'
 import { NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
@@ -79,6 +79,10 @@ class Uploader extends Component {
         //await logIn()
         //await registerStudy()
         this.loadAvailableVisits()
+    }
+
+    componentWillUnmount = () => {
+        this.props.resetRedux()
     }
 
     loadAvailableVisits = () => {
@@ -408,7 +412,7 @@ class Uploader extends Component {
      * Upload selected and validated series on click
      */
     onUploadClick = async () => {
-
+        this.props.resetRedux()
         //build array of series object to be uploaded
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
             return this.props.series[seriesUID]
@@ -519,7 +523,7 @@ class Uploader extends Component {
                         multiUpload={this.config.availableVisits.length > 1}
                         selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload
-                        isUploading={this.state.isUploading}
+                        disabled={ this.state.isUploading || Object.keys(this.props.studiesReady).length === 0 }
                         multiUpload={this.config.availableVisits.length > 1}
                         studyProgress={this.state.studyProgress}
                         studyLength={this.state.studyLength}
@@ -554,7 +558,8 @@ const mapDispatchToProps = {
     selectStudy,
     addStudyReady,
     addSeriesReady,
-    setVisitID
+    setVisitID,
+    resetRedux
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

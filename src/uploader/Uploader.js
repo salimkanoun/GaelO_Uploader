@@ -409,7 +409,7 @@ class Uploader extends Component {
      * Upload selected and validated series on click
      */
     onUploadClick = async () => {
-        
+
         //build array of series object to be uploaded
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
             return this.props.series[seriesUID]
@@ -419,7 +419,7 @@ class Uploader extends Component {
         let studyUIDArray = seriesObjectArrays.map((seriesObject) => {
             return seriesObject.studyInstanceUID
         })
-        studyUIDArray = Array.from(new Set(studyUIDArray))
+        studyUIDArray = [...new Set(studyUIDArray)]
 
         //Filter non selected studyUID
         studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))

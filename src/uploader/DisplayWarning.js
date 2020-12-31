@@ -65,7 +65,7 @@ class DisplayWarning extends Component {
                     return rows
                 case 'series':
                     if ( this.props.warningsSeries[this.props.selectedSeries] === undefined ) return []
-                    for (let warning of Object.values(this.props.selectedSeries[this.props.selectedSeries])) {
+                    for (let warning of Object.values(this.props.warningsSeries[this.props.selectedSeries])) {
                         rows.push({ 
                             seriesInstanceUID: this.props.selectedSeries, 
                             ...warning

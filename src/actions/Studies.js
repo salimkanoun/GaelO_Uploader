@@ -6,7 +6,7 @@ import { NULL_VISIT_ID } from '../model/Warning'
  * Add study to Redux studies Object
  * @param {Object} studyObject
  */
-export function addStudy (studyInstanceUID, patientFirstName, patientLastName, patientSex, patientID, acquisitionDate, accessionNumber, patientBirthDate, studyDescription, orthancStudyID ) {
+export function addStudy (studyInstanceUID, patientFirstName, patientLastName, patientSex, patientID, acquisitionDate, accessionNumber, patientBirthDate, studyDescription, orthancStudyID, seriesModalitiesArray ) {
 
   return {
     type: ADD_STUDY,
@@ -22,7 +22,8 @@ export function addStudy (studyInstanceUID, patientFirstName, patientLastName, p
       patientBirthDate : patientBirthDate,
       accessionNumber : accessionNumber,
       studyInstanceUID : studyInstanceUID,
-      orthancStudyID : orthancStudyID
+      orthancStudyID : orthancStudyID,
+      seriesModalitiesArray : seriesModalitiesArray
     }
   }
 }

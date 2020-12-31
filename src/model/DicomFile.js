@@ -109,8 +109,7 @@ export default class DicomFile {
 
       } catch (e) {
         if (e.message !== 'Tag Not Found') {
-          console.log('tag ' + id)
-          console.log(e)
+          console.error('tag ' + id)
         }
 
       }
@@ -161,7 +160,6 @@ export default class DicomFile {
       const radioPharmElements = elmt.items[0].dataSet.elements
       return this._getString(radioPharmElements['x' + tagAddress])
     } catch (error) {
-      console.log(error)
       return undefined
     }
   }

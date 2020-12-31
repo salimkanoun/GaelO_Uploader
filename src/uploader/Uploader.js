@@ -19,12 +19,12 @@ import ProgressUpload from './render_component/ProgressUpload'
 import Options from './render_component/Options'
 import Util from '../model/Util'
 
-import { isNewStudy, logIn, registerStudy } from '../services/api'
+import { isNewStudy } from '../services/api'
 
 import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries, addWarningsStudy } from '../actions/Warnings'
-import { addVisit } from '../actions/Visits'
+import { addVisit, resetRedux } from '../actions/Visits'
 import { selectStudy, addStudyReady } from '../actions/DisplayTables'
 import { addSeriesReady } from '../actions/DisplayTables'
 import { NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
@@ -75,10 +75,12 @@ class Uploader extends Component {
 
     }
 
-    componentDidMount = async () => {
-        //await logIn()
-        //await registerStudy()
+    componentDidMount = () => {
         this.loadAvailableVisits()
+    }
+
+    componentWillUnmount = () => {
+        this.props.resetRedux()
     }
 
     loadAvailableVisits = () => {
@@ -223,7 +225,7 @@ class Uploader extends Component {
                     this.addFile(elements)
                 })
             }).catch((e) => {
-                console.log('error zip' + e)
+                console.error('error zip' + e)
             })
         }
     }
@@ -240,7 +242,7 @@ class Uploader extends Component {
 
             //If unknown studyInstanceUID, add it to Redux
             if ( ! Object.keys(this.props.studies).includes( studyObject.getStudyInstanceUID() )){
-                this.registerStudyInRedux(studyObject)
+                await this.registerStudyInRedux(studyObject)
             }
 
             //Scan every series in Model
@@ -249,7 +251,7 @@ class Uploader extends Component {
             for (let seriesObject of series) {
 
                 if ( ! Object.keys(this.props.series).includes( seriesObject.getSeriesInstanceUID() )){
-                    this.registerSeriesInRedux(seriesObject)
+                    await this.registerSeriesInRedux(seriesObject)
                 }
                 
             }
@@ -276,7 +278,8 @@ class Uploader extends Component {
             studyToAdd.getAccessionNumber(),
             studyToAdd.getPatientBirthDate(), 
             studyToAdd.getStudyDescription(),
-            studyToAdd.getOrthancStudyID()
+            studyToAdd.getOrthancStudyID(),
+            studyToAdd.getChildModalitiesArray()
         )
         
         const studyInstanceUID = studyToAdd.getStudyInstanceUID()
@@ -391,12 +394,14 @@ class Uploader extends Component {
         let birthDate = studyRedux.patientBirthDate
         let sex = studyRedux.patientSex
         let acquisitionDate = studyRedux.acquisitionDate
+        let modalities = studyRedux.seriesModalitiesArray
 
         if (Util.areEqualFields(visitObject.patientFirstname.trim().charAt(0), patientFirstname.trim().charAt(0))
         && Util.areEqualFields(visitObject.patientLastname.trim().charAt(0), patientLastname.trim().charAt(0))
         && Util.areEqualFields(visitObject.patientSex.trim().charAt(0), sex.trim().charAt(0))
         && Util.isProbablyEqualDates(visitObject.patientDOB, Util.formatRawDate(birthDate))
-        && Util.isProbablyEqualDates(visitObject.visitDate, Util.formatRawDate(acquisitionDate))) {
+        && Util.isProbablyEqualDates(visitObject.visitDate, Util.formatRawDate(acquisitionDate))
+        && modalities.includes(visitObject.visitModality) ) {
             return true
         } else return false
     }
@@ -414,7 +419,7 @@ class Uploader extends Component {
         let studyUIDArray = seriesObjectArrays.map((seriesObject) => {
             return seriesObject.studyInstanceUID
         })
-        studyUIDArray = Array.from(new Set(studyUIDArray))
+        studyUIDArray = [...new Set(studyUIDArray)]
 
         //Filter non selected studyUID
         studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
@@ -469,7 +474,7 @@ class Uploader extends Component {
         })
 
         uploader.on('study-upload-finished', (visitID, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
-            console.log('sutdy upload Finished')
+            console.log('study upload Finished')
             this.config.onStudyUploaded( visitID, sucessIDsUploaded, numberOfFiles, studyOrthancID)
 
         })
@@ -515,7 +520,7 @@ class Uploader extends Component {
                         multiUpload={this.config.availableVisits.length > 1}
                         selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload
-                        isUploading={this.state.isUploading}
+                        disabled={ this.state.isUploading || Object.keys(this.props.studiesReady).length === 0 }
                         multiUpload={this.config.availableVisits.length > 1}
                         studyProgress={this.state.studyProgress}
                         studyLength={this.state.studyLength}
@@ -550,7 +555,8 @@ const mapDispatchToProps = {
     selectStudy,
     addStudyReady,
     addSeriesReady,
-    setVisitID
+    setVisitID,
+    resetRedux
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

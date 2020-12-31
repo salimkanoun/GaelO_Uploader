@@ -9,7 +9,7 @@ const initialState = {
 }
 
 export default function DisplayTablesReducer(state = initialState, action) {
-
+  console.log(state)
   switch (action.type) {
 
     case SELECT_STUDY:
@@ -26,7 +26,7 @@ export default function DisplayTablesReducer(state = initialState, action) {
       }
 
     case ADD_STUDIES_READY:
-      let newStudiesReady2 = state.studiesReady
+      let newStudiesReady2 = [...state.studiesReady]
       //add StudyInstanceUID to selectedStudies
       if (!state.studiesReady.includes(action.payload.studyInstanceUID)) {
         newStudiesReady2.push(action.payload.studyInstanceUID)
@@ -35,7 +35,7 @@ export default function DisplayTablesReducer(state = initialState, action) {
 
       return {
         ...state,
-        studiesReady: [...newStudiesReady2]
+        studiesReady: newStudiesReady2
       }
 
     case REMOVE_STUDIES_READY:
@@ -48,8 +48,8 @@ export default function DisplayTablesReducer(state = initialState, action) {
       }
 
     case ADD_SERIES_READY:
-      let seriesReady = state.seriesReady
-
+      let seriesReady = [...state.seriesReady]
+      console.log(action)
       if (!seriesReady.includes(action.payload.seriesInstanceUID)) {
         //add SeriesInstanceUID to selectedSeries
         seriesReady.push(action.payload.seriesInstanceUID)
@@ -57,7 +57,7 @@ export default function DisplayTablesReducer(state = initialState, action) {
 
       return {
         ...state,
-        seriesReady: [...seriesReady]
+        seriesReady: seriesReady
       }
 
     case REMOVE_SERIES_READY:

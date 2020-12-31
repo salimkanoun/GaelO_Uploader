@@ -6,7 +6,7 @@ import Warnings from './Warnings'
 import Visits from './Visits'
 import WarningsStudy from './WarningsStudy'
 
-export default combineReducers({
+const appReducer =  combineReducers({
   Series,
   Studies,
   DisplayTables,
@@ -14,3 +14,13 @@ export default combineReducers({
   WarningsStudy,
   Visits
 })
+
+const rootReducer = (state, action) => {
+  if (action.type === 'RESET_REDUX') {
+    state = undefined
+  }
+
+  return appReducer(state, action)
+}
+
+export default rootReducer

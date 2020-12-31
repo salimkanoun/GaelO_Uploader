@@ -15,4 +15,9 @@ function installUploader (config, containerId = 'root') {
   return ReactDOM.render(<App config={config} />, container)
 }
 
-export { App, installUploader }
+function closeUploader(containerId = 'root'){
+  const container = document.getElementById(containerId)
+  return ReactDOM.unmountComponentAtNode(container)
+}
+
+export { installUploader, closeUploader }

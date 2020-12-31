@@ -19,7 +19,7 @@ import ProgressUpload from './render_component/ProgressUpload'
 import Options from './render_component/Options'
 import Util from '../model/Util'
 
-import { isNewStudy, logIn, registerStudy } from '../services/api'
+import { isNewStudy } from '../services/api'
 
 import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
@@ -75,9 +75,7 @@ class Uploader extends Component {
 
     }
 
-    componentDidMount = async () => {
-        //await logIn()
-        //await registerStudy()
+    componentDidMount = () => {
         this.loadAvailableVisits()
     }
 
@@ -227,7 +225,7 @@ class Uploader extends Component {
                     this.addFile(elements)
                 })
             }).catch((e) => {
-                console.log('error zip' + e)
+                console.error('error zip' + e)
             })
         }
     }
@@ -287,7 +285,6 @@ class Uploader extends Component {
         const studyInstanceUID = studyToAdd.getStudyInstanceUID()
 
         //Search for a perfect Match in visit candidates and assign it
-        console.log(this.searchPerfectMatchStudy(studyInstanceUID))
         let perfectMatchVisit = this.searchPerfectMatchStudy(studyInstanceUID)
         if (perfectMatchVisit != null) {
             this.props.setVisitID(studyInstanceUID, perfectMatchVisit.visitID)
@@ -477,7 +474,7 @@ class Uploader extends Component {
         })
 
         uploader.on('study-upload-finished', (visitID, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
-            console.log('sutdy upload Finished')
+            console.log('study upload Finished')
             this.config.onStudyUploaded( visitID, sucessIDsUploaded, numberOfFiles, studyOrthancID)
 
         })

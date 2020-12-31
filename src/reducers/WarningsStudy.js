@@ -32,10 +32,11 @@ export default function WarningsStudyReducer(state = initialState, action) {
             studyInstanceUID = action.payload.studyInstanceUID
 
             let newWarningState = state.warningsStudy
-            delete newWarningState[studyInstanceUID][warningKey]
-
-            //If no other warning
-            if( Util.isEmptyObject(newWarningState[studyInstanceUID]) ) delete state.warningsStudy[studyInstanceUID]
+            if( newWarningState[studyInstanceUID] !== undefined && newWarningState[studyInstanceUID][warningKey] !== undefined){
+                delete newWarningState[studyInstanceUID][warningKey]
+                    //If no other warning
+                if( Util.isEmptyObject(newWarningState[studyInstanceUID]) ) delete state.warningsStudy[studyInstanceUID]
+            }
 
             return {
                 warningsStudy: {

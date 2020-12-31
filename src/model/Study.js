@@ -74,6 +74,10 @@ export default class Study {
         else return this.studyInstanceUID
     }
 
+    getAccessionNumber(){
+        return (this.accessionNumber === undefined || this.accessionNumber === null) ? '' : this.accessionNumber
+    }
+
     getStudyID() {
         return (this.studyID === undefined || this.studyID === null) ? '' : this.studyID
     }
@@ -102,6 +106,15 @@ export default class Study {
         return (this.patientID === undefined || this.patientID === null) ? '' : this.patientID
     }
 
+    getChildModalitiesArray(){
+        let childSeriesArray = this.getSeriesArray()
+        let modalityArray = childSeriesArray.map( series => {
+            return series.getModality()
+        })
+
+        return [...new Set(modalityArray)]
+
+    }
     getOrthancStudyID() {
         let hash = SHA1( this.getPatientID() + '|' + this.getStudyInstanceUID() ).toString()
         return `${hash.substring(0, 8)}-${hash.substring(8, 16)}-${hash.substring(16, 24)}-${hash.substring(24, 32)}-${hash.substring(32, 40)}`

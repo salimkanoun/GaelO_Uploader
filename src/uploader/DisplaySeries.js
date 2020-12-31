@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import BootstrapTable from 'react-bootstrap-table-next';
 import { Container, Row, Col } from 'react-bootstrap'
 
+import Util from '../model/Util'
 import { addSeriesReady, removeSeriesReady, selectSeries } from '../actions/DisplayTables'
 import DisplayWarning from './DisplayWarning'
 
@@ -73,6 +74,9 @@ class DisplaySeries extends Component {
                 dataField: 'seriesDate',
                 text: 'Date',
                 editable: false,
+                formatter: (cell, row, rowIndex, extraData) => {
+                    return Util.formatRawDate(cell)
+                }
             },
             {
                 dataField: 'numberOfInstances',
@@ -119,7 +123,6 @@ class DisplaySeries extends Component {
                     <Col xs={6} md={4}>
                         <DisplayWarning
                             type='series'
-                            selectionID={this.props.selectedSeries}
                         />
                     </Col>
                 </Row>

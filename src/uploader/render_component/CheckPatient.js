@@ -33,8 +33,11 @@ export default class CheckPatient extends Component {
         {
             dataField: 'ignoreButton',
             text: '',
-            formatter: (cell, row, rowIndex, extraData) => ((row.ignoredStatus !== null) ?
-                <ButtonIgnore hidden={(row.ignoredStatus === '')} row={row} onClick={() => this.props.onClick(row)} warning={row.ignoredStatus} /> : null)
+            formatter: (cell, row, rowIndex, extraData) => ( 
+                (row.ignoredStatus !== null) ?
+                    <ButtonIgnore row={row} onClick={() => this.props.onClick(row)} dissmissed={row.ignoredStatus} />
+                    : null
+                )
         },
         {
             dataField: 'ignoredStatus',
@@ -50,7 +53,7 @@ export default class CheckPatient extends Component {
         } else if (row.ignoredStatus === null) {
             return 'du-studies row-success'
         }else{
-            return 'du-studies td'
+            return 'du-studies td row-info'
         }
         
     }
@@ -58,10 +61,10 @@ export default class CheckPatient extends Component {
     render = () => {
         return (
             <>
-                { (!this.props.multiUpload) ? 
-                    <p>The imported patient informations do not match with the ones in the server. We let you check these informations below:</p> 
-                    : null 
-                }
+                <p>
+                    The imported patient informations do not match with the ones in the server.<br/> 
+                    We let you check these informations below:
+                </p> 
                 <BootstrapTable
                     keyField='rowName'
                     classes="table table-borderless"

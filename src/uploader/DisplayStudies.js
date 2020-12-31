@@ -23,6 +23,7 @@ import SelectPatient from './SelectPatient'
 
 import { selectStudy, addStudyReady, removeStudyReady } from '../actions/DisplayTables'
 import { unsetVisitID } from '../actions/Studies'
+import Util from '../model/Util';
 
 class StudiesTab extends Component {
 
@@ -54,14 +55,14 @@ class StudiesTab extends Component {
         {
             dataField: 'visitAssignement',
             isDummyField : true,
-            text: 'Assignement',
+            text: 'Assign',
             formatter: (cell, row, rowIndex, extraData) => {
                 if (this.props.warningsStudies[row.studyInstanceUID] !== undefined ) {
                     if (this.props.warningsStudies[row.studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined)
                         return (<></>)
                     else if (this.props.warningsStudies[row.studyInstanceUID]['NULL_VISIT_ID'] !== undefined ) {
                         return (
-                            <Button variant="primary" onClick={this.toggleSelectPatient}>
+                            <Button variant="primary" onClick={this.toggleSelectPatient} block>
                                 {(this.props.multiUpload) ? 'Select Patient' : 'Check Patient'}
                             </Button>
                         )
@@ -72,11 +73,13 @@ class StudiesTab extends Component {
                     return (
                         <Button variant="success" 
                                 onClick={() => {
-                                    this.props.unsetVisitID(row.studyInstanceUID, row.idVisit)
+                                    this.props.unsetVisitID(row.studyInstanceUID, row.visitID)
                                     this.props.removeStudyReady(row.studyInstanceUID)
                                     }
-                                }>
-                            Selected
+                                }
+                                block
+                                >
+                            Done
                         </Button>
                     )
                     
@@ -100,12 +103,15 @@ class StudiesTab extends Component {
         },
         {
             dataField: 'accessionNumber',
-            text: 'Accession Nb',
+            text: 'Accession',
             style: { whiteSpace: 'normal', wordWrap: 'break-word' }
         },
         {
             dataField: 'acquisitionDate',
             text: 'Date',
+            formatter: (cell, row, rowIndex, extraData) => {
+                return Util.formatRawDate(cell)
+            }
         },
     ]
 
@@ -114,7 +120,6 @@ class StudiesTab extends Component {
         clickToSelect: true,
         hideSelectColumn: true,
         onSelect: (row) => {
-            console.log(row)
             this.props.selectStudy(row.studyInstanceUID)
         }
     };
@@ -124,7 +129,6 @@ class StudiesTab extends Component {
      * 
      */
     toggleSelectPatient = () => {
-        console.log('toogle')
         this.setState((state) => { return { showSelectPatient: !state.showSelectPatient } })
     }
 
@@ -147,11 +151,11 @@ class StudiesTab extends Component {
                 <Modal show={this.state.showSelectPatient} onHide={this.toggleSelectPatient}>
                     <Modal.Header className="modal-header" closeButton>
                         <Modal.Title className="modal-title">
-                            Select/Check Patient
+                            Select Patient
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body du-patient">
-                        <SelectPatient multiUpload={this.props.multiUpload} onValidate={this.toggleSelectPatient}/>
+                        <SelectPatient multiUpload={this.props.multiUpload} onValidate={this.toggleSelectPatient} />
                     </Modal.Body>
                 </Modal>
 
@@ -170,10 +174,9 @@ class StudiesTab extends Component {
                                 columns={this.columns}
                                 selectRow={this.selectRow}
                             />
-
                         </Col>
                         <Col xs={6} md={4}>
-                            <DisplayWarning type='study' selectionID={this.props.selectedStudy} multiUpload={this.props.multiUpload} />
+                            <DisplayWarning type='study' />
                         </Col>
                     </Row>
                 </Container>

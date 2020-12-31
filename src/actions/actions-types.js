@@ -24,4 +24,6 @@ export const SET_VISIT_ID = 'SET_VISIT_ID'
 export const UNSET_VISIT_ID = 'UNSET_VISIT_ID'
 export const SET_USED_VISIT = 'SET_USED_VISIT'
 export const SET_NOT_USED_VISIT = 'SET_NOT_USED_VISIT'
-export const RESET_VISITS = 'RESET_VISITS'
+
+//Reset redux
+export const RESET_REDUX = 'RESET_REDUX'

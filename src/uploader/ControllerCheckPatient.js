@@ -13,13 +13,14 @@
  */
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 
 import { Button } from 'react-bootstrap'
 
 import CheckPatient from './render_component/CheckPatient'
 import Util from '../model/Util'
 
-export default class ControllerCheckPatient extends Component {
+class ControllerCheckPatient extends Component {
 
     state = {
         rows: [], //Table rows to display
@@ -27,7 +28,7 @@ export default class ControllerCheckPatient extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.expectedVisit !== prevProps.expectedVisit) {
+        if (this.props.selectedVisitID !== prevProps.selectedVisitID) {
             let rows = this.buildRows()
             let stillMissing = this.isStillAwaitingItems(rows)
 
@@ -77,11 +78,10 @@ export default class ControllerCheckPatient extends Component {
     buildRows = () => {
 
         let rows = []
+        
+        if (this.props.selectedVisitID == null) return rows
 
-        if (this.props.expectedVisit == null) return rows
-
-        let currentStudy = this.props.currentStudy
-        let expectedVisit = this.props.expectedVisit
+        const currentStudy = this.props.studies[this.props.selectedStudy]
 
         //Retrive Data from DICOM Model
         let dicomLastName = currentStudy.patientLastName.toUpperCase().slice(0, 1)
@@ -89,14 +89,19 @@ export default class ControllerCheckPatient extends Component {
         let dicomDateOfBirth = Util.formatRawDate(currentStudy.patientBirthDate)
         let dicomAcquisitionDate = Util.formatRawDate(currentStudy.acquisitionDate)
         let dicomPatientSex = currentStudy.patientSex
+        let dicomModalities = currentStudy.seriesModalitiesArray
+
+        const expectedVisit = this.props.visits[this.props.selectedVisitID]
 
         //Format visit data for table
         // double == (not ===) check if undefined or null
-        let patientFirstName = expectedVisit.firstName == null ? '' : expectedVisit.firstName.toUpperCase().slice(0, 1)
-        let patientLastName = expectedVisit.lastName == null ? '' : expectedVisit.lastName.toUpperCase().slice(0, 1)
-        let patientBirthDate = expectedVisit.patientDOB
-        let patientSex = expectedVisit.patientSex
-        let acquisitionDate = expectedVisit.acquisitionDate
+        let patientFirstName = expectedVisit.patientFirstname == null ? '' : expectedVisit.patientFirstname.toUpperCase().slice(0, 1)
+        let patientLastName = expectedVisit.patientLastname == null ? '' : expectedVisit.patientLastname.toUpperCase().slice(0, 1)
+        let patientBirthDate = expectedVisit.patientDOB == null ? '' : expectedVisit.patientDOB
+        let patientSex = expectedVisit.patientSex == null ? '' : expectedVisit.patientSex
+
+        let visitDate = expectedVisit.visitDate == null ? '' : expectedVisit.visitDate
+        let visitModality = expectedVisit.visitModality == null ? '' : expectedVisit.visitModality
 
         rows.push({
             rowName: 'First Name',
@@ -128,9 +133,16 @@ export default class ControllerCheckPatient extends Component {
 
         rows.push({
             rowName: 'Acquisition Date',
-            expectedStudy: acquisitionDate,
+            expectedStudy: visitDate,
             currentStudy: dicomAcquisitionDate,
-            ignoredStatus: this.isCheckPass(acquisitionDate, dicomAcquisitionDate)
+            ignoredStatus: this.isCheckPass(visitDate, dicomAcquisitionDate)
+        })
+
+        rows.push({
+            rowName: 'Modality',
+            expectedStudy: visitModality,
+            currentStudy: dicomModalities.join('/'),
+            ignoredStatus: dicomModalities.includes(visitModality) ? null : false
         })
 
         return rows
@@ -153,10 +165,22 @@ export default class ControllerCheckPatient extends Component {
         return (
             <div className="du-patient">
                 <CheckPatient onClick={this.onClick} rows={this.state.rows} />
-                <Button type="button" onClick={this.props.onValidatePatient} className="btn btn-primary" disabled={this.state.isDisabled}>
-                    This is the correct patient
-                </Button>
+                <div>
+                    <Button variant='primary' onClick={this.props.onValidatePatient} className="float-right" disabled={this.state.isDisabled}>
+                        This is the correct patient
+                    </Button>
+                </div>
             </div>
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+      studies: state.Studies.studies,
+      selectedStudy: state.DisplayTables.selectedStudy,
+      visits : state.Visits.visits
+    }
+  }
+  
+  export default connect(mapStateToProps, null)(ControllerCheckPatient)

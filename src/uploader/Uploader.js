@@ -9,6 +9,8 @@ import JSZip from 'jszip'
 import Model from '../model/Model'
 import DicomFile from '../model/DicomFile'
 
+import { Alert } from 'react-bootstrap'
+
 import DicomDropZone from './render_component/DicomDropZone'
 
 import ParsingDetails from './render_component/ParsingDetails'
@@ -17,13 +19,13 @@ import ProgressUpload from './render_component/ProgressUpload'
 import Options from './render_component/Options'
 import Util from '../model/Util'
 
-import { getPossibleImport, logIn, registerStudy, validateUpload, isNewStudy } from '../services/api'
+import { isNewStudy } from '../services/api'
 
 import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries, addWarningsStudy } from '../actions/Warnings'
-import { addVisit, resetVisits } from '../actions/Visits'
-import { selectStudy, addStudyReady, unselectStudy } from '../actions/DisplayTables'
+import { addVisit, resetRedux } from '../actions/Visits'
+import { selectStudy, addStudyReady } from '../actions/DisplayTables'
 import { addSeriesReady } from '../actions/DisplayTables'
 import { NULL_VISIT_ID, ALREADY_KNOWN_STUDY } from '../model/Warning'
 import DicomMultiStudyUploader from '../model/DicomMultiStudyUploader'
@@ -73,28 +75,20 @@ class Uploader extends Component {
 
     }
 
-    componentDidMount = async () => {
-        if (this.config.developerMode) {
-            await logIn()
-            await registerStudy()
-        }
-        await this.loadAvailableVisits()
-
+    componentDidMount = () => {
+        this.loadAvailableVisits()
     }
 
-    loadAvailableVisits = async ()=>{
+    componentWillUnmount = () => {
+        this.props.resetRedux()
+    }
 
-        let answer = await getPossibleImport()
-
-        answer= {"AvailablePatients":{"PET0":[{"numeroPatient":"17017101051001","firstName":"F","lastName":"V","patientSex":"M","patientDOB":"02-00-1941","investigatorName":"KARLIN","country":"France","centerNumber":"10501","acquisitionDate":"11-10-2020","visitType":"PET0","idVisit":179}]}}
-
+    loadAvailableVisits = () => {
+        let availableVisits = this.props.config.availableVisits
         //Add All availables visits in visit reducer
-        for (let visitArray of Object.values(answer.AvailablePatients) ) {
-            visitArray.forEach(visit => {
-                this.props.addVisit(visit)
-            })
-        }
-
+        availableVisits.forEach(visit=> {
+            this.props.addVisit(visit)
+        })
     }
 
     /**
@@ -110,7 +104,7 @@ class Uploader extends Component {
 
         if (this.state.fileParsed === 0) {
             //At first drop notify user started action
-            this.config.callbackOnStartAction()
+            this.config.onStartUsing()
         }
 
         //Add number of files to be parsed to the previous number (incremental parsing)
@@ -231,7 +225,7 @@ class Uploader extends Component {
                     this.addFile(elements)
                 })
             }).catch((e) => {
-                console.log('error zip' + e)
+                console.error('error zip' + e)
             })
         }
     }
@@ -241,75 +235,96 @@ class Uploader extends Component {
      */
     checkSeriesAndUpdateRedux = async () => {
         this.setState({ isCheckDone: false })
-        this.props.unselectStudy()
-        this.props.resetVisits()
-        await this.loadAvailableVisits()
+
         //Scan every study in Model
-        for (let studyInstanceUID in this.uploadModel.data) {
-            //Retrieve StudyObject from Model
-            let studyToAdd = this.uploadModel.data[studyInstanceUID]
+        let studyArray = this.uploadModel.getStudiesArray()
+        for (let studyObject of studyArray) {
 
-            //Add study to Redux
-            this.props.addStudy(
-                studyToAdd.getStudyInstanceUID(), 
-                studyToAdd.getPatientFirstName(), 
-                studyToAdd.getPatientLastName(), 
-                studyToAdd.getPatientSex(), 
-                studyToAdd.getPatientID(), 
-                studyToAdd.getAcquisitionDate(), 
-                studyToAdd.getPatientBirthDate(), 
-                studyToAdd.getStudyDescription(),
-                studyToAdd.getOrthancStudyID(),
-                Object.keys(studyToAdd.series)
-            )
-            //Add study warnings to Redux
-            let studyRedux = this.props.studies[studyInstanceUID]
-
-            //Search for a perfect Match in visit candidates and assign it
-            let perfectMatchVisit = this.searchPerfectMatchStudy(studyRedux)
-            if (perfectMatchVisit != null) {
-                this.props.setVisitID(studyInstanceUID, perfectMatchVisit.idVisit)
-            }
-            
-            let studyWarnings = await this.getStudyWarning(studyRedux)
-
-            //If no warning mark it as ready, if not add warning to redux
-            if( studyWarnings.length === 0 ) this.props.addStudyReady(studyInstanceUID)
-            else {
-                studyWarnings.forEach( (warning)=> {
-                    this.props.addWarningsStudy(studyInstanceUID, warning)
-                })
-                
+            //If unknown studyInstanceUID, add it to Redux
+            if ( ! Object.keys(this.props.studies).includes( studyObject.getStudyInstanceUID() )){
+                await this.registerStudyInRedux(studyObject)
             }
 
             //Scan every series in Model
-            let series = this.uploadModel.data[studyInstanceUID].getSeriesArray()
-            
-            for (let seriesInstance of series) {
+            let series = studyObject.getSeriesArray()
 
-                let seriesWarnings = await seriesInstance.getWarnings()
-                //Add series to redux
-                this.props.addSeries(
-                    seriesInstance.getInstancesObject(),
-                    seriesInstance.getSeriesInstanceUID(),
-                    seriesInstance.getSeriesNumber(),
-                    seriesInstance.getSeriesDate(),
-                    seriesInstance.getSeriesDescription(),
-                    seriesInstance.getModality(),
-                    seriesInstance.getStudyInstanceUID()
-                )
+            for (let seriesObject of series) {
 
-                //Automatically add to Redux seriesReady if contains no warnings
-                if(  Util.isEmptyObject( seriesWarnings ) ){
-                    this.props.addSeriesReady( seriesInstance.getSeriesInstanceUID() )
-                }else{
-                    //Add series related warnings to Redux
-                    this.props.addWarningsSeries(seriesInstance.getSeriesInstanceUID(), seriesWarnings )
+                if ( ! Object.keys(this.props.series).includes( seriesObject.getSeriesInstanceUID() )){
+                    await this.registerSeriesInRedux(seriesObject)
                 }
                 
             }
         }
+
+        //Mark check finished to make interface available and select the first study item
         this.setState({ isCheckDone: true })
+        //If no study being selected, select the first one
+        if( this.props.selectedStudy===undefined && Object.keys(this.props.studies).length >= 1) this.props.selectStudy( this.props.studies[Object.keys(this.props.studies)[0]].studyInstanceUID )
+    }
+
+    /**
+     * Register a study of the dicom model to the redux
+     * @param {Study} studyToAdd 
+     */
+    registerStudyInRedux = async (studyToAdd) => {
+        this.props.addStudy(
+            studyToAdd.getStudyInstanceUID(), 
+            studyToAdd.getPatientFirstName(), 
+            studyToAdd.getPatientLastName(), 
+            studyToAdd.getPatientSex(), 
+            studyToAdd.getPatientID(), 
+            studyToAdd.getAcquisitionDate(), 
+            studyToAdd.getAccessionNumber(),
+            studyToAdd.getPatientBirthDate(), 
+            studyToAdd.getStudyDescription(),
+            studyToAdd.getOrthancStudyID(),
+            studyToAdd.getChildModalitiesArray()
+        )
+        
+        const studyInstanceUID = studyToAdd.getStudyInstanceUID()
+
+        //Search for a perfect Match in visit candidates and assign it
+        let perfectMatchVisit = this.searchPerfectMatchStudy(studyInstanceUID)
+        if (perfectMatchVisit != null) {
+            this.props.setVisitID(studyInstanceUID, perfectMatchVisit.visitID)
+        }
+        //Add study warnings to Redux
+        let studyRedux = this.props.studies[studyInstanceUID]
+        let studyWarnings = await this.getStudyWarning(studyRedux)
+
+        //If no warning mark it as ready, if not add warning to redux
+        if( studyWarnings.length === 0 ) this.props.addStudyReady(studyInstanceUID)
+        else {
+            studyWarnings.forEach( (warning)=> {
+                this.props.addWarningsStudy(studyInstanceUID, warning)
+            })
+            
+        }
+    }
+
+    registerSeriesInRedux = async (seriesObject) => {
+
+        let seriesWarnings = await seriesObject.getWarnings()
+        //Add series to redux
+        this.props.addSeries(
+            seriesObject.getInstancesObject(),
+            seriesObject.getSeriesInstanceUID(),
+            seriesObject.getSeriesNumber(),
+            seriesObject.getSeriesDate(),
+            seriesObject.getSeriesDescription(),
+            seriesObject.getModality(),
+            seriesObject.getStudyInstanceUID()
+        )
+
+        //Automatically add to Redux seriesReady if contains no warnings
+        if(  Util.isEmptyObject( seriesWarnings ) ){
+            this.props.addSeriesReady( seriesObject.getSeriesInstanceUID() )
+        }else{
+            //Add series related warnings to Redux
+            this.props.addWarningsSeries(seriesObject.getSeriesInstanceUID(), seriesWarnings )
+        }
+
     }
 
     /**
@@ -320,7 +335,7 @@ class Uploader extends Component {
         let warnings = []
 
         //if Visit ID is not set add Null Visit ID (visitID Needs to be assigned)
-        if ( studyRedux.idVisit == null ) warnings.push(NULL_VISIT_ID)
+        if ( studyRedux.visitID == null ) warnings.push(NULL_VISIT_ID)
 
         // Check if study is already known by server
         try{
@@ -344,10 +359,11 @@ class Uploader extends Component {
     }
 
     /**
-     * Search a perfect match visit for a registered study in redux
-     * @param {object} studyRedux 
+     * Search a perfect match visit for a registered studyInstanceUID in redux
+     * @param {string} studyInstanceUID 
      */
-    searchPerfectMatchStudy = (studyRedux) => {
+    searchPerfectMatchStudy = (studyInstanceUID) => {
+        let studyRedux = this.props.studies[studyInstanceUID]
         // Linear search through expected visits list
         for (let visitObject of Object.values(this.props.visits) ) {
             if ( this.isPerfectMatch(studyRedux, visitObject) ) {
@@ -358,9 +374,9 @@ class Uploader extends Component {
         return undefined;
     }
 
-    getVisitDataById = (idVisit) => {
+    getVisitDataById = (visitID) => {
         for (let visit of this.props.visits) {
-            if ( visit.idVisit === idVisit ) {
+            if ( visit.visitID === visitID ) {
                 return visit;
             }
         }
@@ -378,12 +394,14 @@ class Uploader extends Component {
         let birthDate = studyRedux.patientBirthDate
         let sex = studyRedux.patientSex
         let acquisitionDate = studyRedux.acquisitionDate
+        let modalities = studyRedux.seriesModalitiesArray
 
-        if (Util.areEqualFields(visitObject.firstName.trim().charAt(0), patientFirstname.trim().charAt(0))
-        && Util.areEqualFields(visitObject.lastName.trim().charAt(0), patientLastname.trim().charAt(0))
+        if (Util.areEqualFields(visitObject.patientFirstname.trim().charAt(0), patientFirstname.trim().charAt(0))
+        && Util.areEqualFields(visitObject.patientLastname.trim().charAt(0), patientLastname.trim().charAt(0))
         && Util.areEqualFields(visitObject.patientSex.trim().charAt(0), sex.trim().charAt(0))
         && Util.isProbablyEqualDates(visitObject.patientDOB, Util.formatRawDate(birthDate))
-        && Util.isProbablyEqualDates(visitObject.acquisitionDate, Util.formatRawDate(acquisitionDate))) {
+        && Util.isProbablyEqualDates(visitObject.visitDate, Util.formatRawDate(acquisitionDate))
+        && modalities.includes(visitObject.visitModality) ) {
             return true
         } else return false
     }
@@ -401,7 +419,7 @@ class Uploader extends Component {
         let studyUIDArray = seriesObjectArrays.map((seriesObject) => {
             return seriesObject.studyInstanceUID
         })
-        studyUIDArray = Array.from(new Set(studyUIDArray))
+        studyUIDArray = [...new Set(studyUIDArray)]
 
         //Filter non selected studyUID
         studyUIDArray = studyUIDArray.filter(studyUID => (this.props.studiesReady.includes(studyUID)))
@@ -416,7 +434,7 @@ class Uploader extends Component {
         //group series by studyUID
         for (let studyInstanceUID of studyUIDArray) {
 
-            let idVisit = this.props.studies[studyInstanceUID].idVisit
+            let visitID = this.props.studies[studyInstanceUID].visitID
 
             let seriesInstanceUID = seriesObjectArrays.filter((seriesObject) => {
                 return (seriesObject.studyInstanceUID === studyInstanceUID)
@@ -433,7 +451,7 @@ class Uploader extends Component {
                 filesToUpload.push(...fileArray)
             })
 
-            uploader.addStudyToUpload(idVisit, filesToUpload, studyOrthancID)
+            uploader.addStudyToUpload(visitID, filesToUpload, studyOrthancID)
 
         }
 
@@ -455,16 +473,17 @@ class Uploader extends Component {
 
         })
 
-        uploader.on('study-upload-finished', (idVisit, timeStamp, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
-            console.log('sutdy upload Finished')
-            validateUpload(idVisit, timeStamp, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+        uploader.on('study-upload-finished', (visitID, numberOfFiles, sucessIDsUploaded, studyOrthancID) => {
+            console.log('study upload Finished')
+            this.config.onStudyUploaded( visitID, sucessIDsUploaded, numberOfFiles, studyOrthancID)
+
         })
 
 
         uploader.on('upload-finished', () => {
             console.log('full upload Finished')
-            //this.setState({ isUploading: false })
-            this.config.callbackOnUploadComplete()
+            this.setState({ isUploading: false })
+            this.config.onUploadComplete()
         })
 
         uploader.startUpload()
@@ -472,6 +491,7 @@ class Uploader extends Component {
     }
 
     render = () => {
+        if(this.config.availableVisits.length ===0) return <Alert variant='success'>  No Visits Awaiting Upload </Alert>
         return (
             <Fragment>
                 <div>
@@ -497,11 +517,11 @@ class Uploader extends Component {
                     <ControllerStudiesSeries
                         isCheckDone={this.state.isCheckDone}
                         isUploading={this.state.isUploading}
-                        multiUpload={this.config.multiUpload}
+                        multiUpload={this.config.availableVisits.length > 1}
                         selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload
-                        isUploading={this.state.isUploading}
-                        multiUpload={this.config.multiUpload}
+                        disabled={ this.state.isUploading || Object.keys(this.props.studiesReady).length === 0 }
+                        multiUpload={this.config.availableVisits.length > 1}
                         studyProgress={this.state.studyProgress}
                         studyLength={this.state.studyLength}
                         onUploadClick={this.onUploadClick}
@@ -520,6 +540,7 @@ const mapStateToProps = state => {
         studies: state.Studies.studies,
         series: state.Series.series,
         selectedSeries: state.DisplayTables.selectedSeries,
+        selectedStudy: state.DisplayTables.selectStudy,
         seriesReady: state.DisplayTables.seriesReady,
         studiesReady: state.DisplayTables.studiesReady,
         warningsSeries: state.Warnings.warningsSeries,
@@ -532,11 +553,10 @@ const mapDispatchToProps = {
     addWarningsSeries,
     addVisit,
     selectStudy,
-    unselectStudy,
     addStudyReady,
     addSeriesReady,
     setVisitID,
-    resetVisits
+    resetRedux
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Uploader)

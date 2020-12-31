@@ -16,6 +16,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import Select from 'react-select'
+import { Alert } from 'react-bootstrap'
 
 import ControllerCheckPatient from './ControllerCheckPatient'
 import { setVisitID } from '../actions/Studies'
@@ -50,10 +51,14 @@ class SelectPatient extends Component {
         let visitTypeOptions = []
 
         //Collect all unique visit type to make the visit type select
-        let visitsArray = Object.values(this.props.visits)
-        let visitTypeArray = visitsArray.map((visitObject) => {
-            return visitObject.visitType
-        })
+        let visitTypeArray = []
+
+        for (let visitObject of Object.values(this.props.visits)) {
+            //Select visits with selected visit type and not assigned to another study
+            if ( visitObject.studyInstanceUID === undefined) {
+                visitTypeArray.push(visitObject.visitType)
+            }
+        }
 
         let uniqueVisitType = [...new Set(visitTypeArray)]
 
@@ -74,11 +79,10 @@ class SelectPatient extends Component {
         let visitOptions = []
 
         for (let visitObject of Object.values(this.props.visits)) {
-            console.log(visitObject.visitType)
-            console.log(selectedVisitType)
-            if (visitObject.visitType === selectedVisitType) {
+            //Select visits with selected visit type and not assigned to another study
+            if (visitObject.visitType === selectedVisitType && visitObject.studyInstanceUID === undefined) {
                 visitOptions.push(
-                    { value: visitObject.idVisit, label: visitObject.numeroPatient }
+                    { value: visitObject.visitID, label: visitObject.patientCode }
                 )
             }
         }
@@ -122,15 +126,16 @@ class SelectPatient extends Component {
     }
 
     render = () => {
+        if (this.state.visitTypeOptions.length === 0) return  <Alert variant='warning'>  All Visits have been linked to study, reset links to re-affect visit </Alert>
         return (
             <>
-                <div hidden={ ! this.props.multiUpload}>
+                <div hidden={ !this.props.multiUpload }>
                     <span className='du-patp-label'>Select Visit Type</span>
                     <Select options={this.state.visitTypeOptions} value={this.state.selectedVisitType} onChange={this.selectType} />
                     <span className='du-patp-label'>Select Patient</span>
                     <Select options={this.state.visitOptions} value={this.state.selectedVisit} onChange={this.selectVisit} />
                 </div>
-                <ControllerCheckPatient currentStudy={this.props.studies[this.props.selectedStudy]} expectedVisit={this.state.selectedVisitValue} onValidatePatient={this.validateCheckPatient} />
+                <ControllerCheckPatient selectedVisitID={this.state.selectedVisitValue} onValidatePatient={this.validateCheckPatient} />
             </>
         )
     }

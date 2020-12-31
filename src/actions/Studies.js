@@ -6,12 +6,12 @@ import { NULL_VISIT_ID } from '../model/Warning'
  * Add study to Redux studies Object
  * @param {Object} studyObject
  */
-export function addStudy (studyInstanceUID, patientFirstName, patientLastName, patientSex, patientID, acquisitionDate, patientBirthDate, studyDescription, orthancStudyID, series ) {
+export function addStudy (studyInstanceUID, patientFirstName, patientLastName, patientSex, patientID, acquisitionDate, accessionNumber, patientBirthDate, studyDescription, orthancStudyID, seriesModalitiesArray ) {
 
   return {
     type: ADD_STUDY,
     payload: {
-      idVisit : null,
+      visitID : null,
       patientFirstName : patientFirstName,
       patientLastName : patientLastName,
       patientName : patientFirstName+' '+patientLastName,
@@ -20,9 +20,10 @@ export function addStudy (studyInstanceUID, patientFirstName, patientLastName, p
       studyDescription : studyDescription,
       acquisitionDate : acquisitionDate,
       patientBirthDate : patientBirthDate,
+      accessionNumber : accessionNumber,
       studyInstanceUID : studyInstanceUID,
       orthancStudyID : orthancStudyID,
-      series : series
+      seriesModalitiesArray : seriesModalitiesArray
     }
   }
 }
@@ -30,11 +31,11 @@ export function addStudy (studyInstanceUID, patientFirstName, patientLastName, p
 
 
 /**
- * Set idVisit to the passed study awaiting check
+ * Set visitID to the passed study awaiting check
  * @param {String} studyInstanceUID
- * @param {Integer} idVisit
+ * @param {Integer} visitID
  */
-export function setVisitID (studyInstanceUID, idVisit) {
+export function setVisitID (studyInstanceUID, visitID) {
 
   return function (dispatch){
 
@@ -43,7 +44,7 @@ export function setVisitID (studyInstanceUID, idVisit) {
       {
         type: SET_USED_VISIT,
         payload: { 
-          idVisit: idVisit, 
+          visitID: visitID, 
           studyInstanceUID : studyInstanceUID
         }
       }
@@ -55,7 +56,7 @@ export function setVisitID (studyInstanceUID, idVisit) {
         type: SET_VISIT_ID,
         payload: {
           studyInstanceUID: studyInstanceUID,
-          idVisit: idVisit
+          visitID: visitID
         }
       }
     )
@@ -77,7 +78,7 @@ export function setVisitID (studyInstanceUID, idVisit) {
 
 }
 
-export function unsetVisitID(studyInstanceUID, idVisit) {
+export function unsetVisitID(studyInstanceUID, visitID) {
 
   return function (dispatch){
 
@@ -85,7 +86,7 @@ export function unsetVisitID(studyInstanceUID, idVisit) {
     dispatch( 
       {
         type: SET_NOT_USED_VISIT,
-        payload: { idVisit: idVisit}
+        payload: { visitID: visitID}
       }
     )
 

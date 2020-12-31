@@ -51,23 +51,23 @@ class DisplayWarning extends Component {
      * @return {Array}
      */
     buildRow = () => {
-        if (this.props.selectionID !== undefined && this.props.selectionID !== null) {
+        if (this.props.selectedStudy !== undefined && this.props.selectedSeries !== null) {
             let rows = []
             switch (this.props.type) {
                 case 'study':
-                    if ( this.props.warningsStudies[this.props.selectionID] === undefined ) return []
-                    for (let warning of Object.values(this.props.warningsStudies[this.props.selectionID]) ) {
+                    if ( this.props.warningsStudies[this.props.selectedStudy] === undefined ) return []
+                    for (let warning of Object.values(this.props.warningsStudies[this.props.selectedStudy]) ) {
                         rows.push({ 
-                            studyInstanceUID: this.props.selectionID, 
+                            studyInstanceUID: this.props.selectedStudy, 
                             ...warning
                         })
                     }
                     return rows
                 case 'series':
-                    if ( this.props.warningsSeries[this.props.selectionID] === undefined ) return []
-                    for (let warning of Object.values(this.props.warningsSeries[this.props.selectionID])) {
+                    if ( this.props.warningsSeries[this.props.selectedSeries] === undefined ) return []
+                    for (let warning of Object.values(this.props.warningsSeries[this.props.selectedSeries])) {
                         rows.push({ 
-                            seriesInstanceUID: this.props.selectionID, 
+                            seriesInstanceUID: this.props.selectedSeries, 
                             ...warning
                         })
                     }
@@ -106,6 +106,7 @@ class DisplayWarning extends Component {
 const mapStateToProps = state => {
     return {
         selectedStudy: state.DisplayTables.selectedStudy,
+        selectedSeries: state.DisplayTables.selectedSeries,
         series : state.Series.series,
         studiesReady: state.DisplayTables.studiesReady,
         warningsSeries: state.Warnings.warningsSeries,

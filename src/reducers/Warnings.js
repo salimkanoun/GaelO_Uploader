@@ -25,13 +25,13 @@ export default function WarningsReducer(state = initialState, action) {
       const warningKey = action.payload.warningKey
       const seriesInstanceUID = action.payload.seriesInstanceUID
 
-      let seriesToUpdate = state.warningsSeries[seriesInstanceUID]
-      seriesToUpdate[warningKey]['dismissed'] = !seriesToUpdate[warningKey]['dismissed']
+      let seriesToUpdateCopy = JSON.parse(JSON.stringify(state.warningsSeries[seriesInstanceUID]))
+      seriesToUpdateCopy[warningKey]['dismissed'] = !seriesToUpdateCopy[warningKey]['dismissed']
 
       return {
         warningsSeries: {
           ...state.warningsSeries,
-          [seriesInstanceUID]: { ...seriesToUpdate }
+          [seriesInstanceUID]: { ...seriesToUpdateCopy }
         }
       }
 

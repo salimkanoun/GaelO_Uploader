@@ -67,7 +67,7 @@ class DisplaySeries extends Component {
             },
             {
                 dataField: 'seriesNumber',
-                text: 'Number #',
+                text: 'Series Number',
                 editable: false,
             },
             {

@@ -47,7 +47,7 @@ class ControllerStudiesSeries extends Component {
       let seriesArray = this.getSeriesFromStudy(studyInstanceUID)
 
       for (let series of seriesArray ) {
-        if ( !this.IsSeriesWarningsPassed(series.seriesInstanceUID)) {
+        if ( !this.isSeriesWarningsPassed(series.seriesInstanceUID)) {
           return 'Incomplete'
         }
       }
@@ -96,7 +96,8 @@ class ControllerStudiesSeries extends Component {
 
       seriesToDisplay.forEach( (series) => {
 
-        series.status = this.IsSeriesWarningsPassed(series.seriesInstanceUID) ? 'Valid' : 'Rejected'
+        series.status = this.isSeriesWarningsPassed(series.seriesInstanceUID) ? 'Valid' : 'Rejected'
+
         series.selectedSeries = this.props.seriesReady.includes(series.seriesInstanceUID)
         seriesArray.push({
           ...series
@@ -114,7 +115,7 @@ class ControllerStudiesSeries extends Component {
    * @param {Object} series
    * @return {Boolean}
    */
-  IsSeriesWarningsPassed(series) {
+  isSeriesWarningsPassed(series) {
     for (const warning in this.props.warningsSeries[series]) {
       if (!this.props.warningsSeries[series][warning].dismissed) {
         return false
@@ -150,5 +151,6 @@ const mapStateToProps = state => {
     warningsStudies: state.WarningsStudy.warningsStudy
   }
 }
+
 
 export default connect(mapStateToProps, null)(ControllerStudiesSeries)

@@ -38,8 +38,6 @@ class DisplayWarning extends Component {
                     onClick={() => {
                         if (this.props.type === 'series') {
                             this.props.toogleWarningSeries(row.key, row.seriesInstanceUID)
-                            if (this.props.series[row.seriesInstanceUID].status === 'Valid') this.props.removeSeriesReady(row.seriesInstanceUID) 
-                            else this.props.addSeriesReady(row.seriesInstanceUID) 
                         } 
                     }}/>
             ),
@@ -51,33 +49,32 @@ class DisplayWarning extends Component {
      * @return {Array}
      */
     buildRow = () => {
-        if (this.props.selectedStudy !== undefined && this.props.selectedSeries !== null) {
-            let rows = []
-            switch (this.props.type) {
-                case 'study':
-                    if ( this.props.warningsStudies[this.props.selectedStudy] === undefined ) return []
-                    for (let warning of Object.values(this.props.warningsStudies[this.props.selectedStudy]) ) {
-                        rows.push({ 
-                            studyInstanceUID: this.props.selectedStudy, 
-                            ...warning
-                        })
-                    }
-                    return rows
-                case 'series':
-                    if ( this.props.warningsSeries[this.props.selectedSeries] === undefined ) return []
-                    for (let warning of Object.values(this.props.warningsSeries[this.props.selectedSeries])) {
-                        rows.push({ 
-                            seriesInstanceUID: this.props.selectedSeries, 
-                            ...warning
-                        })
-                    }
-                    return rows
-                default:
-                    return []
-            }
-        } else {
-            return []
+        let rows = []
+        switch (this.props.type) {
+            case 'study':
+                if(this.props.selectedStudy ===undefined) return []
+                if(this.props.warningsStudies[this.props.selectedStudy] === undefined) return []
+                for (let warning of Object.values(this.props.warningsStudies[this.props.selectedStudy]) ) {
+                    rows.push({ 
+                        studyInstanceUID: this.props.selectedStudy, 
+                        ...warning
+                    })
+                }
+                return rows
+            case 'series':
+                if(this.props.selectedSeries ===undefined) return []
+                if (this.props.warningsSeries[this.props.selectedSeries] === undefined) return []
+                for (let warning of Object.values(this.props.warningsSeries[this.props.selectedSeries])) {
+                    rows.push({ 
+                        seriesInstanceUID: this.props.selectedSeries, 
+                        ...warning
+                    })
+                }
+                return rows
+            default:
+                return []
         }
+
     }
 
     getRowClasses = (row, rowIndex) => {

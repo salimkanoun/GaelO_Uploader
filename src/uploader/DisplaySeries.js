@@ -44,7 +44,7 @@ class DisplaySeries extends Component {
                             onChange={(event) => {
                                     if (event.target.checked) this.props.addSeriesReady(row.seriesInstanceUID)
                                     else this.props.removeSeriesReady(row.seriesInstanceUID)
-                                 }} 
+                            }} 
                         />
                     )
                 }
@@ -67,7 +67,7 @@ class DisplaySeries extends Component {
             },
             {
                 dataField: 'seriesNumber',
-                text: 'Number #',
+                text: 'Series Number',
                 editable: false,
             },
             {

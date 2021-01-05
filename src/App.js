@@ -2,7 +2,7 @@ import 'regenerator-runtime/runtime'
 
 import React from 'react'
 import { Provider } from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
+import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 
 import { ToastContainer } from 'react-toastify'
@@ -23,7 +23,7 @@ import seriesWarningMiddelware from './middelware/SeriesWarningMiddelware'
 
 function App (props) {
 
-  const createStoreWithMiddleware = applyMiddleware(thunk, seriesWarningMiddelware)(createStore)
+  const createStoreWithMiddleware =  applyMiddleware(thunk, seriesWarningMiddelware)(createStore)
 
   return (
     <Provider store={createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())}>

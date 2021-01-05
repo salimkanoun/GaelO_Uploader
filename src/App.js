@@ -19,10 +19,11 @@ import './assets/style/dicomupload.css'
 
 import Uploader from './uploader/Uploader'
 import reducers from './reducers'
+import seriesWarningMiddelware from './middelware/SeriesWarningMiddelware'
 
 function App (props) {
 
-  const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
+  const createStoreWithMiddleware = applyMiddleware(thunk, seriesWarningMiddelware)(createStore)
 
   return (
     <Provider store={createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())}>

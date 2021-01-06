@@ -10,7 +10,6 @@ export function isNewStudy (studyName, originalOrthancID) {
     }
 
   }).then((answer) => {
-    return true
     if (answer.status === 200 ) return false
     else if (answer.status === 404) return true
     else throw answer

@@ -73,6 +73,14 @@ class Uploader extends Component {
         this.uppy.on('upload-error', (file, error, response) => {
             toast.error(`Error with file: ${file.id}. Error message: ${error}`)
         })
+
+        //if paused prevent upload to restart at adding of new files
+        this.uppy.on('upload', () => {
+            if(this.state.isPaused) {
+                console.log('pause uppy')
+                this.uppy.pauseAll()
+            }
+        })
         
 
     }
@@ -493,15 +501,15 @@ class Uploader extends Component {
         this.setState({ isUploading: true })
     }
 
-    onPauseUploadClick = () =>{
+    onPauseUploadClick = (pause) =>{
 
-        if(this.state.isPaused){
-            this.uppy.resumeAll()
-        }else{
+        if(pause){
             this.uppy.pauseAll()
+        }else{
+            this.uppy.resumeAll()
         }
 
-        this.setState( (state) => {return { isPaused: !state.isPaused }})
+        this.setState( { isPaused: pause })
     }
 
     render = () => {

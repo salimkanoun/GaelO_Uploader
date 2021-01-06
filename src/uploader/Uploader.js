@@ -36,6 +36,7 @@ class Uploader extends Component {
         isParsingFiles: false,
         isUnzipping: false,
         isUploading: false,
+        isPaused : false,
         fileParsed: 0,
         fileLoaded: 0,
         zipProgress: 0,
@@ -72,6 +73,7 @@ class Uploader extends Component {
         this.uppy.on('upload-error', (file, error, response) => {
             toast.error(`Error with file: ${file.id}. Error message: ${error}`)
         })
+        
 
     }
 
@@ -81,6 +83,7 @@ class Uploader extends Component {
 
     componentWillUnmount = () => {
         this.props.resetRedux()
+        this.uppy.close()
     }
 
     loadAvailableVisits = () => {
@@ -408,7 +411,7 @@ class Uploader extends Component {
     /**
      * Upload selected and validated series on click
      */
-    onUploadClick = async () => {
+    onUploadClick = () => {
 
         //build array of series object to be uploaded
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
@@ -490,6 +493,17 @@ class Uploader extends Component {
         this.setState({ isUploading: true })
     }
 
+    onPauseUploadClick = () =>{
+
+        if(this.state.isPaused){
+            this.uppy.resumeAll()
+        }else{
+            this.uppy.pauseAll()
+        }
+
+        this.setState( (state) => {return { isPaused: !state.isPaused }})
+    }
+
     render = () => {
         if(this.config.availableVisits.length ===0) return <Alert variant='success'>  No Visits Awaiting Upload </Alert>
         return (
@@ -521,10 +535,13 @@ class Uploader extends Component {
                         selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload
                         disabled={ this.state.isUploading || Object.keys(this.props.studiesReady).length === 0 }
+                        isUploading = {this.state.isUploading}
+                        isPaused = {this.state.isPaused}
                         multiUpload={this.config.availableVisits.length > 1}
                         studyProgress={this.state.studyProgress}
                         studyLength={this.state.studyLength}
                         onUploadClick={this.onUploadClick}
+                        onPauseClick = {this.onPauseUploadClick}
                         zipPercent={this.state.zipProgress}
                         uploadPercent={this.state.uploadProgress} />
                 </div>

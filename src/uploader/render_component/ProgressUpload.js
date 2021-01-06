@@ -24,7 +24,7 @@ export default class ProgressUpload extends Component {
   getActionButton = () => {
 
     if (this.props.isUploadStarted) {
-      return <Button variant={this.props.isPaused ? 'primary' : 'warning'} onClick={() =>{this.props.onPauseClick(!this.props.isPaused)}} disabled={!this.props.isUploadStarted || this.props.uploadPercent === 0 }>
+      return <Button variant={this.props.isPaused ? 'primary' : 'warning'} onClick={() =>{this.props.onPauseClick(!this.props.isPaused)}} disabled={!this.props.isUploadStarted || this.props.uploadPercent === 0 || this.props.uploadPercent === 100 }>
         {this.props.isPaused ? <ResumeIcon/> : <PauseIcon />}
       </Button>
     } else {

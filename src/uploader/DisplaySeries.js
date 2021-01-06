@@ -13,11 +13,16 @@
  */
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+
 import BootstrapTable from 'react-bootstrap-table-next';
 import { Container, Row, Col } from 'react-bootstrap'
+
+import Util from '../model/Util'
+import { addSeriesReady, removeSeriesReady, selectSeries } from '../actions/DisplayTables'
 import DisplayWarning from './DisplayWarning'
-import { connect } from 'react-redux';
-import { selectSeriesReady, selectSeries } from './actions/DisplayTables'
+
+
 
 class DisplaySeries extends Component {
 
@@ -30,11 +35,17 @@ class DisplaySeries extends Component {
             {
                 dataField: 'selectedSeries',
                 text: '',
-                formatExtraData: this,
                 formatter: (cell, row, rowIndex, formatExtraData) => {
                     if (row.status === 'Known study') return <> </>
                     return (
-                        <input disabled={row.status === 'Rejected'} checked={this.props.seriesReady.includes(row.seriesInstanceUID)} type='checkbox' onChange={(event) => { formatExtraData.props.selectSeriesReady(row.seriesInstanceUID, event.target.checked) }} />
+                        <input disabled={row.status === 'Rejected'} 
+                            checked={this.props.seriesReady.includes(row.seriesInstanceUID)} 
+                            type='checkbox' 
+                            onChange={(event) => {
+                                    if (event.target.checked) this.props.addSeriesReady(row.seriesInstanceUID)
+                                    else this.props.removeSeriesReady(row.seriesInstanceUID)
+                            }} 
+                        />
                     )
                 }
             },
@@ -56,13 +67,16 @@ class DisplaySeries extends Component {
             },
             {
                 dataField: 'seriesNumber',
-                text: 'Number #',
+                text: 'Series Number',
                 editable: false,
             },
             {
                 dataField: 'seriesDate',
                 text: 'Date',
                 editable: false,
+                formatter: (cell, row, rowIndex, extraData) => {
+                    return Util.formatRawDate(cell)
+                }
             },
             {
                 dataField: 'numberOfInstances',
@@ -83,7 +97,11 @@ class DisplaySeries extends Component {
         }
     }
 
-
+    getSeriesRowClasses = (row, rowIndex) => {
+        if (row.status === 'Rejected') return 'du-series row-danger'
+        if (row.status === 'Valid' && row.selectedSeries === true) return 'du-series row-success'
+        return 'du-series td'
+    }
 
     render() {
         return (
@@ -96,7 +114,7 @@ class DisplaySeries extends Component {
                             classes="table table-borderless"
                             bodyClasses="du-series-tbody"
                             headerClasses="du-series th"
-                            rowClasses={rowClasses}
+                            rowClasses={this.getSeriesRowClasses}
                             wrapperClasses="table-responsive"
                             data={this.props.seriesRows}
                             columns={this.columns}
@@ -105,19 +123,12 @@ class DisplaySeries extends Component {
                     <Col xs={6} md={4}>
                         <DisplayWarning
                             type='series'
-                            selectionID={this.props.selectedSeries}
                         />
                     </Col>
                 </Row>
             </Container>
         )
     }
-}
-
-const rowClasses = (row, rowIndex) => {
-    if (row.status === 'Rejected') return 'du-series row-danger'
-    if (row.status === 'Valid' && row.selectedSeries === true) return 'du-series row-success'
-    return 'du-series td'
 }
 
 
@@ -128,7 +139,8 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
-    selectSeriesReady,
+    addSeriesReady,
+    removeSeriesReady,
     selectSeries
 }
 

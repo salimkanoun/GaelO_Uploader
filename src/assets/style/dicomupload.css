@@ -156,6 +156,11 @@
 	background-color: #e2ffe1;
 }
 
+.row-info {
+	color: #091181;
+	background-color: #e1edff;
+}
+
 .row-danger {
 	color: #c40404;
 	background-color: #fff3f3;

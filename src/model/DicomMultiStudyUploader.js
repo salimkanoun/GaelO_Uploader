@@ -10,10 +10,10 @@ export default class DicomMultiStudyUploader extends EventEmitter {
         this.uppy = uppy
     }
 
-    addStudyToUpload(idVisit, fileArray, orthancStudyID) {
-        this.visitsToUpload[idVisit] = {}
-        this.visitsToUpload[idVisit]['files'] = fileArray
-        this.visitsToUpload[idVisit]['orthancStudyID'] = orthancStudyID
+    addStudyToUpload(visitID, fileArray, orthancStudyID) {
+        this.visitsToUpload[visitID] = {}
+        this.visitsToUpload[visitID]['files'] = fileArray
+        this.visitsToUpload[visitID]['orthancStudyID'] = orthancStudyID
     }
 
     registerListener() {

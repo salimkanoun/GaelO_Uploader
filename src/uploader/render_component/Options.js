@@ -15,7 +15,7 @@
 import React, { Component } from 'react'
 import { Popover, OverlayTrigger, Button } from 'react-bootstrap'
 import { Slider, Typography } from '@material-ui/core';
-import OptionCog from '../images/optionCog'
+import OptionCog from '../../assets/images/optionCog'
 export default class Options extends Component {
 
     state = {
@@ -23,27 +23,26 @@ export default class Options extends Component {
         zipIntensity: 3
     }
 
-    constructor(props){
-        super(props)
-        this.updateBatchSize = this.updateBatchSize.bind(this)
-        this.updateZipIntensity = this.updateZipIntensity.bind(this)
-    }
-
     updateBatchSize = (object, value) => {
+
         this.setState({
             batchUploadSize : value
+        }, ()=>{
+            localStorage.setItem('batchUploadSize', value)
         })
-        localStorage.setItem('batchUploadSize', value);
+        
     }
 
     updateZipIntensity = (object, value) => {
         this.setState({
             zipIntensity : value
+        }, ()=>{
+            localStorage.setItem('zipIntensity', value)
         })
-        localStorage.setItem('zipIntensity', value);
+        
     }
 
-    componentDidMount() {
+    componentDidMount = () => {
 
         if(localStorage.getItem('zipIntensity') !== null){
 
@@ -55,19 +54,22 @@ export default class Options extends Component {
             })
 
         }else{
+
             localStorage.setItem('zipIntensity', 3)
             localStorage.setItem('batchUploadSize', 200)
+
         }
         
     }
 
-    render() {
+    render = () => {
         return (
             <>
                 <OverlayTrigger rootClose trigger="click" placement="right" overlay={
-                    <Popover className='popover' id="popover-basic">
+                    <Popover style={{padding : '20'}}>
                         <Popover.Title as="h3">Options</Popover.Title>
                         <Popover.Content>
+                            <div>
                             <Typography id="discrete-slider-restrict" gutterBottom>
                                 Upload batch size
                             </Typography>
@@ -77,6 +79,7 @@ export default class Options extends Component {
                                 aria-labelledby="discrete-slider-restrict"
                                 step={null}
                                 marks={batchSize}
+                                min={50}
                                 max={500}
                                 valueLabelDisplay="auto"
                                 valueLabelFormat={(x) => x}
@@ -96,6 +99,7 @@ export default class Options extends Component {
                                 valueLabelDisplay="auto"
                                 onChangeCommitted={this.updateZipIntensity}
                             />
+                            </div>
                         </Popover.Content>
                     </Popover>
                 }>
@@ -115,7 +119,7 @@ const batchSize = [
     },
     {
         value: 100,
-        label: '100Mo',
+        label: '',
     },
     {
         value: 200,
@@ -123,6 +127,6 @@ const batchSize = [
     },
     {
         value: 500,
-        label: '500Mo',
+        label: '',
     },
 ];

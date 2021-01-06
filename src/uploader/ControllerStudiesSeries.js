@@ -14,108 +14,100 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+
 import Row from 'react-bootstrap/Row'
+
 import DisplayStudies from './DisplayStudies.js'
 import DisplaySeries from './DisplaySeries.js'
 class ControllerStudiesSeries extends Component {
 
-  state = {
-    studies: [],
-    series: []
-  }
-
-  componentDidUpdate(prevProps) {
-    //Check if DICOMs have been upload OR if warnings have changed OR if studiesReady have changed to update table
-    if ((prevProps.isCheckDone !== this.props.isCheckDone && this.props.isCheckDone) ||
-      (this.props.selectedStudy !== undefined && prevProps.studies[this.props.selectedStudy].idVisit !==
-        this.props.studies[this.props.selectedStudy].idVisit) ||
-        (this.props.studiesReady !== prevProps.studiesReady)) this.buildStudiesRows()
-    //Check if series warnings have change
-    if (prevProps.selectedStudy !== this.props.selectedStudy || prevProps.seriesReady !== this.props.seriesReady) {
-      this.buildSeriesRows()
-      this.buildStudiesRows()
-    }
-  }
-
-  /* STUDIES TABLE CONTROLLER */
-
   /**
-   * Fetch studies from Redux State to display in table
-   * @return {Object}
+   * Format studies from Redux State to display in study table
+   * @return {array}
    */
   buildStudiesRows() {
-    const studies = []
-    if (Object.keys(this.props.studies).length > 0) {
-      for (const study in this.props.studies) {
-        const tempStudy = this.props.studies[study]
-        tempStudy.status = this.studyWarningsPassed(study)
-        tempStudy.selectedStudies = this.props.studiesReady.includes(tempStudy.studyInstanceUID)
-        studies.push({ ...tempStudy })
-      }
+    let studies = []
+    for (let study of Object.values(this.props.studies) ) {
+      study.status = this.getStudyStatus(study.studyInstanceUID)
+      study.selectedStudies = this.props.studiesReady.includes(study.studyInstanceUID)
+      studies.push({ ...study })
     }
-    this.setState({ studies: studies })
+    return studies
   }
 
   /**
-   * Check the study status according to its warnings and its series' warnings
+   * Check the study status according to its warnings and its series warnings
    * @param {Object} study
    * @return {Boolean}
    */
-  studyWarningsPassed(study) {
-    let studyStatus = 'Valid'
-    if (Object.entries(this.props.studies[study].warnings).length === 0) return studyStatus
+  getStudyStatus(studyInstanceUID) {
 
-    if (this.props.studies[study].warnings !== undefined && this.props.studies[study].warnings['ALREADY_KNOWN_STUDY'] !== undefined) {
-      studyStatus = 'Already Known'
-      return studyStatus
-    }
-    // Check for warnings in study
-    for (const warning in this.props.studies[study].warnings) {
-      if (!this.props.studies[study].warnings[warning].dismissed) {
-        studyStatus = 'Rejected'
-        return studyStatus
-      }
-    }
-    let hasAWarningDismissed = false
-    // Check for warnings in series
-    for (const series in this.props.series) {
-      if (Object.keys(this.props.studies[study].series).includes(series)) {
-        for (const warning in this.props.warningsSeries[series]) {
-          if (this.props.warningsSeries[series][warning].dismissed) hasAWarningDismissed = true
-          else studyStatus = 'Incomplete'
+    if ( this.props.warningsStudies[studyInstanceUID] === undefined ) {
+      //If no warning at study level, look if remaining warnings at series level
+      let seriesArray = this.getSeriesFromStudy(studyInstanceUID)
+
+      for (let series of seriesArray ) {
+        if ( !this.isSeriesWarningsPassed(series.seriesInstanceUID)) {
+          return 'Incomplete'
         }
       }
+      //If not, study is valid
+      return 'Valid'
+
+    } else {
+      //If warning at study level return them as string
+      if (this.props.warningsStudies[studyInstanceUID]['ALREADY_KNOWN_STUDY'] !== undefined) {
+        return 'Already Known'
+      }
+
+      if (this.props.warningsStudies[studyInstanceUID]['NULL_VISIT_ID'] !== undefined) {
+        return 'Rejected'
+      }
+
     }
-    if (hasAWarningDismissed) studyStatus = 'Valid'
-    return studyStatus
+
   }
 
-  /* SERIES TABLE CONTROLLER */
+  /**
+   * Get Series in Redux related to a StudyInstanceUID
+   * @param {string} studyInstanceUID 
+   */
+  getSeriesFromStudy = (studyInstanceUID) => {
+      //Read available series in Redux
+      let seriesArray = Object.values(this.props.series)
+      //Select series belonging to the current study
+      let seriesToDisplay = seriesArray.filter((series)=> {
+        return series.studyInstanceUID === studyInstanceUID
+      })
+
+      return seriesToDisplay
+  }
 
   /**
-   * Add status and selection state to previous information from the selected study's series
-   * in order to build table
-   * @return {Array}
+   * Fetch studies from Redux State to display in Series table
+   * @return {Object}
    */
   buildSeriesRows() {
-    const seriesArray = []
-    if (this.props.selectedStudy !== null && this.props.selectedStudy !== undefined) {
-      const seriesToDisplay = Object.keys(this.props.studies[this.props.selectedStudy].series)
-      seriesToDisplay.forEach((series) => {
-        const seriesToPush = this.props.series[series]
-        if (this.props.studies[this.props.selectedStudy].warnings['ALREADY_KNOWN_STUDY'] !== undefined) seriesToPush.status = 'Known study'
-        else seriesToPush.status = this.seriesWarningsPassed(series) ? 'Valid' : 'Rejected'
-        seriesToPush.selectedSeries = false
-        if (this.props.seriesReady.includes(seriesToPush.seriesInstanceUID)) {
-          seriesToPush.selectedSeries = true
-        }
+    let seriesArray = []
+
+    if (this.props.selectedStudy !== null) {
+
+      let seriesToDisplay = this.getSeriesFromStudy(this.props.selectedStudy)
+
+      seriesToDisplay.forEach( (series) => {
+
+        series.status = this.isSeriesWarningsPassed(series.seriesInstanceUID) ? 'Valid' : 'Rejected'
+
+        series.selectedSeries = this.props.seriesReady.includes(series.seriesInstanceUID)
         seriesArray.push({
-          ...seriesToPush
+          ...series
         })
-      }
-      )
+
+      })
+
     }
-    this.setState({ series: seriesArray })
+
+    return seriesArray
   }
 
   /**
@@ -123,7 +115,7 @@ class ControllerStudiesSeries extends Component {
    * @param {Object} series
    * @return {Boolean}
    */
-  seriesWarningsPassed(series) {
+  isSeriesWarningsPassed(series) {
     for (const warning in this.props.warningsSeries[series]) {
       if (!this.props.warningsSeries[series][warning].dismissed) {
         return false
@@ -133,13 +125,14 @@ class ControllerStudiesSeries extends Component {
   }
 
   render() {
+    
     return (
-      <div disabled={this.props.isUploading}>
+      <div disabled={ !this.props.isCheckDone || this.props.isUploading }>
         <Row>
-          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.state.studies} checkStudyReady={(studyID) => { this.studyWarningsPassed(studyID) }} />
+          <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} />
         </Row>
         <Row>
-          <DisplaySeries seriesRows={this.state.series} />
+          <DisplaySeries seriesRows={this.buildSeriesRows()} />
         </Row>
       </div>
     )
@@ -154,10 +147,10 @@ const mapStateToProps = state => {
     studiesReady: state.DisplayTables.studiesReady,
     selectedStudy: state.DisplayTables.selectedStudy,
     selectedSeries: state.DisplayTables.selectedSeries,
-    warningsSeries: state.Warnings.warningsSeries
+    warningsSeries: state.Warnings.warningsSeries,
+    warningsStudies: state.WarningsStudy.warningsStudy
   }
 }
 
-const mapDispatchToProps = {}
 
-export default connect(mapStateToProps, mapDispatchToProps)(ControllerStudiesSeries)
+export default connect(mapStateToProps, null)(ControllerStudiesSeries)

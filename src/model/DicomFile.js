@@ -102,27 +102,38 @@ export default class DicomFile {
         if (element === undefined) throw Error('Tag Not Found')
 
         if (element.vr === 'SQ') {
-          // Treat each item of sequence
-          element.items.forEach(item => {
-            const sequenceElement = item.dataSet.elements
-            const elementsInSeq = Object.keys(sequenceElement)
-            // erase each tag in this item
-            elementsInSeq.forEach(tag => {
-              this.__editElement(sequenceElement[tag], '*')
-            })
-          })
+          this.__editSequence(element, '*')
         } else {
           this.__editElement(element, '*')
         }
 
       } catch (e) {
         if (e.message !== 'Tag Not Found') {
-          console.log('tag ' + id)
-          console.log(e)
+          console.error('tag ' + id)
         }
 
       }
     }
+
+  }
+
+  __editSequence(element, newContent){
+    // Treat each item of sequence
+    element.items.forEach(item => {
+      const sequenceElement = item.dataSet.elements
+      const elementsInSeq = Object.keys(sequenceElement)
+      // erase each tag in this item
+      elementsInSeq.forEach(tag => {
+        if(sequenceElement[tag].vr === 'SQ'){
+          //If sequence in Sequence, recursively run this fuction
+          this.__editSequence(sequenceElement[tag], newContent)
+        }else{
+          //If not sequence anonymize the tag by changing its value
+          this.__editElement(sequenceElement[tag], newContent)
+        }
+      })
+    })
+    
 
   }
 
@@ -149,7 +160,6 @@ export default class DicomFile {
       const radioPharmElements = elmt.items[0].dataSet.elements
       return this._getString(radioPharmElements['x' + tagAddress])
     } catch (error) {
-      console.log(error)
       return undefined
     }
   }

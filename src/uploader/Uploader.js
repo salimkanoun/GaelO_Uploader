@@ -35,7 +35,7 @@ class Uploader extends Component {
         isFilesLoaded: false,
         isParsingFiles: false,
         isUnzipping: false,
-        isUploading: false,
+        isUploadStarted: false,
         isPaused : false,
         fileParsed: 0,
         fileLoaded: 0,
@@ -493,12 +493,11 @@ class Uploader extends Component {
 
         uploader.on('upload-finished', () => {
             console.log('full upload Finished')
-            this.setState({ isUploading: false })
             this.config.onUploadComplete()
         })
 
         uploader.startUpload()
-        this.setState({ isUploading: true })
+        this.setState({ isUploadStarted: true })
     }
 
     onPauseUploadClick = (pause) =>{
@@ -521,7 +520,7 @@ class Uploader extends Component {
                         addFile={this.addFile}
                         isUnzipping={this.state.isUnzipping}
                         isParsingFiles={this.state.isParsingFiles}
-                        isUploading={this.state.isUploading}
+                        isUploadStarted={this.state.isUploadStarted}
                         fileParsed={this.state.fileParsed}
                         fileIgnored={Object.keys(this.state.ignoredFiles).length}
                         fileLoaded={this.state.fileLoaded}
@@ -538,12 +537,12 @@ class Uploader extends Component {
                 <div hidden={!this.state.isFilesLoaded}>
                     <ControllerStudiesSeries
                         isCheckDone={this.state.isCheckDone}
-                        isUploading={this.state.isUploading}
+                        isUploadStarted={this.state.isUploadStarted}
                         multiUpload={this.config.availableVisits.length > 1}
                         selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload
-                        disabled={ this.state.isUploading || Object.keys(this.props.studiesReady).length === 0 }
-                        isUploading = {this.state.isUploading}
+                        disabled={ this.state.isUploadStarted || Object.keys(this.props.studiesReady).length === 0 }
+                        isUploadStarted = {this.state.isUploadStarted}
                         isPaused = {this.state.isPaused}
                         multiUpload={this.config.availableVisits.length > 1}
                         studyProgress={this.state.studyProgress}

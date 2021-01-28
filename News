@@ -1,4 +1,6 @@
 Pending changes:
+
+28/01/2020 - Version 1.0.17
 Global refactor of the uploader, now unique and multiupload use the same code
 Various interface improvement
 Dicom date displayed in US format

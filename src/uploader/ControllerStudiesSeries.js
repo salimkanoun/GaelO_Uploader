@@ -127,7 +127,7 @@ class ControllerStudiesSeries extends Component {
   render() {
     
     return (
-      <div disabled={ !this.props.isCheckDone || this.props.isUploading }>
+      <div disabled={ !this.props.isCheckDone || this.props.isUploadStarted }>
         <Row>
           <DisplayStudies multiUpload={this.props.multiUpload} studiesRows={this.buildStudiesRows()} />
         </Row>

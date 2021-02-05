@@ -16,22 +16,36 @@ import React, { Component } from 'react'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Button from 'react-bootstrap/Button'
 import { Col, Row } from 'react-bootstrap'
+import PauseIcon from '../../assets/images/pauseCog'
+import ResumeIcon from '../../assets/images/resumeCog'
 
 export default class ProgressUpload extends Component {
+
+  getActionButton = () => {
+
+    if (this.props.isUploadStarted) {
+      return <Button variant={this.props.isPaused ? 'primary' : 'warning'} onClick={() =>{this.props.onPauseClick(!this.props.isPaused)}} disabled={!this.props.isUploadStarted || this.props.uploadPercent === 0 || this.props.uploadPercent === 100 }>
+        {this.props.isPaused ? <ResumeIcon/> : <PauseIcon />}
+      </Button>
+    } else {
+      return <Button variant='primary' onClick={this.props.onUploadClick} disabled={this.props.disabled}> Upload </Button>
+    }
+
+  }
 
   render = () => {
     return (
       <Row>
         <Col md='auto'>
-          <Button variant='primary' onClick={this.props.onUploadClick} disabled={this.props.disabled}> Upload </Button>
+          {this.getActionButton()}
         </Col>
         <Col>
-            {this.props.multiUpload ? <ProgressBar variant='success' now={this.props.studyProgress} max={this.props.studyLength} label={'Study ' + this.props.studyProgress + '/' + this.props.studyLength} /> : null}
-            <ProgressBar variant='info' now={this.props.zipPercent} label='Zip' max={100} />
-            <ProgressBar className="mb-3" striped animated variant='success' now={this.props.uploadPercent} label={`Upload ${this.props.uploadPercent}%`} max={100} />
+          {this.props.multiUpload ? <ProgressBar variant='success' now={this.props.studyProgress} max={this.props.studyLength} label={'Study ' + this.props.studyProgress + '/' + this.props.studyLength} /> : null}
+          <ProgressBar variant='info' now={this.props.zipPercent} label='Zip' max={100} />
+          <ProgressBar className="mb-3" striped animated variant='success' now={this.props.uploadPercent} label={`Upload ${this.props.uploadPercent}%`} max={100} />
         </Col>
       </Row>
     )
-    
+
   }
 }

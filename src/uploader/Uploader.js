@@ -35,7 +35,8 @@ class Uploader extends Component {
         isFilesLoaded: false,
         isParsingFiles: false,
         isUnzipping: false,
-        isUploading: false,
+        isUploadStarted: false,
+        isPaused : false,
         fileParsed: 0,
         fileLoaded: 0,
         zipProgress: 0,
@@ -73,6 +74,15 @@ class Uploader extends Component {
             toast.error(`Error with file: ${file.id}. Error message: ${error}`)
         })
 
+        //if paused prevent upload to restart at adding of new files
+        this.uppy.on('upload', () => {
+            if(this.state.isPaused) {
+                console.log('pause uppy')
+                this.uppy.pauseAll()
+            }
+        })
+        
+
     }
 
     componentDidMount = () => {
@@ -81,6 +91,7 @@ class Uploader extends Component {
 
     componentWillUnmount = () => {
         this.props.resetRedux()
+        this.uppy.close()
     }
 
     loadAvailableVisits = () => {
@@ -408,7 +419,7 @@ class Uploader extends Component {
     /**
      * Upload selected and validated series on click
      */
-    onUploadClick = async () => {
+    onUploadClick = () => {
 
         //build array of series object to be uploaded
         let seriesObjectArrays = this.props.seriesReady.map((seriesUID) => {
@@ -482,12 +493,22 @@ class Uploader extends Component {
 
         uploader.on('upload-finished', () => {
             console.log('full upload Finished')
-            this.setState({ isUploading: false })
             this.config.onUploadComplete()
         })
 
         uploader.startUpload()
-        this.setState({ isUploading: true })
+        this.setState({ isUploadStarted: true })
+    }
+
+    onPauseUploadClick = (pause) =>{
+
+        if(pause){
+            this.uppy.pauseAll()
+        }else{
+            this.uppy.resumeAll()
+        }
+
+        this.setState( { isPaused: pause })
     }
 
     render = () => {
@@ -499,7 +520,7 @@ class Uploader extends Component {
                         addFile={this.addFile}
                         isUnzipping={this.state.isUnzipping}
                         isParsingFiles={this.state.isParsingFiles}
-                        isUploading={this.state.isUploading}
+                        isUploadStarted={this.state.isUploadStarted}
                         fileParsed={this.state.fileParsed}
                         fileIgnored={Object.keys(this.state.ignoredFiles).length}
                         fileLoaded={this.state.fileLoaded}
@@ -516,15 +537,18 @@ class Uploader extends Component {
                 <div hidden={!this.state.isFilesLoaded}>
                     <ControllerStudiesSeries
                         isCheckDone={this.state.isCheckDone}
-                        isUploading={this.state.isUploading}
+                        isUploadStarted={this.state.isUploadStarted}
                         multiUpload={this.config.availableVisits.length > 1}
                         selectedSeries={this.props.selectedSeries} />
                     <ProgressUpload
-                        disabled={ this.state.isUploading || Object.keys(this.props.studiesReady).length === 0 }
+                        disabled={ this.state.isUploadStarted || Object.keys(this.props.studiesReady).length === 0 }
+                        isUploadStarted = {this.state.isUploadStarted}
+                        isPaused = {this.state.isPaused}
                         multiUpload={this.config.availableVisits.length > 1}
                         studyProgress={this.state.studyProgress}
                         studyLength={this.state.studyLength}
                         onUploadClick={this.onUploadClick}
+                        onPauseClick = {this.onPauseUploadClick}
                         zipPercent={this.state.zipProgress}
                         uploadPercent={this.state.uploadProgress} />
                 </div>

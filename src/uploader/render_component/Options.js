@@ -103,7 +103,7 @@ export default class Options extends Component {
                         </Popover.Content>
                     </Popover>
                 }>
-                    <Button variant="secondary" className='optionCog'> 
+                    <Button variant="secondary" className='du-icon'> 
                         <OptionCog/> 
                     </Button>
                 </OverlayTrigger>

@@ -18,9 +18,11 @@ const config = {
     "visitType":"PET0",
     "visitID": 1 }
   ],
+  tusEndpoint : '/api/tus',
   onStudyUploaded : (visitID, sucessIDsUploaded, numberOfFiles, originalStudyOrthancID) => {console.log(visitID)},
   onStartUsing : () => {console.log('use started')},
-  onUploadComplete: () => {console.log('upload finished')}
+  onUploadComplete: () => {console.log('upload finished')},
+  isNewStudy : async () => {return true}
 }
 
 const container = document.getElementById('root')

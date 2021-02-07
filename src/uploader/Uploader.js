@@ -19,8 +19,6 @@ import ProgressUpload from './render_component/ProgressUpload'
 import Options from './render_component/Options'
 import Util from '../model/Util'
 
-import { isNewStudy } from '../services/api'
-
 import { addStudy, setVisitID } from '../actions/Studies'
 import { addSeries } from '../actions/Series'
 import { addWarningsSeries, addWarningsStudy } from '../actions/Warnings'
@@ -61,7 +59,7 @@ class Uploader extends Component {
         })
 
         this.uppy.use(Tus, {
-            endpoint: '/api/tus', // use your tus endpoint here
+            endpoint: this.props.config.tusEndpoint, // use your tus endpoint here
             resume: true,
             autoRetry: true,
             chunkSize: 2000000,
@@ -350,7 +348,7 @@ class Uploader extends Component {
 
         // Check if study is already known by server
         try{
-            let newStudy = await isNewStudy( studyRedux.orthancStudyID )
+            let newStudy = await this.props.config.isNewStudy( studyRedux.orthancStudyID )
             if (!newStudy) warnings.push(ALREADY_KNOWN_STUDY)
         } catch (error){
             console.warn(error)

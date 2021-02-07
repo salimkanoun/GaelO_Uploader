@@ -347,22 +347,9 @@ class Uploader extends Component {
         if ( studyRedux.visitID == null ) warnings.push(NULL_VISIT_ID)
 
         // Check if study is already known by server
-        try{
-            let newStudy = await this.props.config.isNewStudy( studyRedux.orthancStudyID )
-            if (!newStudy) warnings.push(ALREADY_KNOWN_STUDY)
-        } catch (error){
-            console.warn(error)
-            toast.error("Session expired, please refresh browser",  {
-                position: "bottom-right",
-                autoClose: false,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                }
-            )
-        }
+        let newStudy = await this.props.config.isNewStudy( studyRedux.orthancStudyID )
+        if (!newStudy) warnings.push(ALREADY_KNOWN_STUDY)
+
 
         return warnings
     }

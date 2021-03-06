@@ -141,8 +141,7 @@ export default class DicomBatchUploader extends EventEmitter {
         for (let file of files){
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
-            dicomFile.anonymise()
-            jszip.file(dicomFile.getFilePath(), dicomFile.byteArray);
+            jszip.file(dicomFile.getFilePath(), dicomFile.anonymise());
         }
 
         let uintarray = await jszip.generateAsync(

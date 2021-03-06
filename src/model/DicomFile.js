@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import dicomParser from 'dicom-parser'
+import dcmjs from 'dcmjs'
 import Study from './Study'
 import Series from './Series'
 import Instance from './Instance'
@@ -42,30 +42,58 @@ export default class DicomFile {
     '1.2.840.10008.5.1.4.1.1.88.65',
     '1.2.840.10008.5.1.4.1.1.88.67'
   ]
+  /*
+    tagsToErase = [
+      '00101005',	// Patient's Birth Name
+      '00100010', // Patient's Name
+      '00100020', // Patient's ID
+      '00100030',	// Patient's Birth Date
+      '00101040', // Patient's Address
+      '00080050',	// Accession Number
+      '00080080',	// Institution Name
+      '00080081',	// Institution Adress
+      '00080090',	// Referring Physician's Name
+      '00080092',	// Referring Physician's Adress
+      '00080094', // Refering Physician's Telephone Number
+      '00080096', // Referring Pysician ID Sequence
+      '00081040', // Institutional Departement Name
+      '00081048', // Physician Of Record
+      '00081049', // Physician Of Record ID Sequence
+      '00081050', // Performing Physician's Name
+      '00081052', // Performing Physicians ID Sequence
+      '00081060', // Name Of Physician Reading Study
+      '00081062', // Physician Reading Study ID Sequence
+      '00081070', // Operators Name
+      '00200010', // Study ID
+      '0040A123' // Person Name
+    ]
+  */
+  tagsToAnonymize = [
+    'PatientBirthName',	// Patient's Birth Name
+    'PatientName', // Patient's Name
+    'PatientID', // Patient's ID
+    'PatientBirthDate',	// Patient's Birth Date
+    'PatientAddress', // Patient's Address
+    'AccessionNumber',	// Accession Number
+    'InstitutionName',	// Institution Name
+    'InstitutionAddress',	// Institution Adress
+    'ReferringPhysicianName',	// Referring Physician's Name
+    'ReferringPhysicianAddress',	// Referring Physician's Adress
+    'ReferringPhysicianTelephoneNumbers', // Refering Physician's Telephone Number
+    'InstitutionalDepartmentName', // Institutional Departement Name
+    'PhysiciansOfRecord', // Physician Of Record
+    'PerformingPhysicianName', // Performing Physician's Name
+    'NameOfPhysiciansReadingStudy', // Name Of Physician Reading Study
+    'OperatorsName', // Operators Name
+    'StudyID', // Study ID
+    'PersonName' // Person Name
+  ]
 
-  tagsToErase = [
-    '00101005',	// Patient's Birth Name
-    '00100010', // Patient's Name
-    '00100020', // Patient's ID
-    '00100030',	// Patient's Birth Date
-    '00101040', // Patient's Address
-    '00080050',	// Accession Number
-    '00080080',	// Institution Name
-    '00080081',	// Institution Adress
-    '00080090',	// Referring Physician's Name
-    '00080092',	// Referring Physician's Adress
-    '00080094', // Refering Physician's Telephone Number
-    '00080096', // Referring Pysician ID Sequence
-    '00081040', // Institutional Departement Name
-    '00081048', // Physician Of Record
-    '00081049', // Physician Of Record ID Sequence
-    '00081050', // Performing Physician's Name
-    '00081052', // Performing Physicians ID Sequence
-    '00081060', // Name Of Physician Reading Study
-    '00081062', // Physician Reading Study ID Sequence
-    '00081070', // Operators Name
-    '00200010', // Study ID
-    '0040A123' // Person Name
+  sequenceToAnonymize = [
+    'ReferringPhysicianIdentificationSequence',
+    'PhysiciansOfRecordIdentificationSequence', // Physician Of Record ID Sequence
+    'PerformingPhysicianIdentificationSequence', // Performing Physicians ID Sequence
+    'PhysiciansReadingStudyIdentificationSequence',// Physician Reading Study ID Sequence
   ]
 
   __pFileReader(file) {
@@ -79,14 +107,12 @@ export default class DicomFile {
   }
 
   readDicomFile() {
-    let self = this
     return this.__pFileReader(this.fileObject).then(reader => {
       const arrayBuffer = reader.result
-      const byteArray = new Uint8Array(arrayBuffer)
-      self.byteArray = byteArray
-      self.dataSet = dicomParser.parseDicom(byteArray)
-      self.studyInstanceUID = self.getStudyInstanceUID()
-      self.seriesInstanceUID = self.getSeriesInstanceUID()
+      this.dicomDictionary = dcmjs.data.DicomMessage.readFile(arrayBuffer);
+      this.dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(this.dicomDictionary.dict);
+      this.studyInstanceUID = this.getStudyInstanceUID()
+      this.seriesInstanceUID = this.getSeriesInstanceUID()
     }).catch((error) => {
       throw error
     })
@@ -95,182 +121,137 @@ export default class DicomFile {
 
   anonymise() {
 
-    for (let tag of this.tagsToErase) {
-      let id = tag.toLowerCase()
+    for (let tag of this.tagsToAnonymize) {
       try {
-        const element = this.dataSet.elements[`x${id}`]
-        if (element === undefined) throw Error('Tag Not Found')
-
-        if (element.vr === 'SQ') {
-          this.__editSequence(element, '*')
-        } else {
-          this.__editElement(element, '*')
-        }
-
+        if (this.dataset[tag] != null) this.dataset[tag] = 'ANONYMIZED'
       } catch (e) {
-        if (e.message !== 'Tag Not Found') {
-          console.error('tag ' + id)
-        }
-
+        console.error(e)
       }
     }
 
-  }
-
-  __editSequence(element, newContent){
-    // Treat each item of sequence
-    element.items.forEach(item => {
-      const sequenceElement = item.dataSet.elements
-      const elementsInSeq = Object.keys(sequenceElement)
-      // erase each tag in this item
-      elementsInSeq.forEach(tag => {
-        if(sequenceElement[tag].vr === 'SQ'){
-          //If sequence in Sequence, recursively run this fuction
-          this.__editSequence(sequenceElement[tag], newContent)
-        }else{
-          //If not sequence anonymize the tag by changing its value
-          this.__editElement(sequenceElement[tag], newContent)
-        }
-      })
-    })
-    
-
-  }
-
-  __editElement(element, newContent) {
-    // Retrieve the index position of the element in the data set array
-    const dataOffset = element.dataOffset
-
-    // Retrieve the length of the element
-    const length = element.length
-
-    // Fill the field with unsignificant values
-    for (let i = 0; i < length; i++) {
-      // Get charcode of the current char in 'newContent'
-      const char = newContent.charCodeAt(i % newContent.length)
-
-      // Write this char in the array
-      this.byteArray[dataOffset + i] = char
+    for (let tag of this.sequenceToAnonymize) {
+      try {
+        if (this.dataset[tag] != null) this.__editSequence(this.dataset[tag], 'ANONYMIZED')
+      } catch (e) {
+        console.error(e)
+      }
     }
+
+    this.dicomDictionary.dict = dcmjs.data.DicomMetaDictionary.denaturalizeDataset(this.dataset);
+
+    return this.dicomDictionary.write();
+
   }
 
-  getRadiopharmaceuticalTag(tagAddress) {
+  __editSequence(tag, newContent) {
+
+    let nestedTags = Object.keys(tag)
+
+    nestedTags.forEach( (dicomTag) =>{
+      if(typeof dicomTag === 'object' ){
+        this.__editSequence(tag[dicomTag], newContent)
+      }else{
+        tag[dicomTag] = newContent
+      }
+    })
+
+  }
+
+  getRadiopharmaceuticalTag(tagName) {
     try {
-      const elmt = this.dataSet.elements.x00540016
-      const radioPharmElements = elmt.items[0].dataSet.elements
-      return this._getString(radioPharmElements['x' + tagAddress])
+      let radiopharmaceuticalSequence = this.dataset.RadiopharmaceuticalInformationSequence
+      return radiopharmaceuticalSequence[tagName]
     } catch (error) {
       return undefined
     }
   }
 
-  _getDicomTag(tagAddress) {
-    const elmt = this.dataSet.elements['x' + tagAddress]
-    if (elmt !== undefined && elmt.length > 0) {
-      // Return the value of the dicom attribute
-      return this._getString(elmt)
-    } else return undefined
-  }
-
   getAccessionNumber() {
-    return this._getDicomTag('00080050')
+    return this.dataset.AccessionNumber
   }
 
   getAcquisitionDate() {
-    return this._getDicomTag('00080020')
+    return this.dataset.AcquisitionDate
+  }
+
+  getAcquisitionTime() {
+    return this.dataset.AcquisitionTime
   }
 
   getInstanceNumber() {
-    return this._getDicomTag('00200013')
+    return this.dataset.InstanceNumber
   }
 
   getModality() {
-    return this._getDicomTag('00080060')
+    return this.dataset.Modality
   }
 
   getPatientBirthDate() {
-    return this._getDicomTag('00100030')
+    return this.dataset.PatientBirthDate
   }
 
   getPatientID() {
-    return this._getDicomTag('00100020')
+    return this.dataset.PatientID
   }
 
   getPatientName() {
-    return this._getDicomTag('00100010')
+    return this.dataset.PatientName
   }
 
   getPatientSex() {
-    return this._getDicomTag('00100040')
+    return this.dataset.PatientSex
   }
 
   getSeriesInstanceUID() {
-    return this._getDicomTag('0020000e')
+    return this.dataset.SeriesInstanceUID
   }
 
   getSeriesDate() {
-    return this._getDicomTag('00080021')
+    return this.dataset.SeriesDate
+  }
+
+  getSeriesTime() {
+    return this.dataset.SeriesTime
   }
 
   getSeriesDescription() {
-    return this._getDicomTag('0008103e')
+    return this.dataset.SeriesDescription
   }
 
   getSOPInstanceUID() {
-    return this._getDicomTag('00080018')
+    return this.dataset.SOPInstanceUID
   }
 
   getSOPClassUID() {
-    return this._getDicomTag('00020002')
+    return this.dataset.SOPClassUID
   }
 
   getSeriesNumber() {
-    return this._getDicomTag('00200011')
+    return this.dataset.SeriesNumber
   }
 
   getStudyInstanceUID() {
-    return this._getDicomTag('0020000d')
+    return this.dataset.StudyInstanceUID
   }
 
   getStudyDate() {
-    return this._getDicomTag('00080020')
+    return this.dataset.StudyDate
   }
 
   getStudyID() {
-    return this._getDicomTag('00200010')
+    return this.dataset.StudyID
   }
 
   getStudyDescription() {
-    return this._getDicomTag('00081030')
+    return this.dataset.StudyDescription
   }
 
-  /**
-	 * Returns element contain as a string
-	 * @param {*} element element from the data set
-	 */
-  _getString(element) {
-    let position = element.dataOffset
-    const length = element.length
+  getPatientWeight() {
+    return this.dataset.PatientWeight
+  }
 
-    if (length < 0) {
-      throw Error('Negative length')
-    }
-    if (position + length > this.byteArray.length) {
-      throw Error('Out of range index')
-    }
-
-    var result = ''
-    var byte
-
-    for (var i = 0; i < length; i++) {
-      byte = this.byteArray[position + i]
-      if (byte === 0) {
-        position += length
-        return result.trim()
-      }
-      result += String.fromCharCode(byte)
-    }
-    return result.trim()
+  getPatientSize() {
+    return this.dataset.PatientSize
   }
 
   isSecondaryCaptureImg() {

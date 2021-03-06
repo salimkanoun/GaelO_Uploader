@@ -11,7 +11,7 @@
     "@uppy/tus": "^1.8.5",
     "bootstrap": "^4.6.0",
     "crypto-js": "^4.0.0",
-    "dicom-parser": "^1.8.5",
+    "dcmjs": "^0.18.2",
     "jszip": "^3.6.0",
     "react": "^17.0.1",
     "react-bootstrap": "^1.5.1",

@@ -100,24 +100,24 @@ export default class Series {
 		if ((dicomFile.getModality()) === undefined) {
 			warnings[MISSING_TAG_00080060.key] = MISSING_TAG_00080060;
 		} else {
-			if ((dicomFile._getDicomTag('00080021') === undefined) && (dicomFile._getDicomTag('00080022') === undefined)) {
+			if ((dicomFile.getSeriesDate() === undefined) && (dicomFile.getAcquisitionDate() === undefined)) {
 				warnings[MISSING_TAG_00080022.key] = MISSING_TAG_00080022;
 			}
 			//Check PT specific tags
 			if (this.modality === 'PT') {
-				if ((dicomFile._getDicomTag('00101030')) === undefined) {
+				if (( dicomFile.getPatientWeight() ) === undefined) {
 					warnings[MISSING_TAG_00101030.key] = MISSING_TAG_00101030;
 				}
-				if ((dicomFile._getDicomTag('00080031')) === undefined && (dicomFile._getDicomTag('00080032')) === undefined) {
+				if ((dicomFile.getSeriesTime()) === undefined && (dicomFile.getAcquisitionTime()) === undefined) {
 					warnings[MISSING_TAG_00101031.key] = MISSING_TAG_00101031;
 				}
-				if ((dicomFile.getRadiopharmaceuticalTag('00181074')) === undefined) {
+				if ((dicomFile.getRadiopharmaceuticalTag('RadionuclideTotalDose')) === undefined) {
 					warnings[MISSING_TAG_00181074.key] = MISSING_TAG_00181074;
 				}
-				if ((dicomFile.getRadiopharmaceuticalTag('00181072')) === undefined && (dicomFile.getRadiopharmaceuticalTag('00181078')) === undefined) {
+				if ((dicomFile.getRadiopharmaceuticalTag('RadiopharmaceuticalStartTime')) === undefined && (dicomFile.getRadiopharmaceuticalTag('00181078')) === undefined) {
 					warnings[MISSING_TAG_00181072.key] = MISSING_TAG_00181072;
 				}
-				if ((dicomFile.getRadiopharmaceuticalTag('00181075')) === undefined) {
+				if ((dicomFile.getRadiopharmaceuticalTag('RadionuclideHalfLife')) === undefined) {
 					warnings[MISSING_TAG_00181075.key] = MISSING_TAG_00181075;
 				}
 			}

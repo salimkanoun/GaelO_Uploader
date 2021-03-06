@@ -1,2 +1,21 @@
+Pending changes:
+
+28/01/2020 - Version 1.0.17
+Global refactor of the uploader, now unique and multiupload use the same code
+Various interface improvement
+Dicom date displayed in US format
+Upload validation and visit informations decoupled from uploader
+Incremental Dicom loading is now possible
+Check ImageModalities in Study checks
+
+17/12/2020 - Version 1.0.4
+Fix bug when item to anonymize contains sequence in sequence
+
+17/11/2020 - Version 1.0.3
+Add alert if backend connexion lost
+
+10/11/2020 - Version 1.0.1
+Fix bug allowing to trigger upload before validate checks
+
 28/10/2020 - Version 1.0.0
 Initial release

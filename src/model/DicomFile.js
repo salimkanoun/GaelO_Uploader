@@ -89,11 +89,18 @@ export default class DicomFile {
     'PersonName' // Person Name
   ]
 
+
+  editableTags = [
+    'SeriesDescription',
+    'PatientWeight',
+    'PatientSize'
+  ]
+
   sequenceToAnonymize = [
     'ReferringPhysicianIdentificationSequence',
-    'PhysiciansOfRecordIdentificationSequence', // Physician Of Record ID Sequence
-    'PerformingPhysicianIdentificationSequence', // Performing Physicians ID Sequence
-    'PhysiciansReadingStudyIdentificationSequence',// Physician Reading Study ID Sequence
+    'PhysiciansOfRecordIdentificationSequence', 
+    'PerformingPhysicianIdentificationSequence',
+    'PhysiciansReadingStudyIdentificationSequence',
   ]
 
   __pFileReader(file) {
@@ -119,11 +126,15 @@ export default class DicomFile {
 
   }
 
+  editTag(tagName, value){
+    this.dataset[tagName] = value
+  }
+
   anonymise() {
 
     for (let tag of this.tagsToAnonymize) {
       try {
-        if (this.dataset[tag] != null) this.dataset[tag] = 'ANONYMIZED'
+        if (this.dataset[tag] != null) this.editTag(tag, 'ANONYMIZED')
       } catch (e) {
         console.error(e)
       }

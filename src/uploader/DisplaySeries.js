@@ -16,15 +16,21 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import BootstrapTable from 'react-bootstrap-table-next';
-import { Container, Row, Col } from 'react-bootstrap'
+import { Container, Row, Col, Button, Modal } from 'react-bootstrap'
 
 import Util from '../model/Util'
 import { addSeriesReady, removeSeriesReady, selectSeries } from '../actions/DisplayTables'
 import DisplayWarning from './DisplayWarning'
+import { Fragment } from 'react';
+import SeriesEdition from './render_component/SeriesEdition';
 
 
 
 class DisplaySeries extends Component {
+
+    state = {
+        showEditSeries : null
+    }
 
     columns = [
             {
@@ -52,7 +58,19 @@ class DisplaySeries extends Component {
             {
                 dataField: 'status',
                 text: 'Status',
-                editable: false
+                editable: false,
+                formatter: (cell, row, rowIndex, extraData) => {
+                    return (
+                        <div>
+                        <Button variant={cell === 'Valid' ? 'success' : 'danger'} onClick={() => {
+                        this.setState({
+                            showEditSeries : row.seriesInstanceUID
+                        })
+                        }}>
+                            {cell}
+                        </Button>
+                    </div>)
+                }
             },
             {
                 dataField: 'seriesDescription',
@@ -103,30 +121,53 @@ class DisplaySeries extends Component {
         return 'du-series td'
     }
 
+    closeEditSeries = () => {
+        this.setState({
+            showEditSeries : null
+        })
+    }
+
+
+
     render() {
         return (
-            <Container fluid>
-                <span className="title">Series</span>
-                <Row>
-                    <Col xs={12} md={8}>
-                        <BootstrapTable
-                            keyField='seriesInstanceUID'
-                            classes="table table-borderless"
-                            bodyClasses="du-series-tbody"
-                            headerClasses="du-series th"
-                            rowClasses={this.getSeriesRowClasses}
-                            wrapperClasses="table-responsive"
-                            data={this.props.seriesRows}
-                            columns={this.columns}
-                            selectRow={this.selectRow} />
-                    </Col>
-                    <Col xs={6} md={4}>
-                        <DisplayWarning
-                            type='series'
+            <Fragment>
+                <Modal show={this.state.showEditSeries != null} onHide={this.closeEditSeries}>
+                    <Modal.Header className="modal-header" closeButton>
+                        <Modal.Title className="modal-title">
+                            Edit Series Tag
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body className="modal-body du-patient">
+                        <SeriesEdition
+                            seriesDetails = {this.props.series[this.state.showEditSeries]}
                         />
-                    </Col>
-                </Row>
-            </Container>
+                    </Modal.Body>
+                </Modal>
+
+                <Container fluid>
+                    <span className="title">Series</span>
+                    <Row>
+                        <Col xs={12} md={8}>
+                            <BootstrapTable
+                                keyField='seriesInstanceUID'
+                                classes="table table-borderless"
+                                bodyClasses="du-series-tbody"
+                                headerClasses="du-series th"
+                                rowClasses={this.getSeriesRowClasses}
+                                wrapperClasses="table-responsive"
+                                data={this.props.seriesRows}
+                                columns={this.columns}
+                                selectRow={this.selectRow} />
+                        </Col>
+                        <Col xs={6} md={4}>
+                            <DisplayWarning
+                                type='series'
+                            />
+                        </Col>
+                    </Row>
+                </Container>
+            </Fragment>
         )
     }
 }
@@ -135,7 +176,8 @@ class DisplaySeries extends Component {
 const mapStateToProps = state => {
     return {
         selectedSeries: state.DisplayTables.selectedSeries,
-        seriesReady: state.DisplayTables.seriesReady
+        seriesReady: state.DisplayTables.seriesReady,
+        series: state.Series.series
     }
 }
 const mapDispatchToProps = {

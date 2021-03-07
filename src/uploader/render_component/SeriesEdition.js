@@ -17,26 +17,52 @@ import { Button, Form } from 'react-bootstrap'
 
 export default class SeriesEdition extends Component {
 
+    state = {
+        validated: false,
+        patientWeight :'',
+        patientSize: '',
+        seriesDescription:''
+    }
+
+
+    componentDidMount = () => {
+        this.setState({
+            patientWeight : this.props.patientWeight,
+            patientSize : this.props.patientSize,
+            seriesDescription : this.props.seriesDescription
+        })
+    }
+
+    handleChanges = (event) => {
+        let name = event.target.name
+        this.setState({ [name]: event.target.valueAsNumber || event.target.value })
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault()
+        this.props.onValidateEdition(this.state)
+        this.setState({ validated: true })
+    }
 
     render = () => {
-        console.log(this.props.seriesDetails)
         return (
             
             <>
-                <Form>
+                <Form noValidate validated={this.state.validated} onSubmit={this.handleSubmit}  >
                     <Form.Group >
-                        <Form.Label>Patient Weight</Form.Label>
-                        <Form.Control defaultValue={this.props.seriesDetails.patientWeight} type="number" label="Check me out" />
+                        <Form.Label>Patient Weight (Kg)</Form.Label>
+                        <Form.Control type="number" min={0} name="patientWeight" onChange={this.handleChanges} value = {this.state.patientWeight}/>
+
                     </Form.Group>
 
                     <Form.Group >
-                        <Form.Label>Patient Height</Form.Label>
-                        <Form.Control defaultValue={this.props.seriesDetails.patientHeight} type="number" />
+                        <Form.Label>Patient Size (m)</Form.Label>
+                        <Form.Control type="number" min={0} max={3} step={0.1} name="patientSize" onChange={this.handleChanges} value = {this.state.patientSize}/>
                     </Form.Group>
 
                     <Form.Group >
                         <Form.Label>Series Description</Form.Label>
-                        <Form.Control type="text" defaultValue={this.props.seriesDetails.seriesDescription} label="Check me out" />
+                        <Form.Control type="text" name="seriesDescription" onChange={this.handleChanges} value = {this.state.seriesDescription}/>
                     </Form.Group>
 
                     <div className = "float-right">   

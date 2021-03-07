@@ -323,7 +323,9 @@ class Uploader extends Component {
             seriesObject.getSeriesDate(),
             seriesObject.getSeriesDescription(),
             seriesObject.getModality(),
-            seriesObject.getStudyInstanceUID()
+            seriesObject.getStudyInstanceUID(),
+            seriesObject.getPatientWeight(),
+            seriesObject.getPatientSize()
         )
 
         //Automatically add to Redux seriesReady if contains no warnings

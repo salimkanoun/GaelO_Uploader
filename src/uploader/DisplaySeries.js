@@ -20,16 +20,24 @@ import { Container, Row, Col, Button, Modal } from 'react-bootstrap'
 
 import Util from '../model/Util'
 import { addSeriesReady, removeSeriesReady, selectSeries } from '../actions/DisplayTables'
+import { addEditionValue } from '../actions/Series'
 import DisplayWarning from './DisplayWarning'
 import { Fragment } from 'react';
 import SeriesEdition from './render_component/SeriesEdition';
+import EditionIcon from '../assets/images/pencil'
 
+/*
+Edition Todo : 
+Quand rappelle le composant edit afficher les edition sauvée dans le redux
+Appliquer les editions quand on fait l'upload (pour tous les dicoms de la serie)
+*/
 
 
 class DisplaySeries extends Component {
 
     state = {
-        showEditSeries : null
+        showEditSeries : false,
+        editionSeriesInstanceUID : ''
     }
 
     columns = [
@@ -54,23 +62,28 @@ class DisplaySeries extends Component {
                         />
                     )
                 }
-            },
-            {
-                dataField: 'status',
-                text: 'Status',
+            },{
+                dataField: 'edit',
+                text: 'Edit',
                 editable: false,
                 formatter: (cell, row, rowIndex, extraData) => {
                     return (
                         <div>
-                        <Button variant={cell === 'Valid' ? 'success' : 'danger'} onClick={() => {
-                        this.setState({
-                            showEditSeries : row.seriesInstanceUID
-                        })
+                        <Button variant='info' onClick={() => {
+                            this.setState({
+                                showEditSeries : true,
+                                editionSeriesInstanceUID : row.seriesInstanceUID
+                            })
                         }}>
-                            {cell}
+                            <EditionIcon/>
                         </Button>
                     </div>)
                 }
+            },
+            {
+                dataField: 'status',
+                text: 'Status',
+                editable: false
             },
             {
                 dataField: 'seriesDescription',
@@ -123,8 +136,26 @@ class DisplaySeries extends Component {
 
     closeEditSeries = () => {
         this.setState({
-            showEditSeries : null
+            showEditSeries : null,
+            editionSeriesInstanceUID : ''
         })
+    }
+
+    onValidateEdition = (data) => {
+        let seriesToModify = this.props.series[this.state.editionSeriesInstanceUID]
+
+        if(seriesToModify.patientWeight !== data.patientWeight){
+            this.props.addEditionValue(this.state.editionSeriesInstanceUID, 'patientWeight', data.patientWeight)
+        }
+        if(seriesToModify.patientSize !== data.patientSize){
+            this.props.addEditionValue(this.state.editionSeriesInstanceUID, 'patientSize', data.patientSize)
+        }
+        if(seriesToModify.seriesDescription !== data.seriesDescription){
+            this.props.addEditionValue(this.state.editionSeriesInstanceUID, 'seriesDescription', data.seriesDescription)
+
+        }
+        this.closeEditSeries()
+
     }
 
 
@@ -132,16 +163,23 @@ class DisplaySeries extends Component {
     render() {
         return (
             <Fragment>
-                <Modal show={this.state.showEditSeries != null} onHide={this.closeEditSeries}>
+                <Modal show={this.state.showEditSeries} onHide={this.closeEditSeries}>
                     <Modal.Header className="modal-header" closeButton>
                         <Modal.Title className="modal-title">
                             Edit Series Tag
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body du-patient">
-                        <SeriesEdition
-                            seriesDetails = {this.props.series[this.state.showEditSeries]}
-                        />
+                            {
+                            this.state.showEditSeries ? 
+                            <SeriesEdition
+                                    patientWeight = {this.props.series[this.state.editionSeriesInstanceUID]['patientWeight']}
+                                    patientSize = {this.props.series[this.state.editionSeriesInstanceUID]['patientSize']}
+                                    seriesDescription = {this.props.series[this.state.editionSeriesInstanceUID]['seriesDescription']}
+                                    onValidateEdition = {this.onValidateEdition}
+                                
+                                /> : null
+                            }
                     </Modal.Body>
                 </Modal>
 
@@ -181,6 +219,7 @@ const mapStateToProps = state => {
     }
 }
 const mapDispatchToProps = {
+    addEditionValue,
     addSeriesReady,
     removeSeriesReady,
     selectSeries

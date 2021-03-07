@@ -21,13 +21,15 @@ export default class Series {
 
 	instances = {}
 
-	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality, studyInstanceUID) {
+	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality, studyInstanceUID, patientWeight, patientSize) {
 		this.seriesInstanceUID = seriesInstanceUID
 		this.seriesNumber = seriesNumber
 		this.seriesDate = seriesDate
 		this.seriesDescription = seriesDescription
 		this.modality = modality
 		this.studyInstanceUID = studyInstanceUID
+		this.patientWeight = patientWeight
+		this.patientSize = patientSize
 	}
 
 	getSeriesInstanceUID(){
@@ -58,6 +60,14 @@ export default class Series {
 			throw new Error('Null StudyInstanceUID')
 		}
 		return this.studyInstanceUID
+	}
+
+	getPatientWeight(){
+		return this.patientWeight == null ? '' : this.patientWeight
+	}
+
+	getPatientSize(){
+		return this.patientSize == null ? '' : this.patientSize
 	}
 
 	addInstance(instanceObject) {

@@ -141,30 +141,13 @@ export default class DicomFile {
     }
 
     for (let tag of this.sequenceToAnonymize) {
-      try {
-        if (this.dataset[tag] != null) this.__editSequence(this.dataset[tag], 'ANONYMIZED')
-      } catch (e) {
-        console.error(e)
-      }
+      //these sequences are optionals (type3), remove them
+      delete this.dataset[tag]
     }
 
     this.dicomDictionary.dict = dcmjs.data.DicomMetaDictionary.denaturalizeDataset(this.dataset);
 
     return this.dicomDictionary.write();
-
-  }
-
-  __editSequence(tag, newContent) {
-
-    let nestedTags = Object.keys(tag)
-
-    nestedTags.forEach( (dicomTag) =>{
-      if(typeof dicomTag === 'object' ){
-        this.__editSequence(tag[dicomTag], newContent)
-      }else{
-        tag[dicomTag] = newContent
-      }
-    })
 
   }
 

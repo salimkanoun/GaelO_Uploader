@@ -8,14 +8,14 @@ export default class DicomBatchUploader extends EventEmitter {
     progressionUploadArray = []
     sucessIDsUploaded= []
 
-    constructor (uppy, visitID, files) {
+    constructor (uppy, visitID, files, editedTags) {
         super()
         this.uppy = uppy
         this.files = files
         this.visitID = visitID
         this.zipIntensity = localStorage.getItem('zipIntensity') === null ? 100 : parseInt(localStorage.getItem('zipIntensity'))
         this.batchUploadSize = localStorage.getItem('batchUploadSize') === null ? 3 : parseInt(localStorage.getItem('batchUploadSize'))
-
+        this.editedTags = editedTags
         this.buildBatches()
 
         this.uppy.on('upload-progress', (file, progress) => {
@@ -141,6 +141,11 @@ export default class DicomBatchUploader extends EventEmitter {
         for (let file of files){
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
+
+            for(let tagName of Object.keys(this.editedTags)){
+                dicomFile.editTag( (tagName.charAt(0).toUpperCase() + tagName.slice(1)), this.editedTags[tagName] )
+            }
+
             jszip.file(dicomFile.getFilePath(), dicomFile.anonymise());
         }
 

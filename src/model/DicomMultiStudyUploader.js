@@ -10,10 +10,11 @@ export default class DicomMultiStudyUploader extends EventEmitter {
         this.uppy = uppy
     }
 
-    addStudyToUpload(visitID, fileArray, orthancStudyID) {
+    addStudyToUpload(visitID, fileArray, orthancStudyID, editedTag) {
         this.visitsToUpload[visitID] = {}
         this.visitsToUpload[visitID]['files'] = fileArray
         this.visitsToUpload[visitID]['orthancStudyID'] = orthancStudyID
+        this.visitsToUpload[visitID]['editedTags'] = editedTag
     }
 
     registerListener() {
@@ -59,7 +60,7 @@ export default class DicomMultiStudyUploader extends EventEmitter {
         for (let visitID of Object.keys(this.visitsToUpload)) {
             ++this.studyNumber
             this.currentVisitID = visitID
-            let uploader = new DicomBatchUploader(this.uppy, visitID, this.visitsToUpload[visitID]['files'])
+            let uploader = new DicomBatchUploader(this.uppy, visitID, this.visitsToUpload[visitID]['files'], this.visitsToUpload[visitID]['editedTags'])
             yield uploader
 
         }

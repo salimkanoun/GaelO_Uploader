@@ -449,7 +449,14 @@ class Uploader extends Component {
                 filesToUpload.push(...fileArray)
             })
 
-            uploader.addStudyToUpload(visitID, filesToUpload, studyOrthancID)
+            //SK A FAIRE VENIR ICI LES INFO D EDITION DU REDUX
+            let editedTags = {
+                'patientWeight' : 50,
+                'patientSize' : 1.5,
+                'seriesDescription' :'new series description'
+            }
+
+            uploader.addStudyToUpload(visitID, filesToUpload, studyOrthancID, editedTags)
 
         }
 

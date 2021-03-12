@@ -116,8 +116,9 @@ export default class DicomFile {
   readDicomFile() {
     return this.__pFileReader(this.fileObject).then(reader => {
       const arrayBuffer = reader.result
-      this.dicomDictionary = dcmjs.data.DicomMessage.readFile(arrayBuffer);
-      this.dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(this.dicomDictionary.dict);
+      this.dicomDictionary = dcmjs.data.DicomMessage.readFile(arrayBuffer)
+      this.dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(this.dicomDictionary.dict)
+      console.log(this.dataset)
       this.studyInstanceUID = this.getStudyInstanceUID()
       this.seriesInstanceUID = this.getSeriesInstanceUID()
     }).catch((error) => {
@@ -272,6 +273,10 @@ export default class DicomFile {
     }
   }
 
+  getStuctureSetROISequence(){
+    return this.dataset.StructureSetROISequence
+  }
+
   getFilePath() {
     let res = this.fileObject.path;
     if (res === undefined) {
@@ -290,7 +295,7 @@ export default class DicomFile {
 
   getSeriesObject() {
     return new Series(this.getSeriesInstanceUID(), this.getSeriesNumber(), this.getSeriesDate(),
-      this.getSeriesDescription(), this.getModality(), this.getStudyInstanceUID(), this.getPatientWeight(), this.getPatientSize());
+      this.getSeriesDescription(), this.getModality(), this.getStudyInstanceUID(), this.getPatientWeight(), this.getPatientSize(), this.getStuctureSetROISequence());
   }
 
   getInstanceObject() {

@@ -4,7 +4,7 @@ import { ADD_SERIES, EDIT_DICOM_TAG } from './actions-types'
  * Add series to Redux series Object
  * @param {Object} series
  */
-export function addSeries (instances, seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality, studyInstanceUID, patientWeight, patientSize) {
+export function addSeries (instances, seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality, studyInstanceUID, patientWeight, patientSize, structureSetROISequence) {
   
   let seriesObject = {
     instances : instances,
@@ -16,7 +16,8 @@ export function addSeries (instances, seriesInstanceUID, seriesNumber, seriesDat
     studyInstanceUID : studyInstanceUID,
     patientWeight : patientWeight,
     patientSize : patientSize,
-    numberOfInstances : Object.keys(instances).length
+    numberOfInstances : Object.keys(instances).length,
+    structureSetROISequence : structureSetROISequence
   }
 
   return {

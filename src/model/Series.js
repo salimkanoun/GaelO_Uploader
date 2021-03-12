@@ -21,7 +21,7 @@ export default class Series {
 
 	instances = {}
 
-	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality, studyInstanceUID, patientWeight, patientSize) {
+	constructor(seriesInstanceUID, seriesNumber, seriesDate, seriesDescription, modality, studyInstanceUID, patientWeight, patientSize, structureSetROISequence) {
 		this.seriesInstanceUID = seriesInstanceUID
 		this.seriesNumber = seriesNumber
 		this.seriesDate = seriesDate
@@ -30,6 +30,7 @@ export default class Series {
 		this.studyInstanceUID = studyInstanceUID
 		this.patientWeight = patientWeight
 		this.patientSize = patientSize
+		this.structureSetROISequence = structureSetROISequence
 	}
 
 	getSeriesInstanceUID(){
@@ -68,6 +69,10 @@ export default class Series {
 
 	getPatientSize(){
 		return this.patientSize == null ? '' : this.patientSize
+	}
+
+	getStructureSetROISequence(){
+		return this.structureSetROISequence
 	}
 
 	addInstance(instanceObject) {

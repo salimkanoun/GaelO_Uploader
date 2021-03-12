@@ -25,6 +25,7 @@ import DisplayWarning from './DisplayWarning'
 import { Fragment } from 'react';
 import SeriesEdition from './render_component/SeriesEdition';
 import EditionIcon from '../assets/images/pencil'
+import DicomRTEdition from './render_component/DicomRTEdition';
 
 /*
 Edition Todo : 
@@ -172,13 +173,18 @@ class DisplaySeries extends Component {
                     <Modal.Body className="modal-body du-patient">
                             {
                             this.state.showEditSeries ? 
-                            <SeriesEdition
-                                    patientWeight = {this.props.series[this.state.editionSeriesInstanceUID]['patientWeight']}
-                                    patientSize = {this.props.series[this.state.editionSeriesInstanceUID]['patientSize']}
-                                    seriesDescription = {this.props.series[this.state.editionSeriesInstanceUID]['seriesDescription']}
-                                    onValidateEdition = {this.onValidateEdition}
-                                
-                                /> : null
+                            <Fragment>
+                                <SeriesEdition
+                                        patientWeight = {this.props.series[this.state.editionSeriesInstanceUID]['patientWeight']}
+                                        patientSize = {this.props.series[this.state.editionSeriesInstanceUID]['patientSize']}
+                                        seriesDescription = {this.props.series[this.state.editionSeriesInstanceUID]['seriesDescription']}
+                                        onValidateEdition = {this.onValidateEdition}
+                                    
+                                    />
+                                    
+                                <DicomRTEdition/>
+                            </Fragment>
+                             : null
                             }
                     </Modal.Body>
                 </Modal>

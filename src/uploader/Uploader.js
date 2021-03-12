@@ -325,7 +325,8 @@ class Uploader extends Component {
             seriesObject.getModality(),
             seriesObject.getStudyInstanceUID(),
             seriesObject.getPatientWeight(),
-            seriesObject.getPatientSize()
+            seriesObject.getPatientSize(),
+            seriesObject.getStructureSetROISequence()
         )
 
         //Automatically add to Redux seriesReady if contains no warnings
@@ -449,14 +450,7 @@ class Uploader extends Component {
                 filesToUpload.push(...fileArray)
             })
 
-            //SK A FAIRE VENIR ICI LES INFO D EDITION DU REDUX
-            let editedTags = {
-                'patientWeight' : 50,
-                'patientSize' : 1.5,
-                'seriesDescription' :'new series description'
-            }
-
-            uploader.addStudyToUpload(visitID, filesToUpload, studyOrthancID, editedTags)
+            uploader.addStudyToUpload(visitID, filesToUpload, studyOrthancID, this.props.editions)
 
         }
 
@@ -562,6 +556,7 @@ const mapStateToProps = state => {
         seriesReady: state.DisplayTables.seriesReady,
         studiesReady: state.DisplayTables.studiesReady,
         warningsSeries: state.Warnings.warningsSeries,
+        editions : state.Series.editions
     }
 }
 const mapDispatchToProps = {

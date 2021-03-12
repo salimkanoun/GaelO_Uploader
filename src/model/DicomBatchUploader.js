@@ -142,8 +142,12 @@ export default class DicomBatchUploader extends EventEmitter {
             let dicomFile = new DicomFile(file)
             await dicomFile.readDicomFile()
 
-            for(let tagName of Object.keys(this.editedTags)){
-                dicomFile.editTag( (tagName.charAt(0).toUpperCase() + tagName.slice(1)), this.editedTags[tagName] )
+            let seriesInstanceUID = dicomFile.getSeriesInstanceUID()
+            if( Object.keys(this.editedTags).includes(seriesInstanceUID) ){
+                
+                Object.keys(this.editedTags[seriesInstanceUID]).forEach( (tagName) =>{
+                    dicomFile.editTag( (tagName.charAt(0).toUpperCase() + tagName.slice(1)), this.editedTags[tagName] )
+                })
             }
 
             jszip.file(dicomFile.getFilePath(), dicomFile.anonymise());

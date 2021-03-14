@@ -25,7 +25,6 @@ import DisplayWarning from './DisplayWarning'
 import { Fragment } from 'react';
 import SeriesEdition from './render_component/SeriesEdition';
 import EditionIcon from '../assets/images/pencil'
-import DicomRTEdition from './render_component/DicomRTEdition';
 
 /*
 Edition Todo : 

@@ -35,7 +35,7 @@ export default class CheckPatient extends Component {
             text: '',
             formatter: (cell, row, rowIndex, extraData) => ( 
                 (row.ignoredStatus !== null) ?
-                    <ButtonIgnore row={row} onClick={() => this.props.onClick(row)} dissmissed={row.ignoredStatus} />
+                    <ButtonIgnore row={row} onClick={() => this.props.onClick(row)} dismissed={row.ignoredStatus} />
                     : null
                 )
         },

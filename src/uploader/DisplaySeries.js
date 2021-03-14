@@ -175,7 +175,6 @@ class DisplaySeries extends Component {
                     <Modal.Body className="modal-body du-patient">
                             {
                             this.state.showEditSeries ? 
-                            <Fragment>
                                 <SeriesEdition
                                         modality = {this.props.series[this.state.editionSeriesInstanceUID]['modality']}
                                         patientWeight = {this.props.series[this.state.editionSeriesInstanceUID]['patientWeight']}
@@ -185,7 +184,6 @@ class DisplaySeries extends Component {
                                         onValidateEdition = {this.onValidateEdition}
                                     
                                     />
-                            </Fragment>
                              : null
                             }
                     </Modal.Body>

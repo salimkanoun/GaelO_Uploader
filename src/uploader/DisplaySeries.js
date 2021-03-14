@@ -176,6 +176,7 @@ class DisplaySeries extends Component {
                             this.state.showEditSeries ? 
                             <Fragment>
                                 <SeriesEdition
+                                        modality = {this.props.series[this.state.editionSeriesInstanceUID]['modality']}
                                         patientWeight = {this.props.series[this.state.editionSeriesInstanceUID]['patientWeight']}
                                         patientSize = {this.props.series[this.state.editionSeriesInstanceUID]['patientSize']}
                                         seriesDescription = {this.props.series[this.state.editionSeriesInstanceUID]['seriesDescription']}
@@ -183,8 +184,6 @@ class DisplaySeries extends Component {
                                         onValidateEdition = {this.onValidateEdition}
                                     
                                     />
-                                    
-                                <DicomRTEdition/>
                             </Fragment>
                              : null
                             }

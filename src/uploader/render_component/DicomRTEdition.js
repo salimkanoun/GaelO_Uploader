@@ -67,7 +67,7 @@ export default class DicomRTEdition extends Component {
                     keyField='ROINumber'
                     classes="table table-borderless"
                     wrapperClasses="table-responsive"
-                    data={[]}
+                    data={this.props.structureSetROISequence}
                     columns={this.columns}
                      />
             </Fragment>

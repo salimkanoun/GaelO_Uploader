@@ -76,7 +76,6 @@ export default class SeriesEdition extends Component {
                     </Form.Group>
 
                     { 
-                    
                         this.props.modality === "RTSTRUCT" ? 
                             <DicomRTEdition onChange = {this.onNameChange} options = {[{ label: "Liver", value: "Liver" }, { label: "Head", value: "Head" }]} structureSetROISequence = {this.props.structureSetROISequence}/> 
                             : 

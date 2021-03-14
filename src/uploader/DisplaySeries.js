@@ -29,7 +29,9 @@ import EditionIcon from '../assets/images/pencil'
 /*
 Edition Todo : 
 Quand rappelle le composant edit afficher les edition sauvée dans le redux
+=> reste a faire pour les nom de ROI
 Appliquer les editions quand on fait l'upload (pour tous les dicoms de la serie)
+=> reste à fraire pour les nom de ROI
 */
 
 

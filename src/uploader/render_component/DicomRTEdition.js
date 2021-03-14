@@ -13,16 +13,11 @@
  */
 
 import React, { Component, Fragment } from 'react'
-import { connect } from 'react-redux'
 
 import Select from 'react-select'
 import BootstrapTable from 'react-bootstrap-table-next'
 
-class DicomRTEdition extends Component {
-
-    state = {
-        newROIName: {}
-    }
+export default class DicomRTEdition extends Component {
 
     columns = [
         {
@@ -39,26 +34,21 @@ class DicomRTEdition extends Component {
             dataField: 'newName',
             text: 'New ROI Name',
             isDummyField: true,
-            formatter: (cell, row, rowIndex) => {
+            formatExtraData : this,
+            formatter: (cell, row, rowIndex, formatExtraData) => {
 
                 let onChange = (value, meta) => {
                     if (meta.action === "clear") {
-                        this.setState((state) => {
-                            delete state['newROIName'][row.ROINumber]
-                            return state
-                        })
+                        this.props.onChange(row.ROINumber, undefined)
                     } else {
-                        this.setState((state) => {
-                            state['newROIName'][row.ROINumber] = value.value
-                            return state
-                        })
+                        this.props.onChange(row.ROINumber, value.value)
                     }
 
                 }
 
                 return (
                     <Select
-                        options={[{ label: "Liver", value: "Liver" }, { label: "Head", value: "Head" }]}
+                        options = {this.props.options}
                         onChange={onChange}
                         isClearable={true}
                         isSearchable={true}
@@ -69,35 +59,18 @@ class DicomRTEdition extends Component {
         }
     ]
 
-    selectRow = {
-        mode: 'radio',
-        clickToSelect: true,
-        clickToEdit: true,
-        hideSelectColumn: true,
-        classes: "row-clicked"
-    }
-
-    render() {
+    render = () => {
+        console.log(this.props)
         return (
             <Fragment>
                 <BootstrapTable
                     keyField='ROINumber'
                     classes="table table-borderless"
                     wrapperClasses="table-responsive"
-                    data={this.props.series[this.props.selectedSeries]['structureSetROISequence']}
+                    data={[]}
                     columns={this.columns}
-                    selectRow={this.selectRow} />
+                     />
             </Fragment>
         )
     }
 }
-
-
-const mapStateToProps = state => {
-    return {
-        selectedSeries: state.DisplayTables.selectedSeries,
-        series: state.Series.series
-    }
-}
-
-export default connect(mapStateToProps, null)(DicomRTEdition)

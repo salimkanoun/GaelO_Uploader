@@ -14,6 +14,7 @@
 
 import React, { Component } from 'react'
 import { Button, Form } from 'react-bootstrap'
+import DicomRTEdition from './DicomRTEdition'
 
 export default class SeriesEdition extends Component {
 
@@ -21,7 +22,8 @@ export default class SeriesEdition extends Component {
         validated: false,
         patientWeight :'',
         patientSize: '',
-        seriesDescription:''
+        seriesDescription:'',
+        newROIName : []
     }
 
 
@@ -38,6 +40,13 @@ export default class SeriesEdition extends Component {
         this.setState({ [name]: event.target.valueAsNumber || event.target.value })
     }
 
+    onNameChange = (roiNumber, newName) => {
+            this.setState((state) => {
+                state.newROIName[roiNumber] = newName
+                return state
+            }, ()=> console.log(this.state))
+    }
+
     handleSubmit = (event) => {
         event.preventDefault()
         this.props.onValidateEdition(this.state)
@@ -45,6 +54,7 @@ export default class SeriesEdition extends Component {
     }
 
     render = () => {
+        console.log(this.props)
         return (
             
             <>
@@ -64,6 +74,14 @@ export default class SeriesEdition extends Component {
                         <Form.Label>Series Description</Form.Label>
                         <Form.Control type="text" name="seriesDescription" onChange={this.handleChanges} value = {this.state.seriesDescription}/>
                     </Form.Group>
+
+                    { 
+                    
+                        this.props.modality === "RTSTRUCT" ? 
+                            <DicomRTEdition onChange = {this.onNameChange} options = {[{ label: "Liver", value: "Liver" }, { label: "Head", value: "Head" }]} structureSetROISequence = {this.props.structureSetROISequence}/> 
+                            : 
+                            null 
+                    }
 
                     <div className = "float-right">   
                         <Button variant="primary" type="submit">

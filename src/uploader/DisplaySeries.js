@@ -161,7 +161,8 @@ class DisplaySeries extends Component {
 
 
 
-    render() {
+    render = () => {
+        
         return (
             <Fragment>
                 <Modal show={this.state.showEditSeries} onHide={this.closeEditSeries}>
@@ -178,6 +179,7 @@ class DisplaySeries extends Component {
                                         patientWeight = {this.props.series[this.state.editionSeriesInstanceUID]['patientWeight']}
                                         patientSize = {this.props.series[this.state.editionSeriesInstanceUID]['patientSize']}
                                         seriesDescription = {this.props.series[this.state.editionSeriesInstanceUID]['seriesDescription']}
+                                        structureSetROISequence = {this.props.series[this.state.editionSeriesInstanceUID]['structureSetROISequence']}
                                         onValidateEdition = {this.onValidateEdition}
                                     
                                     />

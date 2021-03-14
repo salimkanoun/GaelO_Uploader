@@ -15,41 +15,54 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 
+import Select from 'react-select'
 import BootstrapTable from 'react-bootstrap-table-next'
 
 class DicomRTEdition extends Component {
 
     state = {
-        newROIName : {}
+        newROIName: {}
     }
 
     columns = [
-        {
-            dataField: 'ROIName',
-            text: 'ROI Name',
-            editable: false
-        },
         {
             dataField: 'ROINumber',
             text: 'Roi Number',
             editable: false
         },
         {
+            dataField: 'ROIName',
+            text: 'ROI Name',
+            editable: false
+        },
+        {
             dataField: 'newName',
             text: 'New ROI Name',
-            isDummyField : true,
-            formatter : (cell, row, rowIndex) => {
+            isDummyField: true,
+            formatter: (cell, row, rowIndex) => {
 
-                let onChange = (event)=>{
-                    this.setState((state) => {
-                        state['newROIName'][row.ROINumber] = event.target.value
-                        return state
-                    }, () => {console.log(this.state)})
+                let onChange = (value, meta) => {
+                    if (meta.action === "clear") {
+                        this.setState((state) => {
+                            delete state['newROIName'][row.ROINumber]
+                            return state
+                        })
+                    } else {
+                        this.setState((state) => {
+                            state['newROIName'][row.ROINumber] = value.value
+                            return state
+                        })
+                    }
 
                 }
 
                 return (
-                    <input type="text" onChange={onChange} value={this.state.newROIName[row.ROINumber]}/>
+                    <Select
+                        options={[{ label: "Liver", value: "Liver" }, { label: "Head", value: "Head" }]}
+                        onChange={onChange}
+                        isClearable={true}
+                        isSearchable={true}
+                    />
                 )
 
             }
@@ -65,7 +78,6 @@ class DicomRTEdition extends Component {
     }
 
     render() {
-        console.log(this.props.series[this.props.selectedSeries]['structureSetROISequence'])
         return (
             <Fragment>
                 <BootstrapTable

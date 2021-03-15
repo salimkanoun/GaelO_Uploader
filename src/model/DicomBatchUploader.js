@@ -146,7 +146,17 @@ export default class DicomBatchUploader extends EventEmitter {
             if( Object.keys(this.editedTags).includes(seriesInstanceUID) ){
                 
                 Object.keys(this.editedTags[seriesInstanceUID]).forEach( (tagName) =>{
-                    dicomFile.editTag( (tagName.charAt(0).toUpperCase() + tagName.slice(1)), this.editedTags[tagName] )
+                    
+                    if(tagName === 'structureSetROISequence'){
+
+                        Object.keys(this.editedTags[tagName]).forEach( (roiNumber) => {
+                            dicomFile.editStructureSetROISequence(roiNumber, this.editedTags[tagName][roiNumber])
+                        })
+
+                    }else{
+                        dicomFile.editTag( (tagName.charAt(0).toUpperCase() + tagName.slice(1)), this.editedTags[tagName] )
+                    }
+                    
                 })
             }
 

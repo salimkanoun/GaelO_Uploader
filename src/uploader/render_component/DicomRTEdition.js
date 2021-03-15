@@ -12,7 +12,7 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 
 import Select from 'react-select'
 import BootstrapTable from 'react-bootstrap-table-next'
@@ -20,6 +20,11 @@ import BootstrapTable from 'react-bootstrap-table-next'
 export default class DicomRTEdition extends Component {
 
     columns = [
+        {
+            dataField: 'index',
+            text: 'index',
+            hidden: true
+        },
         {
             dataField: 'ROINumber',
             text: 'Roi Number',
@@ -34,21 +39,29 @@ export default class DicomRTEdition extends Component {
             dataField: 'newName',
             text: 'New ROI Name',
             isDummyField: true,
-            formatExtraData : this,
+            formatExtraData: this,
             formatter: (cell, row, rowIndex, formatExtraData) => {
+
+                let getDefaultOption = () => {
+                    return {
+                        label: this.props.editedStructureSetROI[row.index],
+                        value: this.props.editedStructureSetROI[row.index]
+                    }
+                }
 
                 let onChange = (value, meta) => {
                     if (meta.action === "clear") {
-                        this.props.onChange(row.ROINumber, undefined)
+                        this.props.onChange(row.index, undefined)
                     } else {
-                        this.props.onChange(row.ROINumber, value.value)
+                        this.props.onChange(row.index, value.value)
                     }
 
                 }
 
                 return (
                     <Select
-                        options = {this.props.options}
+                        options={this.props.options}
+                        defaultValue={getDefaultOption()}
                         onChange={onChange}
                         isClearable={true}
                         isSearchable={true}
@@ -59,18 +72,27 @@ export default class DicomRTEdition extends Component {
         }
     ]
 
+    getRows = () => {
+
+        let rows = []
+        //Add index to data
+        for (let i = 0; i < this.props.structureSetROISequence.length; i++) {
+            this.props.structureSetROISequence[i]['index'] = i
+            rows.push(this.props.structureSetROISequence[i])
+        }
+        return rows
+    }
+
     render = () => {
         console.log(this.props)
         return (
-            <Fragment>
-                <BootstrapTable
-                    keyField='ROINumber'
-                    classes="table table-borderless"
-                    wrapperClasses="table-responsive"
-                    data={this.props.structureSetROISequence}
-                    columns={this.columns}
-                     />
-            </Fragment>
+            <BootstrapTable
+                keyField='index'
+                classes="table table-borderless"
+                wrapperClasses="table-responsive"
+                data={this.getRows()}
+                columns={this.columns}
+            />
         )
     }
 }

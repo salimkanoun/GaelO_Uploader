@@ -131,6 +131,10 @@ export default class DicomFile {
     this.dataset[tagName] = value
   }
 
+  editStructureSetROISequence(roiNumber, newName){
+    this.dataset.StructureSetROISequence[roiNumber]['ROIName'] = newName
+  }
+
   anonymise() {
 
     for (let tag of this.tagsToAnonymize) {

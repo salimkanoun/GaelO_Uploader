@@ -28,10 +28,10 @@ import EditionIcon from '../assets/images/pencil'
 
 /*
 Edition Todo : 
-Quand rappelle le composant edit afficher les edition sauvée dans le redux
-=> reste a faire pour les nom de ROI
-Appliquer les editions quand on fait l'upload (pour tous les dicoms de la serie)
-=> reste à fraire pour les nom de ROI
+Probleme edition de ROI non cummultif
+Test envoi et verifier edition
+Faire un Select pour les SeriesDescription
+Faire passer du backend les contrainte de SeriesDescription et de ROI Name
 */
 
 
@@ -156,6 +156,10 @@ class DisplaySeries extends Component {
             this.props.addEditionValue(this.state.editionSeriesInstanceUID, 'seriesDescription', data.seriesDescription)
 
         }
+        if(Object.keys(data.newROINames).length > 0){
+            this.props.addEditionValue(this.state.editionSeriesInstanceUID, 'structureSetROISequence', data.newROINames)
+        }
+
         this.closeEditSeries()
 
     }
@@ -181,6 +185,8 @@ class DisplaySeries extends Component {
                                         patientSize = {this.props.series[this.state.editionSeriesInstanceUID]['patientSize']}
                                         seriesDescription = {this.props.series[this.state.editionSeriesInstanceUID]['seriesDescription']}
                                         structureSetROISequence = {this.props.series[this.state.editionSeriesInstanceUID]['structureSetROISequence']}
+                                        editions = {this.props.editions[this.state.editionSeriesInstanceUID]}
+                                        options = {[{ label: "Liver", value: "Liver" }, { label: "Head", value: "Head" }]}
                                         onValidateEdition = {this.onValidateEdition}
                                     
                                     />
@@ -221,7 +227,8 @@ const mapStateToProps = state => {
     return {
         selectedSeries: state.DisplayTables.selectedSeries,
         seriesReady: state.DisplayTables.seriesReady,
-        series: state.Series.series
+        series: state.Series.series,
+        editions: state.Series.editions
     }
 }
 const mapDispatchToProps = {

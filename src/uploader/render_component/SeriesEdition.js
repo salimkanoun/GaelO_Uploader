@@ -13,25 +13,25 @@
  */
 
 import React, { Component } from 'react'
-import { Button, Form } from 'react-bootstrap'
+import { Button, Form, Row, Col } from 'react-bootstrap'
 import DicomRTEdition from './DicomRTEdition'
 
 export default class SeriesEdition extends Component {
 
     state = {
         validated: false,
-        patientWeight :'',
+        patientWeight: '',
         patientSize: '',
-        seriesDescription:'',
-        newROIName : []
+        seriesDescription: '',
+        newROINames: {}
     }
 
 
     componentDidMount = () => {
         this.setState({
-            patientWeight : this.props.patientWeight,
-            patientSize : this.props.patientSize,
-            seriesDescription : this.props.seriesDescription
+            patientWeight: this.props.editions.patientWeight,
+            patientSize: this.props.editions.patientSize,
+            seriesDescription: this.props.editions.seriesDescription
         })
     }
 
@@ -41,10 +41,10 @@ export default class SeriesEdition extends Component {
     }
 
     onNameChange = (roiNumber, newName) => {
-            this.setState((state) => {
-                state.newROIName[roiNumber] = newName
-                return state
-            }, ()=> console.log(this.state))
+        this.setState((state) => {
+            state.newROINames[roiNumber] = newName
+            return state
+        })
     }
 
     handleSubmit = (event) => {
@@ -54,35 +54,56 @@ export default class SeriesEdition extends Component {
     }
 
     render = () => {
-        console.log(this.props)
         return (
-            
             <>
                 <Form noValidate validated={this.state.validated} onSubmit={this.handleSubmit}  >
-                    <Form.Group >
-                        <Form.Label>Patient Weight (Kg)</Form.Label>
-                        <Form.Control type="number" min={0} name="patientWeight" onChange={this.handleChanges} value = {this.state.patientWeight}/>
+                    <Row>
+                        <Col>
+                            <Form.Label>Patient Weight (Kg)</Form.Label>
+                        </Col>
+                        <Col className="text-center">
+                            {this.props.patientWeight}
+                        </Col>
+                        <Col>
+                            <Form.Control type="number" min={0} name="patientWeight" onChange={this.handleChanges} value={this.state.patientWeight} />
+                        </Col>
+                    </Row>
 
-                    </Form.Group>
-
-                    <Form.Group >
+                    <Row>
+                        <Col>
                         <Form.Label>Patient Size (m)</Form.Label>
-                        <Form.Control type="number" min={0} max={3} step={0.1} name="patientSize" onChange={this.handleChanges} value = {this.state.patientSize}/>
-                    </Form.Group>
+                        </Col>
+                        <Col className="text-center">
+                            {this.props.patientSize}
+                        </Col>
+                        <Col>
+                        <Form.Control type="number" min={0} max={3} step={0.1} name="patientSize" onChange={this.handleChanges} value={this.state.patientSize} />
+                        </Col>
+                    </Row>
 
-                    <Form.Group >
+                    <Row>
+                        <Col>
                         <Form.Label>Series Description</Form.Label>
-                        <Form.Control type="text" name="seriesDescription" onChange={this.handleChanges} value = {this.state.seriesDescription}/>
-                    </Form.Group>
+                        </Col>
+                        <Col className="text-center">
+                            {this.props.seriesDescription}
+                        </Col>
+                        <Col>
+                        <Form.Control type="text" name="seriesDescription" onChange={this.handleChanges} value={this.state.seriesDescription} />
+                        </Col>
+                    </Row>
 
-                    { 
-                        this.props.modality === "RTSTRUCT" ? 
-                            <DicomRTEdition onChange = {this.onNameChange} options = {[{ label: "Liver", value: "Liver" }, { label: "Head", value: "Head" }]} structureSetROISequence = {this.props.structureSetROISequence}/> 
-                            : 
-                            null 
+                    {
+                        this.props.modality === "RTSTRUCT" ?
+                            <DicomRTEdition onChange={this.onNameChange} 
+                                options = {this.props.options} 
+                                structureSetROISequence = {this.props.structureSetROISequence}
+                                editedStructureSetROI = {this.props.editions.structureSetROISequence != null ? this.props.editions.structureSetROISequence : {} } />
+                            :
+                            null
                     }
 
-                    <div className = "float-right">   
+                    <div className="float-right">
                         <Button variant="primary" type="submit">
                             Validate
                         </Button>

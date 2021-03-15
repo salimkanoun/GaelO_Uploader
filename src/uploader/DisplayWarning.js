@@ -32,6 +32,7 @@ class DisplayWarning extends Component {
         {
             dataField: 'ignoreButton',
             text: '',
+            classes: 'float-right',
             formatter: (cell, row, rowIndex, extraData) => (
                 <ButtonIgnore hidden={row.ignorable === false}
                     dismissed={row.dismissed}

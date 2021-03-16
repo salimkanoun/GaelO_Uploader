@@ -185,7 +185,7 @@ class DisplaySeries extends Component {
                                         patientSize = {this.props.series[this.state.editionSeriesInstanceUID]['patientSize']}
                                         seriesDescription = {this.props.series[this.state.editionSeriesInstanceUID]['seriesDescription']}
                                         structureSetROISequence = {this.props.series[this.state.editionSeriesInstanceUID]['structureSetROISequence']}
-                                        editions = {this.props.editions[this.state.editionSeriesInstanceUID]}
+                                        editions = {this.props.editions[this.state.editionSeriesInstanceUID] != null ? this.props.editions[this.state.editionSeriesInstanceUID] : {}}
                                         options = {[{ label: "Liver", value: "Liver" }, { label: "Head", value: "Head" }]}
                                         onValidateEdition = {this.onValidateEdition}
                                     
